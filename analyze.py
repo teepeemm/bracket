@@ -9,7 +9,11 @@ appending a '_' to the key. This leads to the same directory, and we consolidate
 This will attempt to locate tournaments through the latest complete year.  This means that as a year progresses,
 tournaments that have recently finished will not be evaluated until the end of the calendar year. Note that
 FootballFCS and NFL finish their brackets in the following year, so that just after a superbowl is the best time to
-get the latest tournaments. """
+get the latest tournaments.
+
+The output csv files that are used by the html GUI are also copied to that directory, with a notable name change:
+because I can publish all files in a folder but not a folder itself, files of the form {group}/{tournament}/{file}
+are renamed to {group}/{tournament}_{file}. """
 
 from __future__ import annotations
 import collections
@@ -831,7 +835,7 @@ def write_tourney_reseeding(subgroup_desc: dict[str, str | float],
     output = pandas.DataFrame(reseeding).sort_values(['Team', 'Games'])
     columns = ['Team', 'Games', 'Rate', 'Reseed']
     output.to_csv(reseeding_file, index=False, columns=columns)
-    output.to_csv('html/'+reseeding_file, index=False, columns=columns)
+    output.to_csv('html/'+'_'.join(reseeding_file.rsplit('/', 1)), index=False, columns=columns)
 
 
 def write_tourney_states(subgroup_desc: dict[str, str | float], tourney_subgroup: dict[str, typing.Any]) -> None:
@@ -887,7 +891,8 @@ def write_tourney_win_loss(subgroup_desc: dict[str, str | float], tourney_subgro
             for game in get_game(description, year):
                 tourney_winner[game[0].seed, game[1].seed] += 1
     numpy.savetxt(win_loss_file, tourney_winner, delimiter=',', fmt='%d')  # type: ignore
-    numpy.savetxt('html/'+win_loss_file, tourney_winner, delimiter=',', fmt='%d')  # type: ignore
+    numpy.savetxt('html/'+'_'.join(win_loss_file.rsplit('/', 1)),
+                  tourney_winner, delimiter=',', fmt='%d')  # type: ignore
     write_plot_file(tourney_winner, win_loss_file.replace('loss.csv', 'lossplot.tex'))
 
 

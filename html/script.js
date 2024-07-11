@@ -44,7 +44,7 @@ function getFileToPlot() {
         file = group+'/';
         const tourney = document.getElementById('tournament').value;
         if ( tourney !== 'all' ) {
-            file += tourney+'/';
+            file += tourney+'_';
         }
     }
     const graph = document.getElementById('graph').value;
