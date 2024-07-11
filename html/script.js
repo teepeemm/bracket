@@ -70,12 +70,6 @@ function replot() {
     processFile(file, plotter);
 }
 
-/** When the #grouper selector changes */
-function grouperChange() {
-    replot();
-    maybeUpdateFilters();
-}
-
 /** When the #group selector changes */
 function groupChange() {
     const group = document.getElementById('group').value;
@@ -91,8 +85,7 @@ function groupChange() {
             processFile(group+'/group_betas.csv', getTournaments);
         }
     }
-    replot();
-    maybeUpdateFilters();
+    tournamentChange();
 }
 
 /** Put the available tournaments into the #tournament selector
@@ -120,8 +113,7 @@ function tournamentChange() {
     if ( tourney !== 'all' && document.getElementById('graph').value === 'tourneyData' ) {
         document.getElementById('graph').value = 'seed_v_fraction';
     }
-    replot();
-    maybeUpdateFilters();
+    graphChange();
 }
 
 /** When the #graph selector changes */
@@ -135,11 +127,30 @@ function graphChange() {
     } else {
         document.getElementById(graph).style.display = 'block';
     }
-    replot();
     maybeUpdateFilters();
+    replot();
 }
 
-/** Wait until the universities have loaded, and then #updateFiltersUsing([string]) */
+/** When the #grouper selector changes */
+function grouperChange() {
+    maybeUpdateFilters();
+    replot();
+}
+
+/** Highlight a search result */
+function searchChange() {
+    const search = document.getElementById('search');
+    Array.from(document.querySelectorAll('svg circle[fill="red"]')).forEach( (circle) =>
+        setElementAttributesNS(circle, {'stroke': 'black', 'fill': 'black', 'r': 2}),
+    );
+    if ( search.value.length < 4 ) {
+        return;
+    }
+    setElementAttributesNS(document.querySelector('svg circle[title="'+search.value+'"]'),
+        {'stroke': 'red', 'fill': 'red', 'r': 3});
+}
+
+/** Wait until the universities have loaded, and then {@link updateFiltersUsing}(string[]) */
 function maybeUpdateFilters() {
     const graph = document.getElementById('graph').value;
     if ( graph !== 'x_v_y' ) {
@@ -154,7 +165,7 @@ function maybeUpdateFilters() {
     }
 }
 
-/** @param {[string]} universities */
+/** @param {string[]} universities */
 function updateFiltersUsing(universities) {
     const graph = document.getElementById('graph').value;
     if ( graph !== 'x_v_y' ) {
@@ -195,7 +206,7 @@ function updateFiltersUsing(universities) {
 }
 
 /** Is this university the result of a user search
- *  @param {[string]} uni The university in question
+ *  @param {string[]} uni The university in question
  *  @return {boolean} */
 function passesUserFilter([uni]) {
     const filter = document.getElementById('filter').value;
@@ -203,23 +214,10 @@ function passesUserFilter([uni]) {
         return true;
     }
     const onlyStates = filter.startsWith('tz-') ? timezones[filter.slice(3)] : [filter];
-    const grouper = document.getElementById('grouper').value;
-    if ( grouper === 'state' ) {
+    if ( document.getElementById('grouper').value === 'state' ) {
         return onlyStates.includes(uni);
     }
     return onlyStates.some( (state) => unisInState[state].includes(uni) );
-}
-
-/** @param {string} line
- *  @return {number} */
-function getStringLength(line) {
-    return line.length;
-}
-
-/** @param {[string]} row
- *  @return {boolean} */
-function rowNonTrivial(row) {
-    return -16 < +row[3] && +row[3] < 16 && 0.01 < +row[2];
 }
 
 /** @param {string} contents */
@@ -263,12 +261,11 @@ function scatterPlotFile(contents) {
         );
         svg.append(group);
     });
-    searchChange();
 }
 
-/** @param {[number, number]} xLoc
+/** @param {number[]} xLoc
  *  @param {boolean} xIsLog
- *  @param {[number, number]} yLoc
+ *  @param {number[]} yLoc
  *  @param {boolean} yIsLog */
 function createScatterFrame(xLoc, xIsLog, yLoc, yIsLog) {
     const [xMin, xMax] = xLoc;
@@ -313,19 +310,10 @@ function createScatterFrame(xLoc, xIsLog, yLoc, yIsLog) {
     svg.replaceChildren(xAxis, yAxis, ...xTicks, ...xLabels, ...yTicks, ...yLabels);
 }
 
-/** @param {number} number
- *  @return {string} The input, but dropping excess floating point digits at the end */
-function fixFloatingPoint(number) {
-    return number.toString()
-        .replace(/(?<=\.\d*[1-9])0{5,}[1-9]$/, '')
-        .replace(/(?<=\.\d*)([0-8])9{5,}\d$/, (d) => parseDecimal(d)+1)
-        .replace(/\.0*$/, '');
-}
-
 /** @param {number} min
  *  @param {number} max
  *  @param {boolean} isLog
- *  @return {[float, float]} */
+ *  @return {float[]} */
 function getTickLocations(min, max, isLog) {
     if ( isLog ) { // using a logarithmic scale
         const tickScale = Math.pow(10, Math.floor(Math.log10(max)));
@@ -340,19 +328,6 @@ function getTickLocations(min, max, isLog) {
     const maxTick = Array(5).fill().map( (_, i) => 2*i*tickScale ).filter( (tick) => tick <= absMax ).pop()
         || tickScale;
     return Array(5).fill().map( (_, i) => (i-2)*maxTick/2 ).filter( (tick) => min <= tick && tick <= max );
-}
-
-/** Highlight a search result */
-function searchChange() {
-    const search = document.getElementById('search');
-    Array.from(document.querySelectorAll('svg circle[fill="red"]')).forEach( (circle) =>
-        setElementAttributesNS(circle, {'stroke': 'black', 'fill': 'black', 'r': 2}),
-    );
-    if ( search.value.length < 4 ) {
-        return;
-    }
-    setElementAttributesNS(document.querySelector('svg circle[title="'+search.value+'"]'),
-        {'stroke': 'red', 'fill': 'red', 'r': 3});
 }
 
 /** @param {string} contents */
@@ -420,6 +395,7 @@ function scatterPlotter(contents) {
         contentsOfFile[this.responseURL.slice(document.location.href.length)] = this.responseText;
         scatterPlotFile(this.responseText);
     }
+    searchChange();
 }
 
 /** Records which universities are in which state
@@ -496,8 +472,8 @@ function plotSigmoid(rate, maxX) {
 
 /** Finds a symmetric logistic best fit.  This is close to the method used by
  *  sklearn, but different in some way I haven't figured out.
- *  @param {[int]} successCounter The number of successes at seed differential [index]
- *  @param {[int]} totalCounter The number of attempts at seed differential [index]
+ *  @param {int[]} successCounter The number of successes at seed differential [index]
+ *  @param {int[]} totalCounter The number of attempts at seed differential [index]
  *  @return {float} */
 function getLogisticBestFitRate(successCounter, totalCounter) {
     let rate = 0.5;
@@ -525,20 +501,19 @@ function plotConfidenceInterval(xFrac, confidenceInterval) {
     const width = parseDecimal(svg.getAttribute('width'));
     const {center, halfWidth} = confidenceInterval;
     svg.append(setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-        'x1': xFrac*width, 'y1': (1-center+halfWidth)*height,
-        'x2': xFrac*width, 'y2': (1-center-halfWidth)*height,
-        'stroke': 'black', 'stroke-width': 2,
+        'x1': xFrac*width, 'y1': (1-center+halfWidth)*height, 'stroke': 'black',
+        'x2': xFrac*width, 'y2': (1-center-halfWidth)*height, 'stroke-width': 2,
     }));
 }
 
 /** Find the intersection of a line through point1 with slope1 and through point2 with slope2.
  *  If the intersection would be outside the x-intervals, then clip it to occur
  *  at the boundary.  (If the slopes are parallel, the intersection is the midpoint of the two points.)
- *  @param {[float, float]} lastPoint
+ *  @param {float[]} lastPoint
  *  @param {float} lastSlope
- *  @param {[float, float]} nextPoint
+ *  @param {float[]} nextPoint
  *  @param {float} nextSlope
- *  @return {[float]} The intersection */
+ *  @return {float[]} The intersection */
 function constrainedIntersection(lastPoint, lastSlope, nextPoint, nextSlope) {
     const [lastX, lastY] = lastPoint;
     const [nextX, nextY] = nextPoint;
@@ -582,6 +557,21 @@ function getConfidenceInterval(successes, total) {
     return {center, halfWidth};
 }
 
+/** @param {number} number
+ *  @return {string} The input, but dropping excess floating point digits at the end */
+function fixFloatingPoint(number) {
+    return number.toString()
+        .replace(/(?<=\.\d*[1-9])0{5,}[1-9]$/, '')
+        .replace(/(?<=\.\d*)([0-8])9{5,}\d$/, (d) => parseDecimal(d)+1)
+        .replace(/\.0*$/, '');
+}
+
+/** @param {string[]} row
+ *  @return {boolean} */
+function rowNonTrivial(row) {
+    return -16 < +row[3] && +row[3] < 16 && 0.01 < +row[2];
+}
+
 /** @param {number} min
  *  @param {number} data
  *  @param {number} max
@@ -595,7 +585,7 @@ function getPoint(min, data, max, isLog) {
     }
 }
 
-/** @param {[[int]]} matrix
+/** @param {Array.<Array.<int>>} matrix
  *  @param {int} col
  *  @return {int} The total of matrix along that particular column */
 function colSum(matrix, col) {
@@ -630,12 +620,6 @@ function setElementAttributes(element, attributeObj) {
     return element;
 }
 
-/** @param {string} input
-    @return {Number} */
-function parseDecimal(input) {
-    return parseInt(input, 10);
-}
-
 /** @param {float} x
  *  @return {float} 1/(1+Math.exp(-x)) */
 function sigmoid(x) {
@@ -646,4 +630,16 @@ function sigmoid(x) {
  *  @return {float} The derivative of the sigmoid function */
 function derivSigmoid(x) {
     return Math.exp(-x)*sigmoid(x)*sigmoid(x);
+}
+
+/** @param {string} line
+ *  @return {number} */
+function getStringLength(line) {
+    return line.length;
+}
+
+/** @param {string} input
+    @return {Number} */
+function parseDecimal(input) {
+    return parseInt(input, 10);
 }
