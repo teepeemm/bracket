@@ -1,6 +1,4 @@
 
-Note that significant portions of this repository are not yet publicly available.
-
 This repository analyzes elimination tournaments in Wikipedia,
 and is the source for a forthcoming paper.
 If you're not as programmatically inclined,
@@ -40,9 +38,3 @@ so that points unplotted by TeX don't appear (it had trouble with the file size)
 * [group/]reseed_approx.csv Same as reseed, but a linear approximation of its components
 * [group/[tournament/]]state_reseed.csv Same as reseed, but grouped by state
 * [group/[tournament/]]tz_reseed.csv Same as reseed, but grouped by timezone
-
-TODO?:
-* 2010 PAC-10 Women's BB Tournament does not use a bracket (OTOH, 2002-2013 don't exist):
-https://en.wikipedia.org/wiki/2010_Pacific-10_Conference_women%27s_basketball_tournament
-* 1994 Women's Volleyball: Texas Southern has a record of '?':
-https://en.wikipedia.org/wiki/1994_NCAA_Division_I_women%27s_volleyball_tournament
