@@ -29,3 +29,7 @@ svg, label {
 .expression {
     white-space: nowrap;
 }
+
+img[alt="Modern Campus CMS"] {
+    display: none;
+}
