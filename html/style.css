@@ -1,0 +1,31 @@
+body {
+    padding: 1em;
+    line-height: 2;
+}
+
+main {
+    display: inline-block;
+    margin-right: 5em;
+}
+
+#explanation {
+    display: inline-block;
+    min-width: 30%;
+    max-width: 500px;
+}
+
+svg, label {
+    margin: 1em;
+}
+
+#seed_v_fraction {
+    display: block;
+}
+
+#x_v_y {
+    display: none;
+}
+
+.expression {
+    white-space: nowrap;
+}

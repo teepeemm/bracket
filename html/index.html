@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en-US">
+ <head>
+  <meta charset="utf-8">
+  <title>Analyzing Elimination Tournaments</title>
+  <link rel="stylesheet" href="style.css">
+ </head>
+ <body>
+  <h1>Analyzing Elimination Tournaments</h1>
+  <main>
+   <div id="inputs">
+    <label>Group
+     <select id="group">
+      <option value="all">All groups</option>
+      <option value="bbm">Men's Basketball</option>
+      <option value="bbw">Women's Basketball</option>
+      <option value="baseball">Baseball</option>
+      <option value="softball">Softball</option>
+      <option value="soccer">Soccer</option>
+      <option value="ih">Ice hockey</option>
+      <option value="professional">Professional</option>
+      <option value="other">Other</option>
+     </select>
+    </label>
+    <label>Tournament
+     <select id="tournament" disabled>
+      <option value="all">All tournaments</option>
+     </select>
+    </label><br>
+    <label>Graph
+     <select id="graph">
+      <option value="seed_v_fraction">Seed differential &amp; fraction won</option>
+      <option value="x_v_y">Individual team data</option>
+      <option value="tourneyData" disabled>Individual tournament data</option>
+     </select>
+    </label>
+    <div id="seed_v_fraction">
+     <label>Individuate seeds
+      <input type="checkbox" id="individuate">
+     </label>
+    </div>
+    <div id="x_v_y">
+     <label>Group data by
+      <select id="grouper">
+       <option value="none">none</option>
+       <option value="conf" disabled>tournament</option>
+       <option value="state">state</option>
+       <option value="tz">timezone</option>
+      </select>
+     </label><br>
+     <label>Only showing
+      <select id="filter">
+       <option value="all">all</option>
+       <optgroup id="filterTimezone" label="Timezone"></optgroup>
+       <optgroup id="filterState" label="State"></optgroup>
+      </select>
+     </label><br>
+     <label>x
+      <select id="x">
+       <option value="1" selected>Number of games</option>
+       <option value="2">Upset rate</option>
+       <option value="3">Expected reseeding</option>
+      </select>
+     </label>
+     <label>y
+      <select id="y">
+       <option value="1">Number of games</option>
+       <option value="2">Upset rate</option>
+       <option value="3" selected>Expected reseeding</option>
+      </select>
+     </label><br>
+     <label>Highlight team: <input type="text" list="teamList" id="search"></label>
+     <datalist id="teamList"></datalist>
+    </div>
+   </div>
+   <svg version="1.1" width="500" height="500" xmlns="http://www.w3.org/2000/svg"></svg>
+  </main>
+  <section id="explanation">
+   <h2>Explanation</h2>
+   <dl>
+    <dt>Group</dt><dd>The sport (except when it's not)</dd>
+    <dt>Tournament</dt><dd>Which tournament within the chosen group</dd>
+    <dt>Graph</dt>
+    <dd>Seed differential &amp; fraction won: Chance of winning a game in a tournament</dd>
+    <dd>Individual team data</dd>
+    <dd>Individual tournament data: Number of games &amp; upset rate within the tournament</dd>
+    <dt>Number of games</dt>
+    <dt>Expected reseeding &mu;</dt>
+    <dt>Upset rate &beta;</dt>
+    <dd>
+     Within the data, the probability of a given team winning their game is best modeled by
+     <span class="expression">1/(1+exp(-&beta;(s-&mu;))),</span>
+     where s is the difference in seeding of the teams.
+     Within a tournament, <span class="expression">&mu;=0</span> because of symmetry.
+    </dd>
+   </dl>
+  </section>
+  <footer>
+   This analysis is based on a forthcoming paper.
+   You can explore the data at <a href="https://github.com/teepeemm/bracket">its Github repository</a>.
+  </footer>
+  <script src="script.js"></script>
+ </body>
+</html>
