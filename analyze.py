@@ -74,6 +74,29 @@ def _get_years_int(arg: int) -> typing.Iterator[int]:
     yield from range(arg, CURRENT_YEAR)  # does not include the current year
 
 
+class Flags(typing.NamedTuple):
+    is_tennis: bool
+    is_professional: str | False
+    num_teams: int
+    multi_elim: bool
+    is_national: bool
+
+
+class SubgroupDesc(typing.NamedTuple):
+    group: str = ''
+    directory: str = ''
+    suffix: str = ''
+    tourney: str = ''
+    is_national: bool = False
+    use_suffix: bool = True
+    use_template: bool = False
+    title: str = ''
+    multi_elim: bool = False
+    source_mtime: float = -float('inf')
+    years: Year = None
+    comment: str = ''
+
+
 @get_years.register
 def _get_years_list(arg: list) -> typing.Iterator[int]:
     """ If get_years took a list, it's a bit more complicated.  A list of two
@@ -134,7 +157,7 @@ class TeamResult:
     @classmethod
     def get_match_data(cls,
                        match_info: list[str],
-                       flags: dict[str, typing.Any],
+                       flags: Flags,
                        disambiguator: dict) -> dict[tuple[str, str], dict]:
         """ Take a bracket of information a line at a time and parcel the lines into particular matches """
         match_data: dict[tuple[str, str], typing.Any] = collections.defaultdict(dict)
@@ -144,15 +167,15 @@ class TeamResult:
             team_num = (matched.group(1).lstrip('0'), matched.group(3).lstrip('0'))
             item_type = matched.group(2).lower()
             if item_type == 'team':
-                if flags['is_tennis']:
+                if flags.is_tennis:
                     match_data[team_num]['team'] = 'tennis'
                 else:
                     match_data[team_num]['team'] = university.normalize_team_name(matched.group(4).strip(),
                                                                                   disambiguator)
-                    if flags['is_professional']:
+                    if flags.is_professional:
                         match_data[team_num]['team'] = \
                             university.normalize_professional_name(match_data[team_num]['team'],
-                                                                   flags['is_professional'])
+                                                                   flags.is_professional)
             elif item_type == 'seed':
                 match_data[team_num]['seed'] = matched.group(4).strip()
             elif 'score' in item_type:
@@ -166,7 +189,7 @@ class TeamResult:
         return match_data
 
     @staticmethod
-    def fix_seeding(team_num: tuple[str, str], team_data: dict[str, typing.Any], flags: dict[str, typing.Any]) -> None:
+    def fix_seeding(team_num: tuple[str, str], team_data: dict[str, typing.Any], flags: Flags) -> None:
         if 'seed' in team_data and re.search(r'\d', team_data['seed']):
             if re.search(r'\((\d+)\)', team_data['seed']):
                 team_data['seed'] = int(re.sub(r'^.*\((\d+)\).*$', r'\1', team_data['seed']))
@@ -176,7 +199,7 @@ class TeamResult:
                 team_data['seed'] = int(re.sub(r'\D', '', team_data['seed']))
             if MAX_SEED < team_data['seed']:
                 team_data['seed'] = MAX_SEED
-        elif 'num_teams' in flags and 'seed' not in team_data and team_num[0] == '1':
+        elif flags.num_teams != -1 and 'seed' not in team_data and team_num[0] == '1':
             # from https://en.wikipedia.org/wiki/Module:Team_bracket/doc#Parameters
             # "For round 1, this value defaults to the conventional seed allocation for tournaments."
             # It'd be more satisfying to code this, but that'd be longer (and I'm not sure of the algorithm)
@@ -191,8 +214,8 @@ class TeamResult:
                 11: ['', 8, 9, 7, 10, 6, 11],
                 16: ['', 1, 16, 8, 9, 5, 12, 4, 13, 6, 11, 3, 14, 7, 10, 2, 15]
             }
-            if flags['num_teams'] in default_seeding and int(team_num[1]) < len(default_seeding[flags['num_teams']]):
-                team_data['seed'] = default_seeding[flags['num_teams']][int(team_num[1])]
+            if flags.num_teams in default_seeding and int(team_num[1]) < len(default_seeding[flags.num_teams]):
+                team_data['seed'] = default_seeding[flags.num_teams][int(team_num[1])]
             else:
                 team_data['seed'] = 0
         else:
@@ -201,7 +224,7 @@ class TeamResult:
     @classmethod
     def game_from_match(cls,
                         match_info: list[str],
-                        flags: dict[str, typing.Any],
+                        flags: Flags,
                         disambiguator: dict) -> typing.Generator[Game, None, str]:
         """ Convert the match information into a series of games """
         match_data: dict[tuple[str, str], dict] = cls.get_match_data(match_info, flags, disambiguator)
@@ -217,7 +240,7 @@ class TeamResult:
             # the two team_data['scores'] lists should have the same length
             # put both lengths in a set, and make sure there's only one length in the set
             raise KeyError('differing number of scores')
-        if flags['multi_elim'] \
+        if flags.multi_elim \
                 and {len(team_data['scores']) for team_data in match_data.values()} == {1} \
                 and max(team_data['scores'][0] for team_data in match_data.values()) < 5:
             # multiple elimination, but only one game present. assume the "scores" are really games
@@ -243,7 +266,7 @@ class TeamResult:
 Game = tuple[TeamResult, TeamResult]
 
 
-def get_bracket(content: str, flags: dict[str, bool]) -> typing.Iterator[tuple[str, dict]]:
+def get_bracket(content: str, flags: Flags) -> typing.Iterator[tuple[str, dict]]:
     """ Find brackets within a Wikipedia page
     :param content: The content of the page
     :param flags:
@@ -301,18 +324,17 @@ def get_game_from_nfl_bracket(bracket: str, disambiguator: dict[str, str]) -> ty
                TeamResult.from_nfl_pieces(*pieces[-3:], disambiguator))  # type: ignore
 
 
-def get_game_from_wikipedia(content: str, flags: dict[str, typing.Any]) -> typing.Iterator[Game]:
+def get_game_from_wikipedia(content: str, flags: Flags) -> typing.Iterator[Game]:
     """ Find the games in the Wikipedia page.
     :param content: The content of the page
     :param flags:
     :returns: Game results
     """
     for bracket, disambiguator in get_bracket(content, flags):
-        if 'num_teams' in flags:
-            del flags['num_teams']
+        flags = flags._replace(num_teams=-1)
         num_teams_m = re.match(r'(\d+)TeamBracket\W', bracket)
         if num_teams_m and 'TeamBracket-NoSeeds' not in bracket and not re.search(r'\|\s*seeds\s*=\s*n', bracket):
-            flags['num_teams'] = int(num_teams_m.group(1))
+            flags = flags._replace(num_teams=int(num_teams_m.group(1)))
         if 'TeamBracket-NFL' in bracket:
             yield from get_game_from_nfl_bracket(bracket, disambiguator)
         else:
@@ -322,21 +344,22 @@ def get_game_from_wikipedia(content: str, flags: dict[str, typing.Any]) -> typin
                     yield from TeamResult.game_from_match(match_info, flags, disambiguator)
 
 
-def get_game(description: dict[str, typing.Any], year: int | None) -> typing.Iterator[Game]:
+def get_game(description: SubgroupDesc, year: int | None) -> typing.Iterator[Game]:
     """ Get games from Wikipedia according to a description.
     :param description: Necessary details to locate the Wikipedia page.  Needs at least keys 'directory' & 'group'.
     :param year: """
-    filename = f'{description["directory"].rstrip("_")}/{year}.txt'
+    filename = f'{description.directory.rstrip("_")}/{year}.txt'
     if not os.path.isfile(filename) or os.path.getmtime(filename) + SECONDS_PER_YEAR < time.time():
-        potential_titles = get_potential_titles(description, year, description['tourney'] == 'NFL_')
+        potential_titles = get_potential_titles(description, year, description.tourney == 'NFL_')
         if not create_wiki_cache(filename, potential_titles):
             return
-    flags = {
-        'multi_elim': description.get('multi_elim', False),
-        'is_tennis': description['directory'] == 'other/Tennis',
-        'is_professional': description['group'] == 'professional' and description['tourney'],
-        'is_national': description['is_national']
-    }
+    flags = Flags(
+        multi_elim=description.multi_elim,
+        is_tennis=description.directory == 'other/Tennis',
+        is_professional=description.group == 'professional' and description.tourney,
+        is_national=description.is_national,
+        num_teams=-1
+    )
     with open(filename) as fp:
         for game in get_game_from_wikipedia(fp.read(), flags):
             if game[0].score < game[1].score:
@@ -355,14 +378,14 @@ def get_source_mtime(directory: str, years: typing.Iterator[int] | typing.Iterat
         return float('inf')
 
 
-def get_potential_titles(description: dict[str, typing.Any], year: int | None, use_range: bool) -> list[str]:
+def get_potential_titles(description: SubgroupDesc, year: int | None, use_range: bool) -> list[str]:
     """ Determines potential titles that Wikipedia may use for a tournament.
     Sometimes the suffix is .lower()ed, and some tournaments have a template.
     NFL playoffs use YYYY-(YY)YY (see _get_year_range), and sometimes that dash is an en-dash.
     :param description: the dict describing the details of this tournament
     :param year: The year of the tournament
     :param use_range: Whether to use _get_year_range for the year """
-    tourney_title = description.get('title', description['tourney'].upper())
+    tourney_title = description.title or description.tourney.upper()
     potential_title = tourney_title
     if year:
         if use_range:
@@ -370,11 +393,11 @@ def get_potential_titles(description: dict[str, typing.Any], year: int | None, u
         else:
             potential_title = f'{year} ' + potential_title
     potential_titles = []
-    if description.get('use_template', False):
+    if description.use_template:
         potential_titles.append('Template:' + potential_title)
-    if description.get('use_suffix', True) and description['group'] != 'other':
-        potential_titles.append(potential_title + ' ' + description['suffix'])
-        potential_titles.append(potential_title + ' ' + description['suffix'].lower())
+    if description.use_suffix and description.group != 'other':
+        potential_titles.append(potential_title + ' ' + description.suffix)
+        potential_titles.append(potential_title + ' ' + description.suffix.lower())
     else:
         potential_titles.append(potential_title)
     if use_range:
@@ -427,7 +450,7 @@ def write_plot_file(winner, filename: str) -> None:
     """ Create a plot of winning probability confidence intervals.
     :param winner: The win/loss numpy matrix
     :param filename: """
-    x_coords = collections.Counter()
+    x_coords: collections.Counter = collections.Counter()
     with open(filename, 'w') as tex_file:
         for row in range(1, 16):
             for col in range(row+1, 17):
@@ -465,7 +488,7 @@ def write_plot_file_round(win_loss_file: str, plot_file: str, should_skip: typin
     :param win_loss_file: The numpy csv file to input (probably created by write_plot_file)
     :param plot_file: The tex file to output
     :param should_skip: Function of row and col """
-    x_coords = collections.Counter()
+    x_coords: collections.Counter = collections.Counter()
     win_loss = numpy.loadtxt(win_loss_file, dtype=int, delimiter=',')
     win_loss_to_analyze = numpy.zeros((MAX_SEED + 1, MAX_SEED + 1), dtype=int)
     with open(plot_file, 'w') as tex_file:
@@ -605,15 +628,15 @@ def get_team_performance(group: str, tourney: str, team: str) -> None:
     """ Summarize how a team has performed within a specific tournament. """
     with open('tourneys.json') as json_file:
         tourneys = json.load(json_file)
-    description = tourneys[group][tourney]
-    description.update(group=group, tourney=tourney, directory=f'{group}/{tourney}',
-                       suffix=tourneys[group].get('suffix', None),
-                       is_national=tourney in tourneys[group].get('nonconference', (tourney,)))
-    win_loss_seeds = {
+    description = SubgroupDesc(**tourneys[group][tourney])._replace(
+        group=group, tourney=tourney, directory=f'{group}/{tourney}',
+        suffix=tourneys[group].get('suffix', None),
+        is_national=tourney in tourneys[group].get('nonconference', (tourney,)))
+    win_loss_seeds: dict[str, collections.Counter] = {
         'wins': collections.Counter(),
         'losses': collections.Counter()
     }
-    for year in get_years(description['years']):
+    for year in get_years(description.years):
         for game in get_game(description, year):
             if game[0].team == team:
                 win_loss_seeds['wins'][game[1].seed-game[0].seed] += 1
@@ -642,20 +665,20 @@ play_in_info = {
 
 def write_play_in_results(group: str) -> None:
     """ Determines what happened in the next round for the winners of play-in games. """
-    description = {
-        'group': group,
-        'title': 'NCAA Division I',
-        'suffix': "Men's Basketball Tournament",
-        'tourney': 'D1',
-        'directory': f'{group}/D1',
-        'is_national': True
-    }
+    description = SubgroupDesc(
+        group=group,
+        title='NCAA Division I',
+        suffix="Men's Basketball Tournament",
+        tourney='D1',
+        directory=f'{group}/D1',
+        is_national=True
+    )
     # the index is the seed of the favored team, which is not the play-in winner
     winner_counter = pandas.DataFrame(data=0, index=range(1, 9),
                                       columns=['play-in win', 'play-in lose', 'non-play-in win', 'non-play-in lose'])
     for num_games, years in play_in_info[group].items():
         for year in years:
-            winner = set()
+            winner: set[str] = set()
             for game in get_game(description, year):
                 if game[0].seed == game[1].seed > 8:
                     # a play in game (but could be a final four game?)
@@ -674,7 +697,7 @@ def write_play_in_results(group: str) -> None:
 def identity(entered: str, **_) -> str:
     """ Returns its argument
     :param entered: The argument to return
-    :param _: Not used. Only present to allow write_overall_reseeding to take group as a keyword """
+    :param _: Not used. Only present to allow write_overall_reseeding to take 'group' as a keyword """
     return entered
 
 
@@ -682,14 +705,14 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any],
                             grouper: typing.Callable[[str, str], str] = identity,
                             label: str = '') -> None:
     try:
-        target_mtime = min(os.path.getmtime(f'{label}reseed.csv'),
-                           os.path.getmtime(f'{label}reseed_filtered.csv'))
         source_mtime = max((get_source_mtime(f'{group}/{tourney.rstrip("_")}',
                                              get_years(description.get('years', None)))
                             for group, tourney_group in tourneys.items()
                             for tourney, description in tourney_group.items()
                             if tourney not in ('suffix', 'comment', 'nonconference')))
-        if source_mtime < target_mtime:
+        # description should be a SubgroupDesc in the previous command, but since we only need the years entry,
+        # we stick with a dict
+        if source_mtime < os.path.getmtime(f'{label}reseed.csv'):
             return
     except FileNotFoundError:
         pass
@@ -698,14 +721,15 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any],
     for group, tourney_group in tourneys.items():
         if group == 'professional':
             continue
-        for tourney, description in tourney_group.items():
+        for tourney, description_dict in tourney_group.items():
             if tourney in ('suffix', 'comment', 'nonconference'):
                 continue
-            description.update(group=group, tourney=tourney, directory=f'{group}/{tourney.rstrip("_")}',
-                               is_national=tourney in tourney_group.get('nonconference', (tourney,)),
-                               suffix=tourney_group.get('suffix', ''))
+            description = SubgroupDesc(**description_dict)._replace(
+                group=group, tourney=tourney, directory=f'{group}/{tourney.rstrip("_")}',
+                is_national=tourney in tourney_group.get('nonconference', (tourney,)),
+                suffix=tourney_group.get('suffix', ''))
             _update_reseeding(outcomes, description, functools.partial(grouper, group=group))
-    reseeding = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
+    reseeding: list[dict[str, str | int]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
         [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
     df = pandas.DataFrame(reseeding)
     output = df.sort_values('Team')
@@ -715,8 +739,8 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any],
     if not label:
         indexer = (9 < df.Games) & (-10 < df.Reseed) & (df.Reseed < 10)
         output = df[indexer].sort_values('Team')
-        output.to_csv(f'{label}reseed_filtered.csv', index=False, columns=columns)
-        output.to_csv(f'html/{label}reseed_filtered.csv', index=False, columns=columns)
+        output.to_csv(f'reseed_filtered.csv', index=False, columns=columns)
+        output.to_csv(f'html/reseed_filtered.csv', index=False, columns=columns)
 
 
 def write_group_reseeding(group: str,
@@ -730,26 +754,26 @@ def write_group_reseeding(group: str,
     :param grouper: Collects various teams into grouper(team).  Passed to _update_reseeding
     :param label: """
     try:
-        target_mtime = min(os.path.getmtime(f'{group}/{label}reseed.csv'),
-                           os.path.getmtime(f'{group}/{label}reseed_filtered.csv'))
         source_mtime = max((get_source_mtime(f'{group}/{tourney.rstrip("_")}',
                                              get_years(description.get('years', None)))
                             for tourney, description in tourney_group.items()
                             if tourney not in ('suffix', 'comment', 'nonconference')))
-        if source_mtime < target_mtime:
+        # again, description should be a SubgroupDesc
+        if source_mtime < os.path.getmtime(f'{group}/{label}reseed.csv'):
             return
     except FileNotFoundError:
         pass
     outcomes: collections.defaultdict[str, dict[str, list[int]]] = collections.defaultdict(
         lambda: {'wins': [], 'losses': []})
-    for tourney, description in tourney_group.items():
+    for tourney, description_dict in tourney_group.items():
         if tourney in ('suffix', 'comment', 'nonconference'):
             continue
-        description.update(group=group, tourney=tourney, directory=f'{group}/{tourney.rstrip("_")}',
-                           is_national=tourney in tourney_group.get('nonconference', (tourney,)),
-                           suffix=tourney_group.get('suffix', ''))
+        description = SubgroupDesc(**description_dict)._replace(
+            group=group, tourney=tourney, directory=f'{group}/{tourney.rstrip("_")}',
+            is_national=tourney in tourney_group.get('nonconference', (tourney,)),
+            suffix=tourney_group.get('suffix', ''))
         _update_reseeding(outcomes, description, grouper)
-    reseeding = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
+    reseeding: list[dict[str, str | int]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
         [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
     df = pandas.DataFrame(reseeding)
     output = df.sort_values('Team')
@@ -759,14 +783,14 @@ def write_group_reseeding(group: str,
     if not label:
         indexer = (9 < df.Games) & (-10 < df.Reseed) & (df.Reseed < 10)
         output = df[indexer].sort_values('Team')
-        output.to_csv(f'{group}/{label}reseed_filtered.csv', index=False, columns=columns)
-        output.to_csv(f'html/{group}/{label}reseed_filtered.csv', index=False, columns=columns)
+        output.to_csv(f'{group}/reseed_filtered.csv', index=False, columns=columns)
+        output.to_csv(f'html/{group}/reseed_filtered.csv', index=False, columns=columns)
 
 
 def _update_reseeding(outcomes: collections.defaultdict[str, dict[str, list[int]]],
-                      description: dict[str, typing.Any],
+                      description: SubgroupDesc,
                       grouper: typing.Callable[[str], str]) -> None:
-    for year in get_years(description.get('years', None)):
+    for year in get_years(description.years):
         for game in get_game(description, year):
             if any((g.is_empty() for g in game)) or game[0].seed == game[1].seed == 0:
                 continue
@@ -793,14 +817,14 @@ def analyze_tourney_subgroup(group: str,
     else:
         os.mkdir(directory)
         source_mtime = float('inf')
-    subgroup_desc = {
-        'group': group,
-        'directory': directory,
-        'suffix': suffix,
-        'tourney': tourney,
-        'source_mtime': source_mtime,
-        'is_national': is_national
-    }
+    subgroup_desc = SubgroupDesc(
+        group=group,
+        directory=directory,
+        suffix=suffix,
+        tourney=tourney,
+        source_mtime=source_mtime,
+        is_national=is_national
+    )
     write_tourney_win_loss(subgroup_desc, tourney_subgroup)
     write_tourney_reseeding(subgroup_desc, tourney_subgroup)
     write_tourney_reseeding(subgroup_desc, tourney_subgroup,
@@ -810,7 +834,7 @@ def analyze_tourney_subgroup(group: str,
     write_tourney_states(subgroup_desc, tourney_subgroup)
 
 
-def write_tourney_reseeding(subgroup_desc: dict[str, str | float],
+def write_tourney_reseeding(subgroup_desc: SubgroupDesc,
                             tourney_subgroup: dict[str, typing.Any],
                             grouper: typing.Callable[[str], str] = identity,
                             label: str = '') -> None:
@@ -819,9 +843,9 @@ def write_tourney_reseeding(subgroup_desc: dict[str, str | float],
     :param tourney_subgroup:
     :param grouper: Collects various teams into grouper(team).  Passed to _update_reseeding
     :param label: """
-    reseeding_file = subgroup_desc['directory'] + f'/{label}reseed.csv'
+    reseeding_file: str = subgroup_desc.directory + f'/{label}reseed.csv'
     try:
-        if subgroup_desc['source_mtime'] < os.path.getmtime(reseeding_file):
+        if subgroup_desc.source_mtime < os.path.getmtime(reseeding_file):
             return
     except FileNotFoundError:
         pass
@@ -838,21 +862,20 @@ def write_tourney_reseeding(subgroup_desc: dict[str, str | float],
     output.to_csv('html/'+'_'.join(reseeding_file.rsplit('/', 1)), index=False, columns=columns)
 
 
-def write_tourney_states(subgroup_desc: dict[str, str | float], tourney_subgroup: dict[str, typing.Any]) -> None:
+def write_tourney_states(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any]) -> None:
     """ List all the teams and their states that have participated in a tournament. """
 
-    def default_key(group: str, key: str) -> list[str]:
+    def default_key(group: str, key: str) -> collections.abc.Sequence[str | int]:
         return [university.get_state(key, group)] + [0] * 5
 
-    state_file = subgroup_desc['directory'] + '/state.csv'
+    state_file: str = subgroup_desc.directory + '/state.csv'
     try:
-        mtime = os.path.getmtime(state_file)
-        if subgroup_desc['source_mtime'] < mtime:
+        if subgroup_desc.source_mtime < os.path.getmtime(state_file):
             return
     except FileNotFoundError:
         pass
     states: collections.defaultdict[str, list[str | int]] = \
-        KeyDefaultDict(functools.partial(default_key, subgroup_desc['group']))
+        KeyDefaultDict(functools.partial(default_key, subgroup_desc.group))
     for tourney, description in tourney_subgroup.items():
         description.update(subgroup_desc)
         for year in get_years(description.get('years', None)):
@@ -874,20 +897,19 @@ def write_tourney_states(subgroup_desc: dict[str, str | float], tourney_subgroup
     output.to_csv(state_file)
 
 
-def write_tourney_win_loss(subgroup_desc: dict[str, str | float], tourney_subgroup: dict[str, typing.Any]) -> None:
+def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any]) -> None:
     """ This creates a 2d array where (row,col) is the number of times row beat col and writes this
     to a csv in the tournament directory. """
-    win_loss_file = subgroup_desc['directory'] + '/winloss.csv'
+    win_loss_file: str = subgroup_desc.directory + '/winloss.csv'
     try:
-        mtime = os.path.getmtime(win_loss_file)
-        if subgroup_desc['source_mtime'] < mtime:
+        if subgroup_desc.source_mtime < os.path.getmtime(win_loss_file):
             return
     except FileNotFoundError:
         pass
     tourney_winner = numpy.zeros((MAX_SEED + 1, MAX_SEED + 1), dtype=int)
-    for tourney, description in tourney_subgroup.items():
-        description.update(subgroup_desc)
-        for year in get_years(description.get('years', None)):
+    for tourney, description_dict in tourney_subgroup.items():
+        description = SubgroupDesc(**description_dict)._replace(**subgroup_desc._asdict())
+        for year in get_years(description.years):
             for game in get_game(description, year):
                 tourney_winner[game[0].seed, game[1].seed] += 1
     numpy.savetxt(win_loss_file, tourney_winner, delimiter=',', fmt='%d')  # type: ignore
@@ -922,12 +944,13 @@ def analyze_confs(group: str, tourney_group: dict[str, typing.Any]) -> None:
             tourney_group[tourney].update(group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=False)
             confs[tourney.rstrip('_')] |= {t.team for game in get_game(tourney_group[tourney], year) for t in game}
         # now look through the nonconference tournaments
-        for tourney, description in tourney_group.items():
+        for tourney, description_dict in tourney_group.items():
+            description = SubgroupDesc(**description_dict)._replace(
+                group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=True)
             if tourney.rstrip('_') not in tourney_group['nonconference']:
                 continue
-            if year not in get_years(description['years']):  # NFL does not get to analyze_confs
+            if year not in get_years(description.years):  # NFL does not get to analyze_confs
                 continue
-            description.update(group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=True)
             for game in get_game(description, year):
                 if not (game[0].seed and game[1].seed):
                     continue
@@ -938,7 +961,7 @@ def analyze_confs(group: str, tourney_group: dict[str, typing.Any]) -> None:
                 seed_diff = game[0].seed - game[1].seed  # positive value is an upset
                 outcomes[conf[0]]['wins'].append(-seed_diff)
                 outcomes[conf[1]]['losses'].append(seed_diff)
-    reseeding = [calc_log_reg(v) | {'Conference': k} for k, v in outcomes.items()] or \
+    reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Conference': k} for k, v in outcomes.items()] or \
         [{'Conference': 'Unknown', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
     df = pandas.DataFrame(reseeding)
     df['ConferenceIsKnown'] = (df['Conference'] != 'Unknown').astype(int)

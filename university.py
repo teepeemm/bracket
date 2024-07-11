@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 import collections
+from analyze import Flags
 
 __author__ = 'Timothy Prescott'
 __version__ = '2024-06-24'
@@ -1183,17 +1184,17 @@ def _disambiguation_literal(uni: str, st: str, content: str) -> bool:
 def get_disambiguating_phrases(uni: str,
                                disambiguation: dict[str, tuple],
                                content: str,
-                               flags: dict[str, str | bool]) -> set[str]:
+                               is_national: bool) -> set[str]:
     """ Filter phrases to identify what could disambiguate a given university """
     disambiguating_phrases = set()
     for st, phrases in disambiguation.items():
         if _disambiguation_literal(uni, st, content) or \
-                any((_disambiguation_match(phrase, content, flags['is_national']) for phrase in phrases)):
+                any((_disambiguation_match(phrase, content, is_national) for phrase in phrases)):
             disambiguating_phrases.add(st)
     return disambiguating_phrases
 
 
-def get_disambiguator(content: str, flags: dict[str, bool | str]) -> dict[str, dict[str, str]]:
+def get_disambiguator(content: str, flags: Flags) -> dict[str, dict[str, str]]:
     """ In normalize_team_name, we will append a disambiguation phrase (often a state) to the end of an ambiguous
     university """
     disambiguator: dict[str, dict[str, str]] = {
@@ -1204,8 +1205,8 @@ def get_disambiguator(content: str, flags: dict[str, bool | str]) -> dict[str, d
             'USC Upstate': 'South Carolina Upstate'
         }
     }
-    _disambiguations = _prof_disambiguations[flags['is_professional'].rstrip('_')] if flags['is_professional'] \
-        else _univ_disambiguations
+    _disambiguations: dict[str, dict[str, tuple[str | re.Pattern, ...]]]\
+        = _prof_disambiguations[flags.is_professional.rstrip('_')] if flags.is_professional else _univ_disambiguations
     # USC usually means Trojans (and definitely in a bracket). That will override
     if 'Gamecocks' in content or 'South Car' in content:
         disambiguator['replacement']['USC'] = 'South Carolina'
@@ -1216,13 +1217,13 @@ def get_disambiguator(content: str, flags: dict[str, bool | str]) -> dict[str, d
             or 'Jefferson Rams' in content or 'Philadelphia Rams' in content:
         disambiguator['replacement']['Philadelphia'] = 'Thomas Jefferson'
     for uni, disambiguation in _disambiguations.items():
-        disambiguating_phrases = get_disambiguating_phrases(uni, disambiguation, content, flags)
+        disambiguating_phrases = get_disambiguating_phrases(uni, disambiguation, content, flags.is_national)
         if len(disambiguating_phrases) == 1:
             st = disambiguating_phrases.pop()
             disambiguator['suffix'][uni] = f'{uni} {all_state_abbrevs.get(st, st)}'
-    if not flags['is_professional']:
+    if not flags.is_professional:
         for (uni, default_st), disambiguation in _univ_disambiguation_defaults.items():
-            disambiguating_phrases = get_disambiguating_phrases(uni, disambiguation, content, flags)
+            disambiguating_phrases = get_disambiguating_phrases(uni, disambiguation, content, flags.is_national)
             if not disambiguating_phrases:
                 disambiguating_phrases.add(default_st)
             if len(disambiguating_phrases) == 1:
