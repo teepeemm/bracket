@@ -1,0 +1,9 @@
+{
+    "source": {
+        "include": [ "html/script.js" ]
+    },
+    "opts": {
+        "access": "all",
+        "destination": "docs"
+    }
+}
