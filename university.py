@@ -9,12 +9,22 @@ Note that Simon Fraser U in British Columbia is the only non-US university in th
 
 from __future__ import annotations
 
-import re
 import collections
-from analyze import Flags
+import re
+import typing
 
 __author__ = 'Timothy Prescott'
 __version__ = '2024-06-24'
+
+
+class Flags(typing.NamedTuple):
+    """ Some short booleans (and one sometimes string) that we may pass in """
+    is_tennis: bool
+    is_professional: str | typing.Literal[False]
+    num_teams: int
+    multi_elim: bool
+    is_national: bool
+
 
 # observed team names that become a particular team name. used by check_team_name_starts()
 _team_name_from = collections.defaultdict(set)
@@ -1265,24 +1275,30 @@ def get_state(team: str, group: str) -> str:
     return ''
 
 
+# these don't observe DST.
+standard_time: dict[str, dict[str, str]] = {
+    'Arizona': {
+        'standard': 'Mountain',
+        'daylight': 'Pacific'
+    },
+    'Saskatchewan': {
+        'standard': 'Central',
+        'daylight': 'Mountain'
+    }
+}
+
+
 def get_timezone(team: str, group: str) -> str:
     """ The timezone (of the state) where a team is located. See the comments on #timezones """
     team_state = get_state(team, group)
     if not team_state:
         return ''
-    if team_state == 'Arizona':
-        # Arizona stays on MST, but these seasons are (almost) entirely one side or another of DST
+    if team_state in standard_time:
+        # these seasons are (almost) entirely one side or another of DST
         if group in ('bbm', 'bbw', 'ih'):
-            return 'Mountain'
+            return standard_time[team_state]['standard']
         if group in ('baseball', 'softball'):
-            return 'Pacific'
-        return team_state
-    if team_state == 'Saskatchewan':
-        # Saskatchewan stays on CST.  But they only show up in professional/NHL, so this is unnecessary
-        if group in ('bbm', 'bbw', 'ih'):
-            return 'Central'
-        if group in ('baseball', 'softball'):
-            return 'Mountain'
+            return standard_time[team_state]['daylight']
         return team_state
     for timezone, state_tuple in timezones.items():
         for state in state_tuple:
@@ -1359,7 +1375,7 @@ def normalize_professional_name(team_name: str, tourney: str) -> str:
     """ Transform a professional team name (which has gone through normalize_team_name) into a standard form. """
     value = team_name
     value = value.replace('LA ', 'Los Angeles ')
-    for state, cities in _cities_in_state.items():
+    for cities in _cities_in_state.values():
         for city in cities:
             if city in value and city not in _professional_keep_team[tourney.rstrip('_')]:
                 value = city
@@ -1367,7 +1383,7 @@ def normalize_professional_name(team_name: str, tourney: str) -> str:
         value = _professional_renames[tourney.rstrip('_')][value]
     if (value, tourney) in ():
         print(team_name, tourney, '=>', value)
-        breakpoint()
+        # breakpoint()
     return value
 
 
@@ -1434,7 +1450,7 @@ def normalize_team_name(team_name: str, disambiguator: dict) -> str:
     # this is a good time to stop to examine how a questionable value arose
     if value in ():  #
         print(team_name, '=>', value)
-        breakpoint()
+        # breakpoint()
     return value
 
 
@@ -1443,4 +1459,4 @@ def check_team_name_starts():
     print(max(((len(t), value, t) for value, t in _team_name_from.items())))
     print(len(_team_name_from['Long Island']), _team_name_from['Long Island'])
     print(len(_team_name_from['Long Island Post']), _team_name_from['Long Island Post'])
-    breakpoint()
+    # breakpoint()
