@@ -780,3 +780,24 @@ It is our hope that this analysis and its database will allow further exploratio
 
 \printbibliography
 \end{document}
+
+
+S(z) = 1/(1+e^{-z})
+1-S(z) = e^{-z}/(1+e^{-z}) = 1/(e^z+1)
+p(x) = S(mx+b). b=0
+L(a,p) = - ( a log p + (1-a) log (1-p) )
+L(a(x),p(x)) = - ( a(x) log p(x) + (1-a(x)) log (1-p(x) )
+L(w(x),p(x)) = - w(x) log p(x) = w(x) log (1+e^(-mx))
+L(l(x),p(x)) = - l(x) log ( 1-p(x) ) = l(x) log (1+e^(mx))
+
+L(w(x),p(x))_m = -xe^(-mx)w(x) / (1+e^(-mx))
+L(l(x),p(x))_m = xe^(mx)l(x) / (1+e^(mx))
+
+p(-1)=S(-m)=1/(1+e^m))
+e^m = 1/p(-1) - 1
+m = ln(1/p(-1) - 1)
+
+
+# my edits
+# https://en.wikipedia.org/w/index.php?title=1981_NCAA_Division_III_basketball_tournament&diff=prev&oldid=1219802469
+# https://en.wikipedia.org/w/index.php?title=1977_Pacific_Coast_Athletic_Association_men%27s_basketball_tournament&diff=prev&oldid=1219661417
