@@ -1,0 +1,33 @@
+[DESIGN]
+
+# Maximum number of branch for function / method body.
+max-branches=12
+
+# Maximum number of locals for function / method body.
+max-locals=15
+
+# Maximum number of parents for a class (see R0901).
+max-parents=7
+
+# Maximum number of public methods for a class (see R0904).
+max-public-methods=20
+
+# Maximum number of return / yield for function / method body.
+max-returns=6
+
+# Maximum number of statements in function / method body.
+max-statements=50
+
+# Minimum number of public methods for a class (see R0903).
+min-public-methods=2
+
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+# default was 100, but PyCharm allows 120
+max-line-length=120
+
+# Maximum number of lines in a module.
+# default was 1000, but I'm over that. but could I shorten university by offloading into a data file?
+max-module-lines=1500

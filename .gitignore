@@ -1,0 +1,30 @@
+
+# there's a lot to ignore.  we'll ignore everything, and add back in what we should keep
+*
+
+!.gitignore
+!README.md
+!.eslintrc.json
+!pylintrc
+!analyze.py
+!tourneys.json
+!university.py
+
+# the paper
+!paper
+paper/*
+!paper/2023bracket.png
+!paper/bracket.tex
+!paper/bracket.bib
+
+# the presentations
+!presentations
+presentations/*
+!presentations/bracket.tex
+
+# the website
+!html
+html/*
+!html/index.html
+!html/script.js
+!html/style.css
