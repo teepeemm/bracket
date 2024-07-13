@@ -8,6 +8,7 @@
 !jsdoc.conf.json
 !pylintrc
 !analyze.py
+!paper.py
 !tourneys.json
 !university.py
 
