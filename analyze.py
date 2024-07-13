@@ -261,11 +261,13 @@ class TeamResult:
         yield from zip(*[cls.team_from_series(series_data) for series_data in match_data.values()])  # type: ignore
         return 'exhausted'  # required by mypy
 
-    def get_conference(self, confs: dict[str, set[str]]) -> str:
-        """ Determine which conference this team represents.
-        :param confs: A dict of conference: teams for that year """
+    @staticmethod
+    def get_conference(team, confs: dict[str, set[str]]) -> str:
+        """ Determine which conference a team represents.
+        :param team: The team in question
+        :param confs: A dict of {conference: {teams}} for that year """
         for conf, teams in confs.items():
-            if self.team in teams:
+            if team in teams:
                 return conf
         return 'Unknown'
 
@@ -507,8 +509,8 @@ def write_plot_file_round(win_loss_file: str, plot_file: str, should_skip: typin
     with open(plot_file, 'w', encoding='utf-8') as tex_file:
         overall_total = 0
         overall_wins = 0
-        for row in range(1, 16):
-            for col in range(row+1, 17):
+        for row in range(1, MAX_SEED+1):
+            for col in range(row+1, MAX_SEED+1):
                 if should_skip(row, col):
                     continue
                 win_loss_to_analyze[row, col] = win_loss[row, col]
@@ -524,7 +526,7 @@ def write_plot_file_round(win_loss_file: str, plot_file: str, should_skip: typin
                 x_coords[x_coord] += 1
                 plotted_x = x_coord + (x_coords[x_coord]-1)/32  # so that identical x_coords don't overlap
                 tex_file.write(f'\\draw({plotted_x},{center+half_width})--++(0,{-2*half_width});\n')
-            center, half_width = get_confidence_interval(overall_wins, overall_total)
+        center, half_width = get_confidence_interval(overall_wins, overall_total)
         print(f'overall: {center:.2%} +- {half_width:.2%}')
     print(analyze_log_reg(win_loss_to_analyze))
 
@@ -803,16 +805,77 @@ def write_group_reseeding(group: str,
         output.to_csv(f'html/{group}/reseed_filtered.csv', index=False, columns=columns)
 
 
+def write_conf_reseeding(group: str, tourney_group: dict[str, typing.Any]) -> None:
+    """ Determine how teams should be reseeded, grouped by conference
+    :param group:
+    :param tourney_group: """
+    reseeding_file = group + '/conf_reseed.csv'
+    try:
+        if os.path.getmtime(group+'/reseed_approx.csv') <= os.path.getmtime(reseeding_file):
+            return
+    except FileNotFoundError:
+        pass
+    outcomes: collections.defaultdict[str, dict[str, list[int]]] = collections.defaultdict(
+        lambda: {'wins': [], 'losses': []})
+    tourneys_of_year = get_tourneys_of_year(tourney_group)
+    for year, tourneys in tourneys_of_year.items():
+        # Conferences change over the years. Any tournament determines that conference's teams for that year
+        confs: dict[str, set[str]] = collections.defaultdict(set)
+        for tourney in tourneys:
+            if tourney.rstrip('_') in tourney_group['nonconference']:
+                continue
+            subgroup_desc = SubgroupDesc(**tourney_group[tourney])._replace(
+                group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=False)
+            confs[tourney.rstrip('_')] |= {t.team for game in get_game(subgroup_desc, year) for t in game}
+        # now look through the nonconference tournaments
+        for tourney, description_dict in tourney_group.items():
+            if tourney in ('comment', 'nonconference', 'suffix'):
+                continue
+            description = SubgroupDesc(**description_dict)._replace(
+                group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=True)
+            if tourney.rstrip('_') not in tourney_group['nonconference']:
+                continue
+            if year not in get_years(description.years):  # NFL does not get to analyze_confs
+                continue
+            _update_reseeding_year(outcomes, description, functools.partial(TeamResult.get_conference, confs=confs),
+                                   year)
+    reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Conference': k} for k, v in outcomes.items()] or \
+        [{'Conference': 'Unknown', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
+    df = pandas.DataFrame(reseeding)
+    df['ConferenceIsKnown'] = (df['Conference'] != 'Unknown').astype(int)
+    output = df.sort_values(['Conference', 'Games'])
+    columns = ['Conference', 'Games', 'Rate', 'Reseed', 'ConferenceIsKnown']
+    output.to_csv(reseeding_file, index=False, columns=columns)
+    output.to_csv('html/'+reseeding_file, index=False, columns=columns)
+
+
 def _update_reseeding(outcomes: collections.defaultdict[str, dict[str, list[int]]],
                       description: SubgroupDesc,
                       grouper: typing.Callable[[str], str]) -> None:
+    """ Passes through to _update_reseeding_year
+    :param outcomes:
+    :param description:
+    :param grouper: """
     for year in get_years(description.years):
-        for game in get_game(description, year):
-            if any((g.is_empty() for g in game)) or game[0].seed == game[1].seed == 0:
-                continue
-            seed_diff = game[0].seed - game[1].seed  # positive value is an upset
-            outcomes[grouper(game[0].team)]['wins'].append(-seed_diff)
-            outcomes[grouper(game[1].team)]['losses'].append(seed_diff)
+        _update_reseeding_year(outcomes, description, grouper, year)
+
+
+def _update_reseeding_year(outcomes: collections.defaultdict[str, dict[str, list[int]]],
+                           description: SubgroupDesc,
+                           grouper: typing.Callable[[str], str],
+                           year: int | None) -> None:
+    """ :param outcomes: the dict to update
+    :param description: passed to get_game
+    :param grouper: perhaps coalesce results
+    :param year: """
+    for game in get_game(description, year):
+        if any((g.is_empty() for g in game)) or game[0].seed == game[1].seed == 0:
+            continue
+        seed_diff = game[0].seed - game[1].seed  # positive value is an upset
+        groups = [grouper(side.team) for side in game]
+        if groups[0] != groups[1]:
+            outcomes[groups[0]]['wins'].append(-seed_diff)
+            outcomes[groups[1]]['losses'].append(seed_diff)
 
 
 def analyze_tourney_subgroup(group: str,
@@ -869,7 +932,7 @@ def write_tourney_reseeding(subgroup_desc: SubgroupDesc,
         lambda: {'wins': [], 'losses': []})
     for description in tourney_subgroup.values():
         subgroup_desc = subgroup_desc._replace(**description)
-        _update_reseeding(outcomes, description, grouper)
+        _update_reseeding(outcomes, subgroup_desc, grouper)
     reseeding: list[dict[str, str | int]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
         [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
     output = pandas.DataFrame(reseeding).sort_values(['Team', 'Games'])
@@ -948,55 +1011,6 @@ def get_tourneys_of_year(tourney_group: dict[str, typing.Any]) -> dict[int, list
     return tourneys_of_year
 
 
-def analyze_confs(group: str, tourney_group: dict[str, typing.Any]) -> None:
-    """ Determine how teams should be reseeded, grouped by conference
-    :param group:
-    :param tourney_group: """
-    reseeding_file = group + '/conf_reseed.csv'
-    try:
-        if os.path.getmtime(group+'/reseed_approx.csv') <= os.path.getmtime(reseeding_file):
-            return
-    except FileNotFoundError:
-        pass
-    outcomes: collections.defaultdict[str, dict[str, list[int]]] = collections.defaultdict(
-        lambda: {'wins': [], 'losses': []})
-    tourneys_of_year = get_tourneys_of_year(tourney_group)
-    for year, tourneys in tourneys_of_year.items():
-        # Conferences change over the years. Any tournament determines that conference's teams for that year
-        confs: dict[str, set[str]] = collections.defaultdict(set)
-        for tourney in tourneys:
-            if tourney.rstrip('_') in tourney_group['nonconference']:
-                continue
-            tourney_group[tourney].update(group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=False)
-            confs[tourney.rstrip('_')] |= {t.team for game in get_game(tourney_group[tourney], year) for t in game}
-        # now look through the nonconference tournaments
-        for tourney, description_dict in tourney_group.items():
-            description = SubgroupDesc(**description_dict)._replace(
-                group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=True)
-            if tourney.rstrip('_') not in tourney_group['nonconference']:
-                continue
-            if year not in get_years(description.years):  # NFL does not get to analyze_confs
-                continue
-            for game in get_game(description, year):
-                if not (game[0].seed and game[1].seed):
-                    continue
-                # find the inter-conference games
-                conf = [g.get_conference(confs) for g in game]
-                if conf[0] == conf[1]:
-                    continue
-                seed_diff = game[0].seed - game[1].seed  # positive value is an upset
-                outcomes[conf[0]]['wins'].append(-seed_diff)
-                outcomes[conf[1]]['losses'].append(seed_diff)
-    reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Conference': k} for k, v in outcomes.items()] or \
-        [{'Conference': 'Unknown', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
-    df = pandas.DataFrame(reseeding)
-    df['ConferenceIsKnown'] = (df['Conference'] != 'Unknown').astype(int)
-    output = df.sort_values(['Conference', 'Games'])
-    columns = ['Conference', 'Games', 'Rate', 'Reseed', 'ConferenceIsKnown']
-    output.to_csv(reseeding_file, index=False, columns=columns)
-    output.to_csv('html/'+reseeding_file, index=False, columns=columns)
-
-
 def analyze_tourney_group(group: str, tourney_group: dict[str, typing.Any]) -> None:
     """
     :param group: The key within the json file, identifying the group
@@ -1016,7 +1030,7 @@ def analyze_tourney_group(group: str, tourney_group: dict[str, typing.Any]) -> N
     write_group_reseeding(group, tourney_group, functools.partial(university.get_state, group=group), 'state_')
     write_group_reseeding(group, tourney_group, functools.partial(university.get_timezone, group=group), 'tz_')
     if group not in ('other', 'professional'):
-        analyze_confs(group, tourney_group)
+        write_conf_reseeding(group, tourney_group)
 
 
 def analyze_overall(tourneys: dict[str, typing.Any]) -> None:
@@ -1094,7 +1108,7 @@ def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float]:
     return {
         'Games': len(x),
         'Rate': clf.coef_[0, 0],
-        'Reseed': clf.intercept_[0] / clf.coef_[0, 0] if clf.coef_[0, 0] else 0
+        'Reseed': - clf.intercept_[0] / clf.coef_[0, 0] if clf.coef_[0, 0] else 0
     }
 
 
