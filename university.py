@@ -327,7 +327,7 @@ _professional_renames: dict[str, dict[str, str]] = {
 # usually, a city (or state) is enough to identify a team.  but not when there are two teams
 _professional_keep_team: dict[str, frozenset[str]] = {
     'MLB': frozenset(['Chicago', 'Los Angeles', 'New York']),
-    'NBA': frozenset(['Los Angeles', ]),
+    'NBA': frozenset(['Los Angeles']),
     'NFL': frozenset(['Los Angeles', 'New York']),
     'NHL': frozenset(['New York']),
     'WNBA': frozenset()
@@ -1167,6 +1167,11 @@ _univ_disambiguation_defaults: dict[tuple[str, str], dict[str, tuple[str | re.Pa
 }
 
 
+# the last +2 is because of USC and Thomas Jefferson U
+TOTAL_DISAMBIGUATIONS: typing.Final[int] = len(_univ_disambiguations) + len(_univ_disambiguation_defaults) \
+    + sum((len(teams) for teams in _prof_disambiguations.values())) + 2
+
+
 def _disambiguation_match(phrase: str | re.Pattern, content: str, is_national: bool) -> bool:
     """ Whether the phrase occurs in the content """
     if isinstance(phrase, str):
@@ -1456,6 +1461,9 @@ def normalize_team_name(team_name: str, disambiguator: dict) -> str:
 
 def check_team_name_starts():
     """ Analyze _team_name_from """
+    print('number of teams:', len(_team_name_from))
+    print('avg number of names:', sum((len(t) for t in _team_name_from.values()))/len(_team_name_from))
+    print('worst:')
     print(max(((len(t), value, t) for value, t in _team_name_from.items())))
     print(len(_team_name_from['Long Island']), _team_name_from['Long Island'])
     print(len(_team_name_from['Long Island Post']), _team_name_from['Long Island Post'])

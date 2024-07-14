@@ -7,9 +7,13 @@ import math
 import typing
 
 import numpy  # type: ignore
+import numpy.polynomial  # type: ignore
 import pandas  # type: ignore
+import scipy.optimize  # type: ignore
+import scipy.stats  # type: ignore
 
 import analyze
+import university
 
 
 def get_team_performance(group: str, tourney: str, team: str) -> None:
@@ -163,8 +167,93 @@ def write_plots_for_paper() -> None:
     write_plot_file_round('bbm/D1/winloss.csv', 'bbm/D1/winlossRd2.tex', lambda r, c: c - r != 8)
     write_plot_file_round('bbw/D1/winloss.csv', 'bbw/D1/winlossRd2.tex', lambda r, c: c - r != 8)
     write_simple_plot_file('winloss.csv', 'winlosssimpleplot.tex')
+    write_play_in_results('bbm')
+    write_play_in_results('bbw')
+    # for the presentation
     win_loss = numpy.loadtxt('bbm/D1/winloss.csv', dtype=int, delimiter=',')
     write_probs_file(win_loss, 'bbm/D1/winlossprobs.tex')
+
+
+def print_team_rename_from_stats() -> None:
+    """ Print some stats about how teams are renamed throughout this process """
+    total_games = 0
+    with open('tourneys.json', encoding='utf-8') as json_file:
+        tourneys = json.load(json_file)
+        for group, tourney_group in tourneys.items():
+            if group == 'professional':
+                continue
+            for tourney, description in tourney_group.items():
+                if tourney in ('comment', 'nonconference', 'suffix'):
+                    continue
+                subgroup_desc = analyze.SubgroupDesc(group=group, directory=f'{group}/{tourney.rstrip("_")}')
+                for year in analyze.get_years(description.get('years', None)):
+                    for _ in analyze.get_game(subgroup_desc, year):
+                        total_games += 1
+    university.check_team_name_starts()
+
+
+def print_prob_one_women_upset() -> None:
+    """ The probability that at most one women's D1 team is upset in the first round """
+    beta = 0.276
+
+    def p(x):
+        return 1/(1+math.exp(-beta*x))
+
+    prob_none = 1
+    for s in range(1,9):
+        prob_none *= p(2*s-1)**4
+    print("probability of no upsets in women's tournament:", prob_none)
+    print("probability of at most one upset:", prob_none*(1+4*sum((1/p(17-2*s)-1) for s in range(1,9))))
+
+
+def print_weighted_reseed(reseed_file: str) -> None:
+    """ Find the mean and standard deviation of a reseeding column, but weighted by how many games a team has played.
+    :param reseed_file: """
+    df = pandas.read_csv(reseed_file)
+    print(f'Total teams in {reseed_file}:', df.shape[0])
+    indexer = (9 < df.Games) & (-16 != df.Reseed)
+    print('10 games, 1 win:', df[indexer].shape[0])
+    print('with small beta:', df[indexer & (df.Rate < 0.01)].shape[0])
+    indexer = (9 < df.Games) & (-16 < df.Reseed) & (df.Reseed < 16) & (0.01 <= df.Rate)
+    total_games = df[indexer].Games.sum()
+    mean = (df[indexer].Games * df[indexer].Reseed).sum() / total_games
+    second_moment = (df[indexer].Games * df[indexer].Reseed * df[indexer].Reseed).sum() / total_games
+    std = (second_moment - mean*mean)**.5
+    print('Teams:', df[indexer].shape[0])
+    print('Games:', total_games)
+    print('Mean weighted reseeding:', mean)
+    print('Std weighted reseeding:', std)
+
+
+def print_prob_several_upsets() -> None:
+    beta = 0.161
+    print('naive:', math.prod((sigmoid(beta*s) for s in (-5, 3, -9, -7))))
+    print('one upset:', math.prod((sigmoid(beta*s) for s in (-5, 3.88, -8.12, -6.12))))
+    print('two upsets:', math.prod((sigmoid(beta*s) for s in (-5, 3.88, -8.12, -5))))
+
+
+def print_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
+    def max_when(x: float, s: float) -> float:
+        return beta/(1+math.exp(-beta*(s-x))) - (x-mu0)/sigma**2
+    x_vals = [ [1, s] for s in range(1, analyze.MAX_SEED)]
+    y_vals = [ scipy.optimize.root_scalar(max_when, (s,), x0=1, x1=2).root for s in range(1, analyze.MAX_SEED)]
+    best_fit = scipy.optimize.lsq_linear(x_vals, y_vals).x  # type: ignore
+    print(best_fit[0], ' + s /', 1/best_fit[1])
+
+
+def print_double_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
+    def max_when(x: float, s: tuple[float, float]) -> float:
+        return beta/(1+math.exp(-beta*(s[0]-x))) + beta/(1+math.exp(-beta*(s[1]-x))) - (x-mu0)/sigma**2
+    x_vals = [ [1, s1, s2] for s1, s2 in itertools.product(range(1, analyze.MAX_SEED), repeat=2) ]
+    y_vals = [ scipy.optimize.root_scalar(max_when, (s[1:],), x0=1, x1=2).root for s in x_vals ]
+    best_fit = scipy.optimize.lsq_linear(x_vals, y_vals).x  # type: ignore
+    print(best_fit[0], ' + s1 /', 1/best_fit[1], ' + s2 /', 1/best_fit[2])
+
+
+seed_adjust = {
+    'bbm/D1/winloss.csv': lambda s: .68+(17-2*s)/25,
+    'bbw/D1/winloss.csv': lambda s: .89+(17-2*s)/33
+}
 
 
 def print_log_likelihood_round(win_loss_file: str,
@@ -174,10 +263,6 @@ def print_log_likelihood_round(win_loss_file: str,
     :param win_loss_file: The numpy csv file to input (probably created by write_plot_file)
     :param should_adjust_seeds:
     :param should_skip: Function of row and col """
-
-    def sigmoid(x: float) -> float:
-        return 1/(1+math.exp(-x))
-
     print(f'avg log likelihood of {win_loss_file}, adjusting seeds: {should_adjust_seeds}')
     win_loss = numpy.loadtxt(win_loss_file, dtype=int, delimiter=',')
     overall_log_reg = analyze.analyze_log_reg(win_loss)
@@ -192,7 +277,7 @@ def print_log_likelihood_round(win_loss_file: str,
             losses = win_loss[col, row]
             # if there was one upset, it was by col, of a seed 17-col, for a seed differential of 17-2col
             # and a seed adjustment of .95 + (17-2col)/20 = 1.8 - col/10
-            adjust = 1.8 - col/10 if should_adjust_seeds else 0
+            adjust = seed_adjust[win_loss_file](col) if should_adjust_seeds else 0
             log_likelihood = wins*math.log(sigmoid(rate*(col-row-adjust))) \
                 + losses*(1-math.log(sigmoid(rate*(row-col+adjust))))
             total_log_likelihood += log_likelihood
@@ -203,24 +288,44 @@ def print_log_likelihood_round(win_loss_file: str,
     print(f'overall: {total_log_likelihood/total_games}')
 
 
-def print_calcs_for_paper() -> None:
-    for should_adjust_seeds, group in itertools.product( (False, True), ('bbm', 'bbw') ):
-        print_log_likelihood_round(f'{group}/D1/winloss.csv', should_adjust_seeds, lambda r, c: c - r != 8)
-
-
-def describe_weighted_reseed(reseed_file: str) -> None:
-    """ Find the mean and standard deviation of a reseeding column, but weighted by how many games a team has played.
-    :param reseed_file: """
-    df = pandas.read_csv(reseed_file)
-    indexer = (9 < df.Games) & (-16 < df.Reseed) & (df.Reseed < 16) & (0.01 < df.Rate)
-    total_games = df[indexer].Games.sum()
-    mean = (df[indexer].Games * df[indexer].Reseed).sum() / total_games
-    second_moment = (df[indexer].Games * df[indexer].Reseed * df[indexer].Reseed).sum() / total_games
-    std = (second_moment - mean*mean)**.5
-    print('Teams:', df[indexer].shape[0])
-    print('Games:', total_games)
-    print('Mean weighted reseeding:', mean)
-    print('Std weighted reseeding:', std)
+def print_calcs_for_paper(page: int = -1) -> None:
+    if page == 3 or page == -1:
+        print('page 3')
+        analyze.analyze_winloss('bbm/D1/winloss.csv')
+        analyze.analyze_winloss('bbw/D1/winloss.csv')
+        print(scipy.stats.fisher_exact([[76, 852], [225, 1000]], 'less')[1])
+        print_prob_one_women_upset()
+    if page == 5 or page == -1:
+        print('page 5')
+        print(scipy.stats.fisher_exact([[9, 9], [40, 30]], 'less')[1])
+        print(scipy.stats.fisher_exact([[3, 1], [50, 34]], 'less')[1])
+        print(scipy.stats.fisher_exact([[0, 1], [68, 19]], 'less')[1])
+        print(scipy.stats.fisher_exact([[1, 0], [78, 19]], 'less')[1])
+        print(scipy.stats.fisher_exact([[33, 1], [53, 1]], 'less')[1])
+        print(scipy.stats.fisher_exact([[3, 1], [2, 2]], 'less')[1])
+        print(scipy.stats.fisher_exact([[4, 0], [4, 0]], 'less')[1])
+    if page == 6 or page == -1:
+        print('page 6')
+        print('disambiguations:',university.TOTAL_DISAMBIGUATIONS)
+        print_team_rename_from_stats()
+        get_team_performance('bbm', 'D1', 'North Carolina')
+        get_team_performance('bbw', 'D1', 'Tennessee')
+        print_weighted_reseed('bbm/D1/reseed.csv')
+        print_weighted_reseed('bbw/D1/reseed.csv')
+    if page == 8 or page == -1:
+        print('page 8')
+        print_prob_several_upsets()
+        print_upset_reseed(0.161, -0.2, 3.2)
+        print_double_upset_reseed(0.161, -0.2, 3.2)
+        print_upset_reseed(0.276, 0.15, 2.1)
+        print_double_upset_reseed(0.276, 0.15, 2.1)
+    if page == 9 or page == -1:
+        print('page 9')
+        for should_adjust_seeds, group in itertools.product( (False, True), ('bbm', 'bbw') ):
+            print_log_likelihood_round(f'{group}/D1/winloss.csv', should_adjust_seeds, lambda r, c: c - r != 8)
+    if page == 12 or page == -1:
+        print('page 12')
+        analyze.analyze_winloss('winloss.csv')
 
 
 def write_tex_table(group, tourney_group: dict[str, typing.Any]) -> None:
@@ -260,6 +365,10 @@ def _write_tex_table_row(table, tourney, years, suffix) -> None:
     if suffix:
         table.write(' ' + suffix)
     table.write(' & ' + str(years) + ' \\\\\n')
+
+
+def sigmoid(x: float) -> float:
+    return 1 / (1 + math.exp(-x))
 
 
 if __name__ == '__main__':
