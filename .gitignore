@@ -1,32 +1,35 @@
 
-# there's a lot to ignore.  we'll ignore everything, and add back in what we should keep
-*
-
-!.gitignore
-!README.md
-!.eslintrc.json
-!jsdoc.conf.json
-!pylintrc
-!analyze.py
-!paper.py
-!tourneys.json
-!university.py
+*.csv
+baseball
+bbm
+bbw
+docs
+ih
+other
+professional
+soccer
+softball
+web
 
 # the paper
-!paper
 paper/*
 !paper/2023bracket.png
 !paper/bracket.tex
 !paper/bracket.bib
+references
 
 # the presentations
-!presentations
 presentations/*
 !presentations/bracket.tex
 
 # the website
-!html
 html/*
 !html/index.html
 !html/script.js
 !html/style.css
+
+.idea
+apicache-py3
+pywikibot.lwp
+throttle.ctrl
+*.tex

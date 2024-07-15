@@ -1,4 +1,6 @@
-""" A module focused on analyzing universities.  The big goal of this is the function normalize_team_name(), which aims
+""" A module focused on analyzing universities.
+
+The big goal of this is the function `normalize_team_name`, which aims
 to consolidate all team names from Wikipedia into a unique identify-able string.  An important note on that function is
 that expediency may mean that we don't use a traditional way of referring to a team.  From a programming point of view,
 the easiest and most consistent approach seems to be to expand all abbreviations, and then remove unnecessary words.
@@ -10,6 +12,7 @@ Note that Simon Fraser U in British Columbia is the only non-US university in th
 from __future__ import annotations
 
 import collections
+import json
 import re
 import typing
 
@@ -26,11 +29,9 @@ class Flags(typing.NamedTuple):
     is_national: bool
 
 
-# observed team names that become a particular team name. used by check_team_name_starts()
 _team_name_from = collections.defaultdict(set)
+""" Observed team names that become a particular team name. Used by `check_team_name_starts`. """
 
-#  We oversimplify and put the entirety of a state into one timezone.  Indiana goes into Eastern.
-#  The provinces are those that have an NHL team (also MLB and NBA, but that's redundant).
 timezones: dict[str, tuple[str, ...]] = {
     'Eastern': ('CT', 'DC', 'DE', 'FL', 'GA', 'IN', 'KY', 'MA', 'MD', 'ME', 'MI', 'NC', 'NH', 'NJ', 'NY', 'OH', 'ON',
                 'PA', 'QC', 'RI', 'SC', 'TN', 'VA', 'VT', 'WV'),
@@ -42,8 +43,9 @@ timezones: dict[str, tuple[str, ...]] = {
     'Alaska': ('AK',),
     'Hawaii': ('HI',),
 }
+""" We oversimplify and put the entirety of a state into one timezone.  Indiana goes into Eastern.
+The provinces are those that have an NHL team (also MLB and NBA, but that's redundant). """
 
-# a few states are omitted because they could be ambiguous
 state_abbrevs: dict[str, str] = {
     'AL': 'Alabama', 'ALA': 'Alabama', 'AK': 'Alaska', 'ALAS': 'Alaska',
     'AZ': 'Arizona', 'ARIZ': 'Arizona', 'AR': 'Arkansas', 'ARK': 'Arkansas',
@@ -78,23 +80,23 @@ state_abbrevs: dict[str, str] = {
     'VT': 'Vermont', 'VA': 'Virginia',
     # not alphabetical at the end so that WV is checked before VA
 }
+""" A few states are omitted because they could be ambiguous. """
 
-# these states have a space in their expansion, so we have to be a bit careful.
 spaced_abbrevs: frozenset[str] = frozenset(['BC', 'DC', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'SC', 'SD', 'WV'])
+""" These states have a space in their expansion, so we have to be a bit careful. """
 
-# these were not included above because the abbreviation could be ambiguous
 other_state_abbrevs: dict[str, str] = {
     'AB': 'Alberta',  # Alabama Birmingham
     'LA': 'Louisiana',  # Los Angeles
     'NE': 'Nebraska',  # Northeast
     'UT': 'Utah'  # University of TN or TX
 }
+""" These were not included in `spaced_abbrevs` because the abbreviation could be ambiguous. """
 
 all_state_abbrevs = state_abbrevs | other_state_abbrevs
 
 all_states = list(all_state_abbrevs.values())
 
-# this will be: name = re.sub(r'\b'+key+r'(\.|\b)', value, name)
 other_abbrevs: dict[str, str] = {
     r'U\.S': 'US',  # before U and S
     'SE': 'Southeast', 'SW': 'Southwest', 'NW': 'Northwest',  # NE can be Nebraska
@@ -109,9 +111,8 @@ other_abbrevs: dict[str, str] = {
     'Mtl': 'Montreal',
     'Tech': 'Tech'  # eliminates punctuation
 }
+r""" This will be: `name = re.sub(r'\b'+key+r'(\.|\b)', value, name)`. """
 
-# This is our last chance to rename something.  We've tried our best up to this point, but some places are too quirky.
-# different teams: Seton H[ai]ll, DePau[lw]
 _team_renames: dict[str, str] = {
     'Alfred State': 'SUNY Alfred',
     'Allentown': 'DeSales',
@@ -281,8 +282,9 @@ _team_renames: dict[str, str] = {
     'WVU Tech': 'West Virginia Tech',
     'Yankton College South Dakota': 'Yankton'
 }
+""" This is our last chance to rename something.  We've tried our best up to this point, but some places are too quirky.
+different teams: Seton H[ai]ll, DePau[lw] """
 
-# professional teams are easier to handle because there are fewer of them, but harder because they move and rename
 _professional_renames: dict[str, dict[str, str]] = {
     'MLB': {
         'California': 'Anaheim',
@@ -323,8 +325,9 @@ _professional_renames: dict[str, dict[str, str]] = {
     },
     'WNBA': {}
 }
+""" Professional teams are easier to handle because there are fewer of them,
+but harder because they move and rename. """
 
-# usually, a city (or state) is enough to identify a team.  but not when there are two teams
 _professional_keep_team: dict[str, frozenset[str]] = {
     'MLB': frozenset(['Chicago', 'Los Angeles', 'New York']),
     'NBA': frozenset(['Los Angeles']),
@@ -332,8 +335,8 @@ _professional_keep_team: dict[str, frozenset[str]] = {
     'NHL': frozenset(['New York']),
     'WNBA': frozenset()
 }
+""" Usually, a city (or state) is enough to identify a team.  But not when there are two teams """
 
-# If a university has several versions to its name, try to consolidate them here.
 _versions: dict[str, str] = {
     r'Alcorn( A\&M)?( State)?( Mississippi)?': 'Alcorn',
     r'App(alachian)? State( North Carolina)?': 'Appalachian',
@@ -422,9 +425,8 @@ _versions: dict[str, str] = {
     'Winston Salem( State)?( North Carolina)?': 'Winston Salem',
     'Xavier( University of)? L[Aa]': 'Xavier Louisiana',
 }
+""" If a university has several versions to its name, try to consolidate them here. """
 
-# this does not contain all state universities with that prefix, just the necessary ones.
-# also, that city needs to not occur elsewhere
 _state_university: dict[str, tuple[str, ...]] = {
     'California State': ('Bakersfield', 'Chico', 'Dominguez Hills', 'East Bay', 'Fullerton', 'Northridge', 'Sacramento',
                          'San Bernardino', 'Stanislaus'),
@@ -444,8 +446,9 @@ _state_university: dict[str, tuple[str, ...]] = {
     'Wisconsin': ('Eau Claire', 'Green Bay', 'La Crosse', 'Milwaukee', 'Oshkosh', 'Parkside', 'Platteville',
                   'River Falls', 'Stevens Point', 'Stout', 'Whitewater'),
 }
+""" This does not contain all state universities with that prefix, just the necessary ones.
+Also, that city needs to not occur elsewhere. """
 
-# places that show up as U<stuff>
 university_of: dict[str, str] = {
     'Albany': 'Albany',
     'AB': 'Alabama Birmingham',
@@ -483,10 +486,8 @@ university_of: dict[str, str] = {
     'TSA': 'Texas San Antonio',
     'T Tyler': 'Texas Tyler',
 }
+""" Places that show up as U`stuff`. """
 
-# If this city appears in a university name, then we know it's in this state.
-# There are many more cities that could go here.
-# We use this only when a city shows up with multiple universities and only one state.
 _cities_in_state: dict[str, tuple[str, ...]] = {
     'AB': ('Calgary', 'Edmonton'),
     'AL': ('Auburn',),
@@ -520,8 +521,10 @@ _cities_in_state: dict[str, tuple[str, ...]] = {
     'WA': ('Seattle',),
     'WI': ('Green Bay', 'Milwaukee')
 }
+""" If this city appears in a university name, then we know it's in this state.
+There are many more cities that could go here.
+We use this only when a city shows up with multiple universities and only one state. """
 
-# If the university shows up in the name, then we don't need to worry about it here.  See also _cities_in_state
 universities_in_state: dict[str, tuple[str, ...]] = {
     'AK': (),
     'AL': ('Athens State', 'Birmingham Southern', 'Christian Heritage', 'Faulkner', 'Florence State', 'Huntingdon',
@@ -653,8 +656,8 @@ universities_in_state: dict[str, tuple[str, ...]] = {
            'Milwaukee School of Engineering', 'Mount Senario', 'Northland', 'Ripon', 'Saint Norbert', 'Viterbo'),
     'WY': ()
 }
+""" If the university shows up in the name, then we don't need to worry about it here.  See also `_cities_in_state`. """
 
-# This is not intended to be exhaustive, but for the appearances in (1) team_rstrip_common and (2) _disambiguation_match
 _conferences: frozenset[str] = frozenset([
     'A East', 'Atlantic 10', 'Atlantic Coast Conference', 'America East', 'Atlantic Hockey', 'Atlantic Sun', 'Big East',
     'Big Sky', 'Big South', 'Big Ten', 'BSC', 'C USA', 'CAA', 'Colonial Athletic Association',
@@ -664,11 +667,12 @@ _conferences: frozenset[str] = frozenset([
     'Northeast Conference', 'OVC', 'Ohio Valley Conference', 'Patriot', 'Patriot League', 'SLC', 'SoCon', 'Southern',
     'Southland', 'Summit League', 'SWAC', 'TAAC', 'West Coast Conference'
 ])
+""" This is not intended to be exhaustive, but for the appearances in (1) `team_rstrip_common` and
+(2) `_disambiguation_match` """
 
-# This is not intended to be exhaustive, but to cover occurrences of `St. <saint>'
 _saints: frozenset[str] = frozenset(['Louis', 'Paul', 'Thomas'])
+""" This is not intended to be exhaustive, but to cover occurrences of `St. (saint)`. """
 
-# whether we can drop the literal word at the end of a name
 can_drop = {
     'College': {'Augusta', 'Brooklyn', 'Centre', 'Culver Stockton', 'Federal City', 'Hartwick', 'Hunter', 'Ithaca',
                 'Limestone', 'Madison', 'Maryville', 'Middlebury', 'Philander Smith', 'Saint Norbert', 'Smith',
@@ -684,8 +688,8 @@ can_drop = {
                    'Georgia State', 'Lamar', 'Life', 'Oklahoma City', 'Samford', 'Southwestern Assemblies of God',
                    'Thomas Jefferson'}
 }
+""" Whether we can drop the literal word at the end of a name. """
 
-# used by disambiguate
 _prof_disambiguations: dict[str, dict[str, dict[str, tuple[()]]]] = {
     'MLB': {
         'Florida': {'Marlins': ()},
@@ -709,9 +713,8 @@ _prof_disambiguations: dict[str, dict[str, dict[str, tuple[()]]]] = {
     },
     'WNBA': {}
 }
+""" Used by `get_disambiguator`. """
 
-# These are used in _disambiguation_match.  If an element of the tuple is present in content, then we assume we have
-# that tuple's key.  We use the conferences only in non-national tournaments.
 _univ_disambiguations: dict[str, dict[str, tuple[str | re.Pattern, ...]]] = {
     'Albany': {
             'GA': ('Albany State Golden Rams',),
@@ -1140,8 +1143,9 @@ _univ_disambiguations: dict[str, dict[str, tuple[str | re.Pattern, ...]]] = {
         'PA': ()
     }
 }
+""" These are used in `_disambiguation_match`.  If an element of the tuple is present in content, then we assume we have
+that tuple's key.  We use the conferences only in non-national tournaments. """
 
-# disambiguations that have a (well known) default to fall back to if nothing else is present
 _univ_disambiguation_defaults: dict[tuple[str, str], dict[str, tuple[str | re.Pattern, ...]]] = {
     ('Miami', 'FL'): {
         'FL': ('Miami Hurricanes', 'Atlantic Coast Conference', 'Big East'),
@@ -1165,15 +1169,18 @@ _univ_disambiguation_defaults: dict[tuple[str, str], dict[str, tuple[str | re.Pa
         'LA': ('Gold Rush', 'Gold Nuggets', 'Xavier University of Louisiana')
     }
 }
+""" Disambiguations that have a (well known) default to fall back to if nothing else is present """
 
-
-# the last +2 is because of USC and Thomas Jefferson U
 TOTAL_DISAMBIGUATIONS: typing.Final[int] = len(_univ_disambiguations) + len(_univ_disambiguation_defaults) \
     + sum((len(teams) for teams in _prof_disambiguations.values())) + 2
+# The last +2 is because of USC and Thomas Jefferson U
 
 
 def _disambiguation_match(phrase: str | re.Pattern, content: str, is_national: bool) -> bool:
-    """ Whether the phrase occurs in the content """
+    """ :param phrase:
+    :param content:
+    :param is_national:
+    :return: Whether the phrase occurs in the content. """
     if isinstance(phrase, str):
         if is_national and phrase in _conferences:
             return False
@@ -1182,7 +1189,7 @@ def _disambiguation_match(phrase: str | re.Pattern, content: str, is_national: b
 
 
 def _disambiguation_literal(uni: str, st: str, content: str) -> bool:
-    """ Whether '{uni} (st)' occurs in content, for various ideas of 'st' """
+    """ :return: Whether '{uni} (st)' occurs in content, for various ideas of 'st'. """
     if uni.removeprefix('Saint') not in content:
         return False
     if re.search(rf'{uni.removeprefix("Saint ")} \(?(?i:{st})\b', content) or \
@@ -1210,7 +1217,7 @@ def get_disambiguating_phrases(uni: str,
 
 
 def get_disambiguator(content: str, flags: Flags) -> dict[str, dict[str, str]]:
-    """ In normalize_team_name, we will append a disambiguation phrase (often a state) to the end of an ambiguous
+    """ In `normalize_team_name`, we will append a disambiguation phrase (often a state) to the end of an ambiguous
     university """
     disambiguator: dict[str, dict[str, str]] = {
         'suffix': {},
@@ -1247,7 +1254,6 @@ def get_disambiguator(content: str, flags: Flags) -> dict[str, dict[str, str]]:
     return disambiguator
 
 
-# The state that a professional team plays in
 _professional_states: dict[str, str] = {
     'Carolina': 'NC',
     'Columbus': 'OH',
@@ -1257,6 +1263,7 @@ _professional_states: dict[str, str] = {
     'Oakland': 'CA',
     'Rochester': 'NY',
 }
+""" The state that a professional team plays in """
 
 
 def get_state(team: str, group: str) -> str:
@@ -1280,7 +1287,6 @@ def get_state(team: str, group: str) -> str:
     return ''
 
 
-# these don't observe DST.
 standard_time: dict[str, dict[str, str]] = {
     'Arizona': {
         'standard': 'Mountain',
@@ -1291,10 +1297,11 @@ standard_time: dict[str, dict[str, str]] = {
         'daylight': 'Mountain'
     }
 }
+""" these don't observe DST """
 
 
 def get_timezone(team: str, group: str) -> str:
-    """ The timezone (of the state) where a team is located. See the comments on #timezones """
+    """ The timezone (of the state) where a team is located. See the comments on `timezones` """
     team_state = get_state(team, group)
     if not team_state:
         return ''
@@ -1377,7 +1384,7 @@ def _get_spaced_abbrev(match) -> str:
 
 
 def normalize_professional_name(team_name: str, tourney: str) -> str:
-    """ Transform a professional team name (which has gone through normalize_team_name) into a standard form. """
+    """ Transform a professional team name (which has gone through `normalize_team_name`) into a standard form. """
     value = team_name
     value = value.replace('LA ', 'Los Angeles ')
     for cities in _cities_in_state.values():
@@ -1460,7 +1467,7 @@ def normalize_team_name(team_name: str, disambiguator: dict) -> str:
 
 
 def check_team_name_starts():
-    """ Analyze _team_name_from """
+    """ Analyze `_team_name_from` """
     print('number of teams:', len(_team_name_from))
     print('avg number of names:', sum((len(t) for t in _team_name_from.values()))/len(_team_name_from))
     print('worst:')

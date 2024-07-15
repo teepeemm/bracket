@@ -1,10 +1,10 @@
 """ Functions to analyze tournament seedings.
 
-A key file for __main__ is tourneys.json.  In that file, the highest level is a 'group', consisting of a sport (and
+A key file for `__main__` is tourneys.json.  In that file, the highest level is a 'group', consisting of a sport (and
 gender in the case of basketball) (although the last group is 'other'). Within a group, each line is another object
-corresponding to a tournament with a name and years that tournament occurred. See get_years() for that last item. Often,
-a tournament changed their name over the years. In that case, we distinguish the tournaments within the json file by
-appending a '_' to the key. This leads to the same directory, and we consolidate the data for the tournament.
+corresponding to a tournament with a name and years that tournament occurred. See `get_years()` for that last item.
+Often, a tournament changed their name over the years. In that case, we distinguish the tournaments within the json file
+by appending a '_' to the key. This leads to the same directory, and we consolidate the data for the tournament.
 
 This will attempt to locate tournaments through the latest complete year.  This means that as a year progresses,
 tournaments that have recently finished will not be evaluated until the end of the calendar year. Note that
@@ -52,7 +52,7 @@ V = typing.TypeVar('V')
 
 
 class KeyDefaultDict(dict[K, V]):
-    """ A defaultdict where the default_factory takes the missing key as its argument """
+    """ A defaultdict where the `default_factory` takes the missing key as its argument """
     def __init__(self, default_factory: typing.Callable[[K], V] = None):
         super().__init__()
         self.default_factory = default_factory
@@ -66,7 +66,8 @@ class KeyDefaultDict(dict[K, V]):
 
 @functools.singledispatch
 def get_years(arg: Year | None) -> typing.Iterator[int] | typing.Iterator[None]:
-    """ Returns years of a tournament. """
+    """ :param arg: A description of the years
+    :return: The individual years of a tournament. """
     raise TypeError('bad year:', type(arg), arg)
 
 
@@ -154,8 +155,8 @@ class TeamResult:
 
     @staticmethod
     def dict_has_match_data(team_data: dict[str, typing.Any]) -> typing.Optional[typing.Any]:
-        """ Does this dict have any match data at all?
-        :param team_data: """
+        """ :param team_data:
+        :return: Does this dict have any match data at all? """
         return team_data.get('team') or team_data.get('seed') or team_data.get('scores')
 
     @classmethod
@@ -262,17 +263,18 @@ class TeamResult:
         return 'exhausted'  # required by mypy
 
     @staticmethod
-    def get_conference(team, confs: dict[str, set[str]]) -> str:
-        """ Determine which conference a team represents.
+    def get_conference(team: str, confs: dict[str, set[str]]) -> str:
+        """ Conferences can change, so we have to figure out the conferences for each year in question
         :param team: The team in question
-        :param confs: A dict of {conference: {teams}} for that year """
+        :param confs: A dict of {conference: {teams}} for that year
+        :return: The conference for that team """
         for conf, teams in confs.items():
             if team in teams:
                 return conf
         return 'Unknown'
 
     def is_empty(self) -> bool:
-        """ The team is empty and the score is 0. """
+        """ :return: The team is empty and the score is 0. """
         return self.score == 0 and self.team == ''  # and self.seed == 0
 
 
@@ -283,7 +285,7 @@ def get_bracket(content: str, flags: Flags) -> typing.Iterator[tuple[str, dict]]
     """ Find brackets within a Wikipedia page
     :param content: The content of the page
     :param flags:
-    :returns: The source code of the bracket, with some parsing and simplification already done """
+    :return: The source code of the bracket, with some parsing and simplification already done """
     disambiguator = university.get_disambiguator(content, flags)
     for pattern, repl in disambiguator['replacement'].items():
         content = re.sub(rf'\b{pattern}\b', repl, content)
@@ -343,7 +345,7 @@ def get_game_from_wikipedia(content: str, flags: Flags) -> typing.Iterator[Game]
     """ Find the games in the Wikipedia page.
     :param content: The content of the page
     :param flags:
-    :returns: Game results
+    :return: Game results
     """
     for bracket, disambiguator in get_bracket(content, flags):
         flags = flags._replace(num_teams=-1)
@@ -360,9 +362,9 @@ def get_game_from_wikipedia(content: str, flags: Flags) -> typing.Iterator[Game]
 
 
 def get_game(description: SubgroupDesc, year: int | None) -> typing.Iterator[Game]:
-    """ Get games from Wikipedia according to a description.
-    :param description: Necessary details to locate the Wikipedia page.  Needs at least keys 'directory' & 'group'.
-    :param year: """
+    """ :param description: Necessary details to locate the Wikipedia page.  Needs at least keys `directory` & `group`.
+    :param year:
+    :return: Individual games from Wikipedia according to the description """
     filename = f'{description.directory.rstrip("_")}/{year}.txt'
     if not os.path.isfile(filename) or os.path.getmtime(filename) + SECONDS_PER_YEAR < time.time():
         potential_titles = get_potential_titles(description, year, description.tourney == 'NFL_')
@@ -386,7 +388,7 @@ def get_source_mtime(directory: str, years: typing.Iterator[int] | typing.Iterat
     """ The most recent modification time of the source wiki files in this directory
     :param directory:
     :param years: The years to examine in this directory
-    :return: The most recent modification time, or +inf """
+    :return: The most recent modification time, or `+inf` """
     try:
         return max(os.path.getmtime(f'{directory.rstrip("_")}/{year}.txt') for year in years)
     except FileNotFoundError:
@@ -395,11 +397,11 @@ def get_source_mtime(directory: str, years: typing.Iterator[int] | typing.Iterat
 
 def get_potential_titles(description: SubgroupDesc, year: int | None, use_range: bool) -> list[str]:
     """ Determines potential titles that Wikipedia may use for a tournament.
-    Sometimes the suffix is .lower()ed, and some tournaments have a template.
-    NFL playoffs use YYYY-(YY)YY (see _get_year_range), and sometimes that dash is an en-dash.
+    Sometimes the suffix is `.lower()`ed, and some tournaments have a template.
+    NFL playoffs use YYYY-(YY)YY (see `_get_year_range`), and sometimes that dash is an en-dash.
     :param description: the dict describing the details of this tournament
     :param year: The year of the tournament
-    :param use_range: Whether to use _get_year_range for the year """
+    :param use_range: Whether to use `_get_year_range` for the year """
     tourney_title = description.title or description.tourney.upper()
     potential_title = tourney_title
     if year:
@@ -433,7 +435,7 @@ def create_wiki_cache(filename: str, potential_titles: list[str]) -> bool:
     (Tail) recursively checks each potential title, and uses the first that works.
     :param filename: The cache file to use
     :param potential_titles: The potential sites in Wikipedia.
-    :returns: Whether the site was found """
+    :return: Whether the site was found """
     if not potential_titles:
         print(filename, 'does not exist')
         return False
@@ -650,7 +652,7 @@ def write_group_reseeding(group: str,
     pgf/simplecsv is not up to handling the larger csvs.
     :param group:
     :param tourney_group:
-    :param grouper: Collects various teams into grouper(team).  Passed to _update_reseeding
+    :param grouper: Collects various teams into grouper(team).  Passed to `_update_reseeding`
     :param label: """
     try:
         source_mtime = max((get_source_mtime(f'{group}/{tourney.rstrip("_")}',
@@ -801,7 +803,7 @@ def write_tourney_reseeding(subgroup_desc: SubgroupDesc,
     """ Determine how teams have performed in a tournament.
     :param subgroup_desc:
     :param tourney_subgroup:
-    :param grouper: Collects various teams into grouper(team).  Passed to _update_reseeding
+    :param grouper: Collects various teams into grouper(team).  Passed to `_update_reseeding`
     :param label: """
     reseeding_file: str = subgroup_desc.directory + f'/{label}reseed.csv'
     try:
@@ -932,7 +934,7 @@ def analyze_overall(tourneys: dict[str, typing.Any]) -> None:
 def analyze_log_reg(winner: numpy.ndarray) -> dict[str, float]:
     """ Perform a logistic regression on a winloss matrix
     :param winner: The winloss matrix
-    :returns: The analysis, with keys 'games', 'rate', and 'loss per game' """
+    :return: The analysis, with keys 'games', 'rate', and 'loss per game' """
     diff = [winner[1:, 1:].trace(-i) for i in range(1 - MAX_SEED, MAX_SEED)]
     if not sum(diff):
         return {
@@ -974,7 +976,7 @@ def analyze_winloss(filename: str, show_grids=False) -> None:
 def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float]:
     """ Compute the logistic regression in the form 1/(1+exp(-rate(x-reseed))).
     :param win_loss_seeds: A dictionary with keys 'wins' and 'losses' and values the corresponding lists
-    :returns: A dictionary with keys 'Games', 'Rate', and 'Reseed' """
+    :return: A dictionary with keys 'Games', 'Rate', and 'Reseed' """
     x = win_loss_seeds['wins'] + win_loss_seeds['losses']
     y = [1] * len(win_loss_seeds['wins']) + [0] * len(win_loss_seeds['losses'])
     if len(set(y)) == 1:
@@ -1007,4 +1009,3 @@ if __name__ == '__main__':
     with open('tourneys.json', encoding='utf-8') as _json_file:
         _tourneys = json.load(_json_file)
     analyze_overall(_tourneys)
-    # university.check_team_name_starts()

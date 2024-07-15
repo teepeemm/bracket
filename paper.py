@@ -47,7 +47,6 @@ def get_team_performance(group: str, tourney: str, team: str) -> None:
     print(analyze.calc_log_reg(win_loss_seeds_with_list))
 
 
-# how many play in games were in each year
 play_in_info = {
     'bbm': {
         1: range(2001, 2011),
@@ -57,6 +56,7 @@ play_in_info = {
         4: range(2022, analyze.CURRENT_YEAR)
     }
 }
+""" how many play in games were in each year """
 
 
 def write_play_in_results(group: str) -> None:
@@ -226,6 +226,7 @@ def print_weighted_reseed(reseed_file: str) -> None:
 
 
 def print_prob_several_upsets() -> None:
+    """ Determine the probability that a specific sequence of upsets occurred """
     beta = 0.161
     print('naive:', math.prod((sigmoid(beta*s) for s in (-5, 3, -9, -7))))
     print('one upset:', math.prod((sigmoid(beta*s) for s in (-5, 3.88, -8.12, -6.12))))
@@ -233,6 +234,10 @@ def print_prob_several_upsets() -> None:
 
 
 def print_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
+    """ Determine the best fit for an upset
+    :param beta:
+    :param mu0:
+    :param sigma: """
     def max_when(x: float, s: float) -> float:
         return beta/(1+math.exp(-beta*(s-x))) - (x-mu0)/sigma**2
     x_vals = [ [1, s] for s in range(1, analyze.MAX_SEED)]
@@ -242,6 +247,10 @@ def print_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
 
 
 def print_double_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
+    """ Determine the best fit for two upsets
+    :param beta:
+    :param mu0:
+    :param sigma: """
     def max_when(x: float, s: tuple[float, float]) -> float:
         return beta/(1+math.exp(-beta*(s[0]-x))) + beta/(1+math.exp(-beta*(s[1]-x))) - (x-mu0)/sigma**2
     x_vals = [ [1, s1, s2] for s1, s2 in itertools.product(range(1, analyze.MAX_SEED), repeat=2) ]
@@ -254,6 +263,7 @@ seed_adjust = {
     'bbm/D1/winloss.csv': lambda s: .68+(17-2*s)/25,
     'bbw/D1/winloss.csv': lambda s: .89+(17-2*s)/33
 }
+""" Copying the output of `print_upset_reseed` """
 
 
 def print_log_likelihood_round(win_loss_file: str,
@@ -289,13 +299,14 @@ def print_log_likelihood_round(win_loss_file: str,
 
 
 def print_calcs_for_paper(page: int = -1) -> None:
-    if page == 3 or page == -1:
+    """ :param page: """
+    if page in (3, -1):
         print('page 3')
         analyze.analyze_winloss('bbm/D1/winloss.csv')
         analyze.analyze_winloss('bbw/D1/winloss.csv')
         print(scipy.stats.fisher_exact([[76, 852], [225, 1000]], 'less')[1])
         print_prob_one_women_upset()
-    if page == 5 or page == -1:
+    if page in (5, -1):
         print('page 5')
         print(scipy.stats.fisher_exact([[9, 9], [40, 30]], 'less')[1])
         print(scipy.stats.fisher_exact([[3, 1], [50, 34]], 'less')[1])
@@ -304,7 +315,7 @@ def print_calcs_for_paper(page: int = -1) -> None:
         print(scipy.stats.fisher_exact([[33, 1], [53, 1]], 'less')[1])
         print(scipy.stats.fisher_exact([[3, 1], [2, 2]], 'less')[1])
         print(scipy.stats.fisher_exact([[4, 0], [4, 0]], 'less')[1])
-    if page == 6 or page == -1:
+    if page in (6, -1):
         print('page 6')
         print('disambiguations:',university.TOTAL_DISAMBIGUATIONS)
         print_team_rename_from_stats()
@@ -312,18 +323,18 @@ def print_calcs_for_paper(page: int = -1) -> None:
         get_team_performance('bbw', 'D1', 'Tennessee')
         print_weighted_reseed('bbm/D1/reseed.csv')
         print_weighted_reseed('bbw/D1/reseed.csv')
-    if page == 8 or page == -1:
+    if page in (8, -1):
         print('page 8')
         print_prob_several_upsets()
         print_upset_reseed(0.161, -0.2, 3.2)
         print_double_upset_reseed(0.161, -0.2, 3.2)
         print_upset_reseed(0.276, 0.15, 2.1)
         print_double_upset_reseed(0.276, 0.15, 2.1)
-    if page == 9 or page == -1:
+    if page in (9, -1):
         print('page 9')
         for should_adjust_seeds, group in itertools.product( (False, True), ('bbm', 'bbw') ):
             print_log_likelihood_round(f'{group}/D1/winloss.csv', should_adjust_seeds, lambda r, c: c - r != 8)
-    if page == 12 or page == -1:
+    if page in (12, -1):
         print('page 12')
         analyze.analyze_winloss('winloss.csv')
 
@@ -368,9 +379,9 @@ def _write_tex_table_row(table, tourney, years, suffix) -> None:
 
 
 def sigmoid(x: float) -> float:
+    """ :param x: """
     return 1 / (1 + math.exp(-x))
 
 
 if __name__ == '__main__':
     pass
-    # university.check_team_name_starts()
