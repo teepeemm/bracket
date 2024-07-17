@@ -113,177 +113,13 @@ other_abbrevs: dict[str, str] = {
 }
 r""" This will be: `name = re.sub(r'\b'+key+r'(\.|\b)', value, name)`. """
 
-_team_renames: dict[str, str] = {
-    'Alfred State': 'SUNY Alfred',
-    'Allentown': 'DeSales',
-    'Alliance College Pennsylvania': 'Alliance Pennsylvania',
-    'Arkansas State Teachers': 'Central Arkansas',
-    'Arizona State Flagstaff': 'Northern Arizona',
-    'Arizona State Tempe': 'Arizona State',
-    'Arkansas AM&North': 'Arkansas Pine Bluff',
-    'Army West Point': 'Army',
-    'Arnold': 'Bridgeport',
-    'Athens State': 'Athens Alabama',
-    'Austin Peay State': 'Austin Peay',
-    'BU': 'Boston University',
-    'Baptist Bible': 'Clarks Summit',
-    'Baptist South Carolina': 'Charleston Southern',
-    'Baptist College South Carolina': 'Charleston Southern',
-    'Benedictine College': 'Benedictine Kansas',
-    'Bethany Nazarene': 'Southern Nazarene',
-    'Bethel University Tennessee': 'Bethel Tennessee',
-    'Bridgewater College': 'Bridgewater Virginia',
-    'Bridgewater State': 'Bridgewater Massachusetts',
-    'CCNY': 'City College New York',
-    'California Polytechnic SLO': 'California Polytechnic San Luis Obispo',
-    'California State Dom. Hills': 'California State Dominguez Hills',
-    'Case Western Reserve': 'Case Western',
-    'Central College Missouri': 'Central Methodist',
-    'Central Normal Indiana': 'Canterbury',
-    'Chris. Newport': 'Christopher Newport',
-    'Christ Irvine': 'Concordia Irvine',
-    'Clark Georgia': 'Clark Atlanta',
-    'Coastal': 'Coastal Carolina',
-    'College of the Ozarks': 'Ozarks Missouri',
-    'Colorado School of Mines': 'Colorado Mines',
-    'Columbia College Iowa': 'Columbia Iowa',
-    'Columbia College Missouri': 'Columbia Missouri',
-    'Columbia Union': 'Washington Adventist',
-    'Columbus College Georgia': 'Columbus State Georgia',
-    'Columbus Georgia': 'Columbus State Georgia',
-    'Concordia Illinois': 'Concordia Chicago',
-    'Concordia California': 'Concordia Irvine',
-    'Connecticut Teachers': 'Central Connecticut',
-    'Cornell College': 'Cornell Iowa',
-    'CSU Los Angeles': 'California State Los Angeles',
-    'CSUSB': 'California State San Bernardino',
-    'CSUN': 'California State Northridge',
-    'Cumberland': 'Cumberland Tennessee',
-    'Cumberland Kentucky': 'Cumberlands Kentucky',
-    'Cumberlands': 'Cumberlands Kentucky',
-    'Dickinson North Dakota': 'Dickinson State',
-    'Dist. Columbia': 'District of Columbia',
-    'ETSU': 'East Tennessee',
-    'Emmanuel College Georgia': 'Emmanuel Georgia',
-    'FAU': 'Florida Atlantic',
-    'FGCU': 'Florida Gulf Coast',
-    'FIU': 'Florida International',
-    'FTU': 'Frederick Taylor',
-    'GCU': 'Grand Canyon',
-    'GRU Augusta': 'Augusta',
-    'Georgetown College': 'Georgetown Kentucky',
-    'Georgia Teachers': 'Georgia Southern',
-    'Glassboro State': 'Rowan',
-    'Great Falls': 'Providence Montana',
-    'Harris Stowe State (Saint Louis Missouri)': 'Harris Stowe State',
-    'Illinois Benedictine': 'Benedictine Illinois',
-    'Illinois State Normal': 'Illinois State',
-    'Iowa State Teachers': 'Northern Iowa',
-    'IPFW': 'Indiana Purdue Fort Wayne',
-    'IUP': 'Indiana Pennsylvania',
-    'IUPUI': 'Indiana Purdue Indianapolis',
-    'Johnson and Wales Colorado': 'Johnson and Wales Denver',
-    'Johnson and Wales (Providence)': 'Johnson and Wales Rhode Island',
-    'Kansas Newman': 'Newman',
-    'King': 'King Tennessee',
-    "King's": "King's Pennsylvania",
-    'Kings Point': 'Merchant Marine',
-    'Lindenwood University Belleville': 'Lindenwood Belleville',
-    'Livingston': 'West Alabama',
-    'LMU': 'Loyola Marymount',
-    'Loyola Louisiana': 'Loyola New Orleans',
-    'Louisiana': 'Louisiana State',
-    'Martin Methodist': 'Tennessee Southern',
-    'MCLA': 'Massachusetts Liberal Arts',
-    'MIT': 'Massachusetts Institute Tech',
-    'MTSU': 'Middle Tennessee',
-    'Madison': 'James Madison',
-    'Maryland Baltimore Colorado': 'Maryland Baltimore County',  # undo that
-    'Metropolitan State': 'Metro State',
-    'Missouri South &T': 'Missouri S&T',  # undo that
-    'Morris Harvey': 'Charleston West Virginia',
-    'MSOE': 'Milwaukee School of Engineering',
-    'NE Louisiana': 'Northeast Louisiana',
-    'NE Missouri State': 'Northeast Missouri State',
-    'New Mexico Normal': 'New Mexico Highlands',
-    'Nicholls': 'Nicholls State',
-    'NJCU': 'New Jersey City',
-    'NJIT': 'New Jersey Institute Tech',
-    'Northeastern State': 'Northeastern Oklahoma',
-    'Northwest Christian': 'Bushnell',
-    'Notre Dame California': 'Notre Dame de Namur',
-    'Nyack': 'Alliance New York',
-    'NYIT': 'New York Tech',
-    'NYU': 'New York University',
-    'Ole Mississippi': 'Mississippi',
-    'Panhandle A&M': 'Panhandle State',
-    'Panzer': 'Montclair State',
-    'Parsons College Iowa': 'Parsons Iowa',
-    'Point Loma Nazarene': 'Point Loma',
-    'Post': 'Post Connecticut',  # but be careful of Long Island Post
-    'RIT': 'Rochester Institute Tech',
-    'RPI': 'Rensselaer',
-    'Regis College Massachusetts': 'Regis Massachusetts',
-    'Ricks': 'Brigham Young Idaho',
-    'Rocky Mountain College': 'Rocky Mountain Montana',
-    'SIUE': 'Southern Illinois Edwardsville',
-    'SMSU': 'Southwest Minnesota State',
-    'SMU': 'Southern Methodist',
-    'SNHU': 'Southern New Hampshire',
-    'New Hampshire College': 'Southern New Hampshire',
-    'SUNYIT': 'SUNY Polytechnic',
-    'Sage': 'Russell Sage',
-    'Saint Andrews Presbyterian': 'Saint Andrews',
-    "Saint Benedict's Kansas": 'Benedictine Kansas',
-    'Saint Bernard': 'Southern Benedictine Alabama',
-    'Saint Francis New York': 'Saint Francis Brooklyn',
-    'Saint Procopius': 'Benedictine Illinois',
-    'Saint Thomas Aquinas': 'Saint Thomas Aquinas New York',
-    'Salem International': 'Salem West Virginia',
-    'Salem Teikyo': 'Salem West Virginia',
-    'South Carolina Spartanburg': 'South Carolina Upstate',
-    'Southeast Missouri': 'Southeast Missouri State',
-    'Southeast Louisiana': 'Southeastern Louisiana',
-    'Southern State': 'Southern Arkansas',
-    'Southern State Arkansas': 'Southern Arkansas',
-    'Springfield College': 'Springfield Massachusetts',
-    'State College of Arkansas': 'Central Arkansas',
-    'Superior State': 'Wisconsin Superior',
-    'TCNJ': 'Tech College New Jersey',
-    'TCU': 'Texas Christian',
-    'Thomas Jefferson Textile': 'Thomas Jefferson',
-    'Towson': 'Towson State',
-    'Tri State': 'Trine',
-    'Trinity Christian': 'Trinity Illinois',
-    'Truman Missouri': 'Truman State',
-    'UC Irvine': 'California Irvine',
-    'Union Commonwealth': 'Union Kentucky',
-    'University of Charleston West Virginia': 'Charleston West Virginia',
-    'University of the Cumberlands': 'Cumberlands Kentucky',
-    'University of New England': 'New England University',
-    'University of Saint Thomas Texas': 'Saint Thomas Texas',
-    'VCU': 'Virginia Commonwealth',
-    'VMI': 'Virginia Military Institute',
-    'VPI': 'Virginia Tech',
-    'Valley State California': 'California State Northridge',
-    'Villa Julie': 'Stevenson',
-    'Wake': 'Wake Forest',
-    'Warner Southern': 'Warner Florida',
-    'Washington University in Saint Louis': 'Washington Saint Louis',
-    'West Carolina': 'Western Carolina',
-    'West Virginia Tech West Virginia': 'West Virginia Tech',
-    'Western Baptist Oregon': 'Corban',
-    'Western State': 'Western Colorado',
-    'Western State Colorado': 'Western Colorado',
-    'Westminster College Utah': 'Westminster Utah',
-    'William Smith': 'Hobart',
-    'WKU': 'Western Kentucky',
-    'WPI': 'Worcester Polytechnic Institute',
-    'WVU Tech': 'West Virginia Tech',
-    'Yankton College South Dakota': 'Yankton'
-}
+_team_renames: dict[str, str] = json.load(open('team_renames.json', encoding='utf-8'))
 """ This is our last chance to rename something.  We've tried our best up to this point, but some places are too quirky.
-different teams: Seton H[ai]ll, DePau[lw] """
+Some quick comments about some of them:
+Maryland Baltimore Co became Maryland Baltimore Colorado instead of Maryland Baltimore County
+Missouri S&T became Missouri South &T instead of not changing
+Post becomes Post Connecticut, but we need to be careful of Long Island Post
+Different teams: Seton H[ai]ll, DePau[lw] """
 
 _professional_renames: dict[str, dict[str, str]] = {
     'MLB': {
@@ -715,434 +551,37 @@ _prof_disambiguations: dict[str, dict[str, dict[str, tuple[()]]]] = {
 }
 """ Used by `get_disambiguator`. """
 
-_univ_disambiguations: dict[str, dict[str, tuple[str | re.Pattern, ...]]] = {
-    'Albany': {
-            'GA': ('Albany State Golden Rams',),
-            'NY': ('Albany Great Danes', 'America East')
-        },
-    'Alfred': {
-            'NY': ('Alfred Saxons',),
-            'OH': ()
-        },
-    'Alliance': {
-            'NY': ('Nyack College', 'Alliance University'),
-            'PA': ('Alliance College',)
-    },
-    'American': {
-            'DC': ('American University', 'American Eagles', 'CAA'),
-            'MA': ('American International', 'American Yellow Jackets')
-        },
-    'Anderson': {
-        'IN': (),
-        'SC': ()
-    },
-    'Athens': {
-        'AL': (),
-        'GA': ()
-    },
-    'Augustana': {
-            'IL': ('Augustana College (Il',),
-            'SD': ('Augustana University',)
-        },
-    'Baptist': {
-            'SC': ('Baptist Buccaneers', 'Charleston Southern')
-        },
-    'Baptist College': {
-            'SC': ('Baptist Buccaneers', 'Charleston Southern')
-        },
-    'Belmont': {
-            'OH': (),
-            'TN': ('Belmont University', 'Belmont Bruins', 'Ohio Valley Conference')
-        },
-    'Bethany': {
-        'KS': (),
-        'WV': ('Bethany College (West Virg',)
-    },
-    'Bethel': {
-            'IN': ('Bethel Pilots',),
-            'MN': ('Bethel Royals',),
-            'TN': ('Bethel Wildcats', 'Bethel University (TN')
-        },
-    'Bishop': {
-            'AL': (),
-            'TX': ('Bishop Tigers',)
-        },
-    'Carroll': {
-            'MT': ('Carroll College (Mont',),
-            'WI': ('Carroll University',)
-        },
-    'Centenary': {
-            'NJ': ('Centenary Cyclone',),
-            'LA': ('Centenary Gentlemen', 'Centenary Ladies',)
-        },
-    'Central': {
-            'MO': ('Central Methodist Eagles',),
-            'OH': ('Central State Marauders',),
-            'IL': (), 'IA': ('Central Dutch',), 'OK': (), 'TX': ()
-    },
-    'Central College': {
-            'MO': ('Central Methodist Eagles',),
-            'IL': (), 'IA': (), 'TX': ()
-        },
-    'Central Normal': {
-            'IN': ('Canterbury College',)
-        },
-    'Central State': {
-            'OH': ('Central State Marauders',),
-            'OK': ()
-    },
-    'Central Wesleyan': {
-            'MO': (),
-            'SC': ('Wesleyan Warriors',)
-        },
-    'Charleston': {
-            'SC': ('College of Charleston', 'Charleston Cougars', 'Colonial Athletic Association'),
-            'WV': ('University of Charleston', 'Charleston Golden Eagles')
-        },
-    'Clark': {
-            'Atlanta': (),
-            'MA': ('Clark Cougars',),
-            'OH': (),
-            'WA': ()
-        },
-    'Cleveland State': {
-            'OH': ('Cleveland State Vikings', 'Cleveland State University', 'Midwestern Collegiate Conference',
-                   'Horizon League'),
-            'TN': ('Cleveland State Cougars', 'Cleveland State Community College')
-        },
-    'Columbia': {
-            'NY': ('Columbia Lions',),
-            'MO': ('Columbia College (Missouri',),
-            'CA': (), 'Chicago': (), 'FL': (), 'Hollywood': (), 'Loras': (),
-            'OR': (), 'SC': (), 'VA': (), 'WA': (), 'WI': ()
-        },
-    'Columbus': {
-            'GA': ('Columbus State University', 'Columbus State Cougars'),
-            'OH': ('Columbus State Community College',)
-        },
-    'Columbus College': {
-            'GA': ('Columbus State University', 'Columbus State Cougars'),
-            'OH': ('Columbus State Community College',)
-        },
-    'Columbus State': {
-            'GA': ('Columbus State University', 'Columbus State Cougars'),
-            'OH': ('Columbus State Community College',)
-        },
-    'Concordia': {
-            'Chicago': ('Concordia (IL',),
-            'Irvine': ('Concordia Eagles', 'Concordia (Cali'),
-            'MN': (),
-            'NE': (),
-            'NY': (),
-            'OR': (),
-            'Saint Paul': (),
-            'TX': (),
-            'WI': ()
-    },
-    'Cornell': {
-            'NY': ('Cornell University', 'Cornell Big Red', 'ECAC'),
-            'IA': ('Cornell Rams',)
-        },
-    'Dominican': {
-            'CA': (),
-            'NY': ('Dominican Chargers',)
-    },
-    'Eastern': {
-        'PA': ('Eastern Eagles', 'Eastern University'),
-        'CT': (), 'IL': (), 'KY': (), 'Mennonite': (), 'MI': (), 'NM': (), 'OR': (), 'WA': (), 'TX': (),  # Univ
-        'VA': (), 'AZ': (), 'ID': (), 'IA': (), 'Nazarene': (), 'OK': (), 'WV': (), 'MT': ()  # College
-    },
-    'Emmanuel': {
-            'GA': ('Emmanuel Lions', 'Emmanuel College (Georgia'),
-            'MA': ()
-        },
-    'Franklin': {
-            'and Marshall': (),
-            'IN': ('Franklin Grizzlies',),
-            'Pierce': ()
-        },
-    'Georgetown': {
-            'DC': ('Georgetown University', 'Hoyas', 'Big East'),
-            'KY': ('Georgetown College', 'Georgetown Tigers',)
-        },
-    'Gordon': {
-            'GA': (),
-            'MA': ('Gordon Fighting Scots', 'Gordon College (Mass')
-        },
-    'Grace': {
-            'IN': ('Grace Lancers',),
-            'NE': ()
-        },
-    'Holy Cross': {
-            'IN': ('Holy Cross Saints',),
-            'LA': ('Our Lady of Holy Cross College',),
-            'MA': ('Holy Cross Crusaders', 'College of the Holy Cross', 'Patriot League', 'Atlantic Hockey')
-        },
-    'Holy Family': {
-            'PA': ('Holy Family Tigers', 'Holy Family University'),
-            'WI': ('Holy Family Lakers',)
-        },
-    'Hope': {
-            'International': ('Hope Royals',),
-            'MI': ('Hope Flying', 'Hope College')
-        },
-    'Jacksonville': {
-            'AL': (),
-            'FL': ('Jacksonville Dolphins', 'Jacksonville University', 'Atlantic Sun')
-        },
-    'Johnson and Wales': {
-            'Denver': (),
-            'RI': ('New England Hockey Conference', 'Commonwealth Coast Conference', 'Johnson & Wales (R.I')
-        },
-    'Lafayette': {
-            'LA': ('Lafayette Ragin',),
-            'PA': ('Lafayette College', 'Lafayette Leopards', 'Patriot League')
-        },
-    'Lake Superior': {
-            'State': (),  # MI
-            'MN': ()
-        },
-    'Lincoln': {
-            'MO': (),
-            'PA': ()
-        },
-    'Lindenwood': {
-            'Belleville': (),
-            'MO': ('Lindenwood Lions', 'Lindenwood University')
-        },
-    'Loyola': {
-            'Marymount': ('Loyola Marymount', 'Loyola Lions'),
-            'MD': ('Loyola Greyhounds',),
-            'New Orleans': ('Loyola Wolf Pack', 'Loyola (La'),
-            'Chicago': ('Loyola Ramblers', 'Missouri Valley Conference')
-        },
-    'Marian': {
-            'IN': ('Marian Knights',),
-            'WI': ('Marian Sabres',)
-        },
-    'Marymount': {
-            'KS': (),
-            'VA': ('Marymount Saints',)
-        },
-    'Maryville': {
-            'MO': ('Maryville Saints', 'Maryville University'),
-            'TN': ('Maryville Scots',)
-        },
-    'Metro State': {
-            'Denver': ('Metro State Roadrunners', 'Metropolitan State Roadrunners',
-                       'Metropolitan State University of Denver', 'Metropolitan State College of Denver'),
-            'MN': ()
-        },
-    'Monmouth': {
-            'NJ': ('Monmouth Hawks', 'Monmouth University', 'Metro Atlantic Athletic Conference'),
-            'IL': ('Monmouth Fighting Scots', 'Monmouth Scots')
-        },
-    "Mount Saint Mary's": {
-            'CA': ("Mary's Athenians",),
-            'MD': ("Mary's Mountaineers", 'Metro Atlantic Athletic Conference', 'Northeast Conference'),
-            'NH': (), 'NY': ()
-        },
-    'New England': {
-            'College': ('New England College', 'New England Pilgrims'),  # NH
-            'University': ('University of New England', 'New England Nor'),  # ME
-            'Western': ()  # MA
-    },
-    'North Central': {
-            'IL': ('North Central Cardinals',),
-            'MN': ()
-        },
+_univ_disambiguations: dict[str, dict[str, list[str | re.Pattern]]] \
+    = json.load(open('univ_disambiguations.json', encoding='utf-8')) \
+    | {
     'Northeastern': {
-            'CO': ('Northeastern Junior College',),
-            'IL': ('Northeastern Golden Eagles',),
-            'MA': ('Northeastern Huskies', 'Colonial Athletic Association', 'Hockey East', 'ECAC',
-                   re.compile(r'Northeastern University\S'))
-        },
-    'Northwood': {
-            'FL': (),
-            'MI': ('Northwood Timberwolves',)
-        },
-    'Oakland': {
-            'MI': ('Oakland Grizzlies', 'Oakland Golden Grizzlies', 'Summit League', 'Oakland University',
-                   'Horizon League'),
-            'MS': ()
-        },
-    'Olivet': {
-            'CA': (),
-            'MI': ('Olivet Comets',),
-            'Nazarene': ()
-        },
-    'Ottawa': {
-            'AZ': (),
-            'KS': (),
-            'ON': ()
-        },
-    'Pacific': {
-            'CA': ('Pacific Tiger', 'University of the Pacific', 'West Coast Conference'),
-            'OR': ('Pacific Boxer',)
-        },
-    'Park': {
-            'MO': ('Park Pirates', 'Park University')
-        },
-    'Parsons': {
-            'IA': ('Parsons College',),
-            'NY': ('Parsons School of Design',)
-        },
-    'Queens': {
-            'NC': ('Queens Royals',),
-            'NY': ('Queens Knights',)
-        },
-    'Regis': {
-            'CO': ('Regis Rangers', 'Regis University'),
-            'MA': ()
-        },
-    'Rio Grande': {
-            'OH': ('Rio Grande Red',)
+            'CO': ['Northeastern Junior College'],
+            'IL': ['Northeastern Golden Eagles'],
+            'MA': ['Northeastern Huskies', 'Colonial Athletic Association', 'Hockey East', 'ECAC',
+                   re.compile(r'Northeastern University\S')]
         },
     'Robert Morris': {
-            'IL': ('Morris Eagles', 'Robert Morris University Illinois'),
-            'PA': ('Morris Colonials', 'Northeast Conference', 'Atlantic Hockey',
-                   re.compile(r'Robert Morris University\S'))
-        },
-    'Rochester': {
-            'Institute Tech': (),
-            'MI': ('Rochester Warriors', 'Rochester University', 'Rochester Christian University'),
-            'NY': ('Rochester Yellowjackets', 'University of Rochester')
-        },
-    'Rocky Mountain': {
-            'CO': (),
-            'MT': ('Rocky Mountain Battlin', 'Rocky Mountain College')
-        },
-    'Sacred Heart': {
-            'CT': ('Sacred Heart Pioneers', 'Northeast Conference', 'Atlantic Hockey')
+            'IL': ['Morris Eagles', 'Robert Morris University Illinois'],
+            'PA': ['Morris Colonials', 'Northeast Conference', 'Atlantic Hockey',
+                   re.compile(r'Robert Morris University\S')]
         },
     'Benedict': {
-            'SC': ('Benedict Tigers', 'Benedict College', re.compile(r'\SBenedict(\S|\n)'))
-        },
-    'Benedictine': {
-            'IL': (),
-            'KS': ()
-        },
-    'Saint Benedict': {
-            'KS': (),
-            'MN': ("College of Saint Benedict and Saint John's University", 'Benedict Blazers')
-        },
-    "Saint Benedict's": {
-            'KS': (),
-            'MN': ()
-        },
-    'Saint Francis': {
-            'Brooklyn': ('Francis Terriers',),
-            'IN': ('Francis Cougars',),
-            'PA': ('Francis Red Flash',)
-        },
-    "Saint John's": {
-            'MN': ("College of Saint Benedict and Saint John's University", 'Johnnies'),
-            'NY': ("St. John's Red", 'Big East', "St. John's University (New York City)", 'Jamaica, NY')
+            'SC': ['Benedict Tigers', 'Benedict College', re.compile(r'\SBenedict(\S|\n)')]
         },
     "Saint Joseph's": {
-            'Brooklyn': ("Joseph's Bears",),
-            'CT': ("Joseph's Blue Jays",),
-            'IN': ("St. Joseph's (IN)", "Joseph's Pumas"),
-            'Long Island': ("Joseph's Golden Eagles",),
-            'ME': ("Joseph's Monks",),
-            'NY': (),
-            'PA': ("Joseph's Hawks", 'Atlantic 10', re.compile(r"Saint Joseph's University\S"))
-        },
-    "Saint Mary's": {
-            'CA': ("Mary's Gaels", "Mary's College Gaels", "Mary's College of California", 'West Coast Conference'),
-            'MN': ("Mary's Cardinals",),
-            'TX': ("Mary's Rattlers", "Mary's (Tex")
-        },
-    'Saint Thomas': {
-            'FL': ('Thomas Bobcats', 'Thomas University (Fl'),
-            'MN': ('Thomas Tommies',)
-        },
-    'Salem': {
-        'MA': ('Salem State Vikings',),
-        'NC': ('Salem Spirit',),
-        'WV': ('Salem International', 'Salem Tigers', 'Salem Teikyo')
-    },
-    'Simpson': {
-            'CA': (),
-            'IA': ('Simpson Storm',)
+            'Brooklyn': ["Joseph's Bears"],
+            'CT': ["Joseph's Blue Jays"],
+            'IN': ["St. Joseph's (IN)", "Joseph's Pumas"],
+            'Long Island': ["Joseph's Golden Eagles"],
+            'ME': ["Joseph's Monks"],
+            'NY': [],
+            'PA': ["Joseph's Hawks", 'Atlantic 10', re.compile(r"Saint Joseph's University\S")]
         },
     'Smith': {
-            'MA': ('Smith Pioneers', re.compile(r'\SSmith College(\W|$)'),),
-            'NY': ()
-        },
-    'Southeastern': {
-            'FL': (),
-            'LA': (),
-            'OK': ()
-        },  # Southwestern [Univ] is also ambiguous in 2015 BBW D3
-    'Springfield': {
-            'IL': ('Springfield Prairie Stars',),
-            'MA': ('Springfield Pride', 'Springfield College', 'Springfield Maroons')
-        },
-    'Stevens': {
-            'Tech': ('Stevens Ducks', 'Stevens Institute of Technology')
-        },
-    'Trinity': {
-            'CT': ('Trinity Bantams',),
-            'TX': ('Trinity Tigers',),
-            'AL': (), 'DC': (), 'FL': (), 'IL': (),  # 3 in FL, 2 in IL
-            'IN': (), 'NC': (), 'ND': (), 'SD': (), 'VT': (), 'WA': ()
-        },
-    'Truman': {
-            'IL': ('Harry S Truman College',),
-            'MO': ('Truman Bulldogs', 'Truman State')
-        },
-    'Union': {
-            'KY': ('Union College (Kentucky)',),
-            'NY': ('Union Dutchmen', 'ECAC Hockey'),
-            'OH': (),  # a failing private online university
-            'TN': ('Union Bulldogs',)
-        },
-    'Valley State': {
-            'CA': ('Valley State Matadors',)
-        },
-    'Warner': {
-            'FL': ('Warner Royals',)
-        },
-    'Wayne State': {
-            'MI': ('Wayne State University', 'Wayne State Warriors'),
-            'NE': ('Wayne State College',)
-        },
-    'Wesleyan': {
-            'CT': ('Wesleyan University', 'Wesleyan Cardinals'),
-            'GA': ('Wesleyan College',)
-        },  # there's a whole slew of others, but they go by "<adjective> Wesleyan"
-    'Western Baptist': {
-            'MO': (),
-            'OR': ('Corban',)
-    },
-    'Westminster': {
-            'MO': (),
-            'PA': ('Westminster College, Penn',),
-            'UT': ()
-        },
-    'Wheaton': {
-            'IL': (),
-            'MA': ()
-        },
-    'Williams': {
-            'Baptist': ('Williams Baptist',),
-            'MA': ('Williams Ephs', 'Williams College')
-        },
-    'Wilmington': {
-            'NC': (),
-            'DE': ('Wilmington University',),
-            'OH': ()
-        },
-    'Wilson': {
-        'CA': (),
-        'PA': ('Wilson Phoenix',)
-    },
-    'York': {
-        'NE': ('York Panthers',),
-        'PA': ()
+            'MA': ['Smith Pioneers', re.compile(r'\SSmith College(\W|$)')],
+            'NY': []
+        }
     }
-}
 """ These are used in `_disambiguation_match`.  If an element of the tuple is present in content, then we assume we have
 that tuple's key.  We use the conferences only in non-national tournaments. """
 
@@ -1204,7 +643,7 @@ def _disambiguation_literal(uni: str, st: str, content: str) -> bool:
 
 
 def get_disambiguating_phrases(uni: str,
-                               disambiguation: dict[str, tuple],
+                               disambiguation: dict[str, typing.Iterable[str | re.Pattern]],
                                content: str,
                                is_national: bool) -> set[str]:
     """ Filter phrases to identify what could disambiguate a given university """
@@ -1227,7 +666,7 @@ def get_disambiguator(content: str, flags: Flags) -> dict[str, dict[str, str]]:
             'USC Upstate': 'South Carolina Upstate'
         }
     }
-    _disambiguations: dict[str, dict[str, tuple[str | re.Pattern, ...]]]\
+    _disambiguations: dict[str, dict[str, typing.Iterable[str | re.Pattern]]]\
         = _prof_disambiguations[flags.is_professional.rstrip('_')] if flags.is_professional else _univ_disambiguations
     # USC usually means Trojans (and definitely in a bracket). That will override
     if 'Gamecocks' in content or 'South Car' in content:
@@ -1263,7 +702,7 @@ _professional_states: dict[str, str] = {
     'Oakland': 'CA',
     'Rochester': 'NY',
 }
-""" The state that a professional team plays in """
+""" The state that a professional team plays in. """
 
 
 def get_state(team: str, group: str) -> str:
@@ -1297,7 +736,7 @@ standard_time: dict[str, dict[str, str]] = {
         'daylight': 'Mountain'
     }
 }
-""" these don't observe DST """
+""" These don't observe DST. """
 
 
 def get_timezone(team: str, group: str) -> str:

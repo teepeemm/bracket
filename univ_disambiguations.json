@@ -1,0 +1,404 @@
+{
+    "Albany": {
+            "GA": ["Albany State Golden Rams"],
+            "NY": ["Albany Great Danes", "America East"]
+        },
+    "Alfred": {
+            "NY": ["Alfred Saxons"],
+            "OH": []
+        },
+    "Alliance": {
+            "NY": ["Nyack College", "Alliance University"],
+            "PA": ["Alliance College"]
+    },
+    "American": {
+            "DC": ["American University", "American Eagles", "CAA"],
+            "MA": ["American International", "American Yellow Jackets"]
+        },
+    "Anderson": {
+        "IN": [],
+        "SC": []
+    },
+    "Athens": {
+        "AL": [],
+        "GA": []
+    },
+    "Augustana": {
+            "IL": ["Augustana College (Il"],
+            "SD": ["Augustana University"]
+        },
+    "Baptist": {
+            "SC": ["Baptist Buccaneers", "Charleston Southern"]
+        },
+    "Baptist College": {
+            "SC": ["Baptist Buccaneers", "Charleston Southern"]
+        },
+    "Belmont": {
+            "OH": [],
+            "TN": ["Belmont University", "Belmont Bruins", "Ohio Valley Conference"]
+        },
+    "Bethany": {
+        "KS": [],
+        "WV": ["Bethany College (West Virg"]
+    },
+    "Bethel": {
+            "IN": ["Bethel Pilots"],
+            "MN": ["Bethel Royals"],
+            "TN": ["Bethel Wildcats", "Bethel University (TN"]
+        },
+    "Bishop": {
+            "AL": [],
+            "TX": ["Bishop Tigers"]
+        },
+    "Carroll": {
+            "MT": ["Carroll College (Mont"],
+            "WI": ["Carroll University"]
+        },
+    "Centenary": {
+            "NJ": ["Centenary Cyclone"],
+            "LA": ["Centenary Gentlemen", "Centenary Ladies"]
+        },
+    "Central": {
+            "MO": ["Central Methodist Eagles"],
+            "OH": ["Central State Marauders"],
+            "IL": [], "IA": ["Central Dutch"], "OK": [], "TX": []
+    },
+    "Central College": {
+            "MO": ["Central Methodist Eagles"],
+            "IL": [], "IA": [], "TX": []
+        },
+    "Central Normal": {
+            "IN": ["Canterbury College"]
+        },
+    "Central State": {
+            "OH": ["Central State Marauders"],
+            "OK": []
+    },
+    "Central Wesleyan": {
+            "MO": [],
+            "SC": ["Wesleyan Warriors"]
+        },
+    "Charleston": {
+            "SC": ["College of Charleston", "Charleston Cougars", "Colonial Athletic Association"],
+            "WV": ["University of Charleston", "Charleston Golden Eagles"]
+        },
+    "Clark": {
+            "Atlanta": [],
+            "MA": ["Clark Cougars"],
+            "OH": [],
+            "WA": []
+        },
+    "Cleveland State": {
+            "OH": ["Cleveland State Vikings", "Cleveland State University", "Midwestern Collegiate Conference",
+                   "Horizon League"],
+            "TN": ["Cleveland State Cougars", "Cleveland State Community College"]
+        },
+    "Columbia": {
+            "NY": ["Columbia Lions"],
+            "MO": ["Columbia College (Missouri"],
+            "CA": [], "Chicago": [], "FL": [], "Hollywood": [], "Loras": [],
+            "OR": [], "SC": [], "VA": [], "WA": [], "WI": []
+        },
+    "Columbus": {
+            "GA": ["Columbus State University", "Columbus State Cougars"],
+            "OH": ["Columbus State Community College"]
+        },
+    "Columbus College": {
+            "GA": ["Columbus State University", "Columbus State Cougars"],
+            "OH": ["Columbus State Community College"]
+        },
+    "Columbus State": {
+            "GA": ["Columbus State University", "Columbus State Cougars"],
+            "OH": ["Columbus State Community College"]
+        },
+    "Concordia": {
+            "Chicago": ["Concordia (IL"],
+            "Irvine": ["Concordia Eagles", "Concordia (Cali"],
+            "MN": [],
+            "NE": [],
+            "NY": [],
+            "OR": [],
+            "Saint Paul": [],
+            "TX": [],
+            "WI": []
+    },
+    "Cornell": {
+            "NY": ["Cornell University", "Cornell Big Red", "ECAC"],
+            "IA": ["Cornell Rams"]
+        },
+    "Dominican": {
+            "CA": [],
+            "NY": ["Dominican Chargers"]
+    },
+    "Eastern": {
+        "PA": ["Eastern Eagles", "Eastern University"],
+        "CT": [], "IL": [], "KY": [], "Mennonite": [], "MI": [], "NM": [], "OR": [], "WA": [], "TX": [],
+        "VA": [], "AZ": [], "ID": [], "IA": [], "Nazarene": [], "OK": [], "WV": [], "MT": []
+    },
+    "Emmanuel": {
+            "GA": ["Emmanuel Lions", "Emmanuel College (Georgia"],
+            "MA": []
+        },
+    "Franklin": {
+            "and Marshall": [],
+            "IN": ["Franklin Grizzlies"],
+            "Pierce": []
+        },
+    "Georgetown": {
+            "DC": ["Georgetown University", "Hoyas", "Big East"],
+            "KY": ["Georgetown College", "Georgetown Tigers"]
+        },
+    "Gordon": {
+            "GA": [],
+            "MA": ["Gordon Fighting Scots", "Gordon College (Mass"]
+        },
+    "Grace": {
+            "IN": ["Grace Lancers"],
+            "NE": []
+        },
+    "Holy Cross": {
+            "IN": ["Holy Cross Saints"],
+            "LA": ["Our Lady of Holy Cross College"],
+            "MA": ["Holy Cross Crusaders", "College of the Holy Cross", "Patriot League", "Atlantic Hockey"]
+        },
+    "Holy Family": {
+            "PA": ["Holy Family Tigers", "Holy Family University"],
+            "WI": ["Holy Family Lakers"]
+        },
+    "Hope": {
+            "International": ["Hope Royals"],
+            "MI": ["Hope Flying", "Hope College"]
+        },
+    "Jacksonville": {
+            "AL": [],
+            "FL": ["Jacksonville Dolphins", "Jacksonville University", "Atlantic Sun"]
+        },
+    "Johnson and Wales": {
+            "Denver": [],
+            "RI": ["New England Hockey Conference", "Commonwealth Coast Conference", "Johnson & Wales (R.I"]
+        },
+    "Lafayette": {
+            "LA": ["Lafayette Ragin"],
+            "PA": ["Lafayette College", "Lafayette Leopards", "Patriot League"]
+        },
+    "Lake Superior": {
+            "State": [],
+            "MN": []
+        },
+    "Lincoln": {
+            "MO": [],
+            "PA": []
+        },
+    "Lindenwood": {
+            "Belleville": [],
+            "MO": ["Lindenwood Lions", "Lindenwood University"]
+        },
+    "Loyola": {
+            "Marymount": ["Loyola Marymount", "Loyola Lions"],
+            "MD": ["Loyola Greyhounds"],
+            "New Orleans": ["Loyola Wolf Pack", "Loyola (La"],
+            "Chicago": ["Loyola Ramblers", "Missouri Valley Conference"]
+        },
+    "Marian": {
+            "IN": ["Marian Knights"],
+            "WI": ["Marian Sabres"]
+        },
+    "Marymount": {
+            "KS": [],
+            "VA": ["Marymount Saints"]
+        },
+    "Maryville": {
+            "MO": ["Maryville Saints", "Maryville University"],
+            "TN": ["Maryville Scots"]
+        },
+    "Metro State": {
+            "Denver": ["Metro State Roadrunners", "Metropolitan State Roadrunners",
+                       "Metropolitan State University of Denver", "Metropolitan State College of Denver"],
+            "MN": []
+        },
+    "Monmouth": {
+            "NJ": ["Monmouth Hawks", "Monmouth University", "Metro Atlantic Athletic Conference"],
+            "IL": ["Monmouth Fighting Scots", "Monmouth Scots"]
+        },
+    "Mount Saint Mary's": {
+            "CA": ["Mary's Athenians"],
+            "MD": ["Mary's Mountaineers", "Metro Atlantic Athletic Conference", "Northeast Conference"],
+            "NH": [], "NY": []
+        },
+    "New England": {
+            "College": ["New England College", "New England Pilgrims"],
+            "University": ["University of New England", "New England Nor"],
+            "Western": []
+    },
+    "North Central": {
+            "IL": ["North Central Cardinals"],
+            "MN": []
+        },
+    "Northwood": {
+            "FL": [],
+            "MI": ["Northwood Timberwolves"]
+        },
+    "Oakland": {
+            "MI": ["Oakland Grizzlies", "Oakland Golden Grizzlies", "Summit League", "Oakland University",
+                   "Horizon League"],
+            "MS": []
+        },
+    "Olivet": {
+            "CA": [],
+            "MI": ["Olivet Comets"],
+            "Nazarene": []
+        },
+    "Ottawa": {
+            "AZ": [],
+            "KS": [],
+            "ON": []
+        },
+    "Pacific": {
+            "CA": ["Pacific Tiger", "University of the Pacific", "West Coast Conference"],
+            "OR": ["Pacific Boxer"]
+        },
+    "Park": {
+            "MO": ["Park Pirates", "Park University"]
+        },
+    "Parsons": {
+            "IA": ["Parsons College"],
+            "NY": ["Parsons School of Design"]
+        },
+    "Queens": {
+            "NC": ["Queens Royals"],
+            "NY": ["Queens Knights"]
+        },
+    "Regis": {
+            "CO": ["Regis Rangers", "Regis University"],
+            "MA": []
+        },
+    "Rio Grande": {
+            "OH": ["Rio Grande Red"]
+        },
+    "Rochester": {
+            "Institute Tech": [],
+            "MI": ["Rochester Warriors", "Rochester University", "Rochester Christian University"],
+            "NY": ["Rochester Yellowjackets", "University of Rochester"]
+        },
+    "Rocky Mountain": {
+            "CO": [],
+            "MT": ["Rocky Mountain Battlin", "Rocky Mountain College"]
+        },
+    "Sacred Heart": {
+            "CT": ["Sacred Heart Pioneers", "Northeast Conference", "Atlantic Hockey"]
+        },
+    "Benedictine": {
+            "IL": [],
+            "KS": []
+        },
+    "Saint Benedict": {
+            "KS": [],
+            "MN": ["College of Saint Benedict and Saint John's University", "Benedict Blazers"]
+        },
+    "Saint Benedict's": {
+            "KS": [],
+            "MN": []
+        },
+    "Saint Francis": {
+            "Brooklyn": ["Francis Terriers"],
+            "IN": ["Francis Cougars"],
+            "PA": ["Francis Red Flash"]
+        },
+    "Saint John's": {
+            "MN": ["College of Saint Benedict and Saint John's University", "Johnnies"],
+            "NY": ["St. John's Red", "Big East", "St. John's University (New York City)", "Jamaica, NY"]
+        },
+    "Saint Mary's": {
+            "CA": ["Mary's Gaels", "Mary's College Gaels", "Mary's College of California", "West Coast Conference"],
+            "MN": ["Mary's Cardinals"],
+            "TX": ["Mary's Rattlers", "Mary's (Tex"]
+        },
+    "Saint Thomas": {
+            "FL": ["Thomas Bobcats", "Thomas University (Fl"],
+            "MN": ["Thomas Tommies"]
+        },
+    "Salem": {
+        "MA": ["Salem State Vikings"],
+        "NC": ["Salem Spirit"],
+        "WV": ["Salem International", "Salem Tigers", "Salem Teikyo"]
+    },
+    "Simpson": {
+            "CA": [],
+            "IA": ["Simpson Storm"]
+        },
+    "Southeastern": {
+            "FL": [],
+            "LA": [],
+            "OK": []
+        },
+    "Southwestern": {
+            "TX": ["Southwestern University"]
+    },
+    "Springfield": {
+            "IL": ["Springfield Prairie Stars"],
+            "MA": ["Springfield Pride", "Springfield College", "Springfield Maroons"]
+        },
+    "Stevens": {
+            "Tech": ["Stevens Ducks", "Stevens Institute of Technology"]
+        },
+    "Trinity": {
+            "CT": ["Trinity Bantams"],
+            "TX": ["Trinity Tigers"],
+            "AL": [], "DC": [], "FL": [], "IL": [],
+            "IN": [], "NC": [], "ND": [], "SD": [], "VT": [], "WA": []
+        },
+    "Truman": {
+            "IL": ["Harry S Truman College"],
+            "MO": ["Truman Bulldogs", "Truman State"]
+        },
+    "Union": {
+            "KY": ["Union College (Kentucky)"],
+            "NY": ["Union Dutchmen", "ECAC Hockey"],
+            "OH": [],
+            "TN": ["Union Bulldogs"]
+        },
+    "Valley State": {
+            "CA": ["Valley State Matadors"]
+        },
+    "Warner": {
+            "FL": ["Warner Royals"]
+        },
+    "Wayne State": {
+            "MI": ["Wayne State University", "Wayne State Warriors"],
+            "NE": ["Wayne State College"]
+        },
+    "Wesleyan": {
+            "CT": ["Wesleyan University", "Wesleyan Cardinals"],
+            "GA": ["Wesleyan College"]
+        },
+    "Western Baptist": {
+            "MO": [],
+            "OR": ["Corban"]
+    },
+    "Westminster": {
+            "MO": [],
+            "PA": ["Westminster College, Penn"],
+            "UT": []
+        },
+    "Wheaton": {
+            "IL": [],
+            "MA": []
+        },
+    "Williams": {
+            "Baptist": ["Williams Baptist"],
+            "MA": ["Williams Ephs", "Williams College"]
+        },
+    "Wilmington": {
+            "NC": [],
+            "DE": ["Wilmington University"],
+            "OH": []
+        },
+    "Wilson": {
+        "CA": [],
+        "PA": ["Wilson Phoenix"]
+    },
+    "York": {
+        "NE": ["York Panthers"],
+        "PA": []
+    }
+}
