@@ -701,8 +701,7 @@ def write_conf_reseeding(group: str, tourney_group: dict[str, typing.Any]) -> No
         pass
     outcomes: collections.defaultdict[str, dict[str, list[int]]] = collections.defaultdict(
         lambda: {'wins': [], 'losses': []})
-    tourneys_of_year = get_tourneys_of_year(tourney_group)
-    for year, tourneys in tourneys_of_year.items():
+    for year, tourneys in get_tourneys_of_year(tourney_group).items():
         # Conferences change over the years. Any tournament determines that conference's teams for that year
         confs: dict[str, set[str]] = collections.defaultdict(set)
         for tourney in tourneys:

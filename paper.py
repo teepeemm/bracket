@@ -113,10 +113,10 @@ def write_plot_file_round(win_loss_file: str, plot_file: str, should_skip: typin
                 if total < 10:
                     continue
                 center, half_width = analyze.get_confidence_interval(win_loss[row, col], total)
-                x_coord = col - row
+                # x_coord = col - row
                 print(f'Seeds: {row} v {col}: {center:.2%} +- {half_width:.2%}')
-                x_coords[x_coord] += 1
-                plotted_x = x_coord + (x_coords[x_coord]-1)/32  # so that identical x_coords don't overlap
+                x_coords[col - row] += 1
+                plotted_x = col - row + (x_coords[col - row]-1)/32  # so that identical x_coords don't overlap
                 tex_file.write(f'\\draw({plotted_x},{center+half_width})--++(0,{-2*half_width});\n')
         center, half_width = analyze.get_confidence_interval(overall_wins, overall_total)
         print(f'overall: {center:.2%} +- {half_width:.2%}')

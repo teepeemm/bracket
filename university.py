@@ -115,8 +115,8 @@ r""" This will be: `name = re.sub(r'\b'+key+r'(\.|\b)', value, name)`. """
 
 with open('team_renames.json', encoding='utf-8') as _json:
     _team_renames: dict[str, str] = json.load(_json)
-""" This is our last chance to rename something.  We've tried our best up to this point, but some places are too quirky.
-Some quick comments about some of them:
+    """ This is our last chance to rename something.  We've tried our best up to this point, but some places are too
+quirky. Some quick comments about some of them:
 Maryland Baltimore Co became Maryland Baltimore Colorado instead of Maryland Baltimore County
 Missouri S&T became Missouri South &T instead of not changing
 Post becomes Post Connecticut, but we need to be careful of Long Island Post
@@ -583,8 +583,8 @@ with open('univ_disambiguations.json', encoding='utf-8') as _json:
             'NY': []
         }
     }
-""" These are used in `_disambiguation_match`.  If an element of the tuple is present in content, then we assume we have
-that tuple's key.  We use the conferences only in non-national tournaments.
+    """ These are used in `_disambiguation_match`.  If an element of the tuple is present in content, then we assume we
+have that tuple's key.  We use the conferences only in non-national tournaments.
 Most of this is offloaded to univ_disambiguations.json.  The ones here use a regex, which isn't valid json. """
 
 _univ_disambiguation_defaults: dict[tuple[str, str], dict[str, tuple[str | re.Pattern, ...]]] = {
@@ -708,7 +708,7 @@ _professional_states: dict[str, str] = {
 
 
 def get_state(team: str, group: str) -> str:
-    """ The state where a team is located """
+    """ The state where a team is located. """
     if not team:
         return ''
     if group == 'professional' and team == 'Washington':
@@ -840,20 +840,9 @@ def normalize_professional_name(team_name: str, tourney: str) -> str:
     return value
 
 
-def normalize_team_name(team_name: str, disambiguator: dict) -> str:
-    """ Transform a university's team name into a standard form. This is the most important function of the module. """
-    value = team_name
-    # start by getting this into ascii (but no hyphens)
-    value = re.sub(r'[-\u2010-\u2015\u2212]', ' ', value)  # various hyphens
-    value = re.sub('[ʻ’]', "'", value)  # leaning single quotes
-    value = value.replace('é', 'e')
-    for state, city_tuple in _state_university.items():
-        for city in city_tuple:
-            if city in team_name:
-                return f'{state} {city}'
-    value = team_remove_prefix(value)
-    value = team_rstrip_common(value)
-    for_set = value  # to eventually add to _team_name_from
+def _expand_abbrevs(value: str) -> str:
+    """ :param value:
+    :return: `value`, with various abbreviations expanded. """
     value = re.sub(r'\s\s+', ' ', value)
     value = re.sub(r'^Mt\.? ', 'Mount ', value)
     value = re.sub(r'^(Mount )?St(\.|\b)', r'\1Saint', value)
@@ -865,17 +854,13 @@ def normalize_team_name(team_name: str, disambiguator: dict) -> str:
     value = re.sub(r'(?<=\s)\(([A-Z][A-Za-z])\.?\)$',
                    lambda m: other_state_abbrevs.get(m.group(1).upper(), m.group(0)), value)
     value = re.sub(r'\b([A-Z])\.? ([A-Z])(\.|\b)', _get_spaced_abbrev, value)
-    for abbrev, expanded in university_of.items():
-        if value == 'U' + abbrev:
-            _team_name_from[expanded].add(for_set)
-            return expanded
-    # Pennsylvania has two weird cases
-    if 'California' in value and 'Pennsylvania' in value:
-        return 'PennWest California'
-    if 'Indiana' in value and 'Pennsylvania' in value:
-        return 'Indiana Pennsylvania'
+    return value
+
+
+def _expand_more_abbrevs(value: str) -> str:
+    """ :param value:
+    :return: `value`, with more abbreviations expanded. """
     value = value.replace(',', '')
-    # expand some more abbreviations
     for state in all_states:
         if state in value:
             value = re.sub(state + r' St(\.|\b)', state + ' State', value)
@@ -891,6 +876,34 @@ def normalize_team_name(team_name: str, disambiguator: dict) -> str:
     value = re.sub(r'St\.?$', 'State', value)  # this comes before or after the trailing <state>
     value = team_remove_suffix(value)
     value = re.sub(r'St\.?$', 'State', value)
+    return value
+
+
+def normalize_team_name(team_name: str, disambiguator: dict) -> str:
+    """ Transform a university's team name into a standard form. This is the most important function of the module. """
+    value = team_name
+    # start by getting this into ascii (but no hyphens)
+    value = re.sub(r'[-\u2010-\u2015\u2212]', ' ', value)  # various hyphens
+    value = re.sub('[ʻ’]', "'", value)  # leaning single quotes
+    value = value.replace('é', 'e')
+    for state, city_tuple in _state_university.items():
+        for city in city_tuple:
+            if city in team_name:
+                return f'{state} {city}'
+    value = team_remove_prefix(value)
+    value = team_rstrip_common(value)
+    for_set = value  # to eventually add to _team_name_from
+    value = _expand_abbrevs(value)
+    for abbrev, expanded in university_of.items():
+        if value == 'U' + abbrev:
+            _team_name_from[expanded].add(for_set)
+            return expanded
+    # Pennsylvania has two weird cases
+    if 'California' in value and 'Pennsylvania' in value:
+        return 'PennWest California'
+    if 'Indiana' in value and 'Pennsylvania' in value:
+        return 'Indiana Pennsylvania'
+    value = _expand_more_abbrevs(value)
     for regex, output in _versions.items():
         if re.fullmatch(regex, value):
             _team_name_from[output].add(for_set)
