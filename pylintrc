@@ -17,5 +17,5 @@ max-returns=6
 max-line-length=120
 
 # Maximum number of lines in a module.
-# default was 1000, but I'm over that. but could I shorten university by offloading into a data file?
-max-module-lines=1500
+# default was 1000, but I'm over that. but could I shorten analyze by offloading into a data file?
+max-module-lines=1100

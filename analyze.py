@@ -4,7 +4,8 @@ A key file for `__main__` is tourneys.json.  In that file, the highest level is 
 gender in the case of basketball) (although the last group is 'other'). Within a group, each line is another object
 corresponding to a tournament with a name and years that tournament occurred. See `get_years()` for that last item.
 Often, a tournament changed their name over the years. In that case, we distinguish the tournaments within the json file
-by appending a '_' to the key. This leads to the same directory, and we consolidate the data for the tournament.
+by appending one or more `_` to the key. This leads to the same directory, and we consolidate the data for the
+tournament.
 
 This will attempt to locate tournaments through the latest complete year.  This means that as a year progresses,
 tournaments that have recently finished will not be evaluated until the end of the calendar year. Note that

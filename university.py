@@ -113,7 +113,8 @@ other_abbrevs: dict[str, str] = {
 }
 r""" This will be: `name = re.sub(r'\b'+key+r'(\.|\b)', value, name)`. """
 
-_team_renames: dict[str, str] = json.load(open('team_renames.json', encoding='utf-8'))
+with open('team_renames.json', encoding='utf-8') as _json:
+    _team_renames: dict[str, str] = json.load(_json)
 """ This is our last chance to rename something.  We've tried our best up to this point, but some places are too quirky.
 Some quick comments about some of them:
 Maryland Baltimore Co became Maryland Baltimore Colorado instead of Maryland Baltimore County
@@ -551,24 +552,24 @@ _prof_disambiguations: dict[str, dict[str, dict[str, tuple[()]]]] = {
 }
 """ Used by `get_disambiguator`. """
 
-_univ_disambiguations: dict[str, dict[str, list[str | re.Pattern]]] \
-    = json.load(open('univ_disambiguations.json', encoding='utf-8')) \
-    | {
-    'Northeastern': {
+with open('univ_disambiguations.json', encoding='utf-8') as _json:
+    _univ_disambiguations: dict[str, dict[str, list[str | re.Pattern]]] \
+        = json.load(_json) | {
+        'Northeastern': {
             'CO': ['Northeastern Junior College'],
             'IL': ['Northeastern Golden Eagles'],
             'MA': ['Northeastern Huskies', 'Colonial Athletic Association', 'Hockey East', 'ECAC',
                    re.compile(r'Northeastern University\S')]
         },
-    'Robert Morris': {
+        'Robert Morris': {
             'IL': ['Morris Eagles', 'Robert Morris University Illinois'],
             'PA': ['Morris Colonials', 'Northeast Conference', 'Atlantic Hockey',
                    re.compile(r'Robert Morris University\S')]
         },
-    'Benedict': {
+        'Benedict': {
             'SC': ['Benedict Tigers', 'Benedict College', re.compile(r'\SBenedict(\S|\n)')]
         },
-    "Saint Joseph's": {
+        "Saint Joseph's": {
             'Brooklyn': ["Joseph's Bears"],
             'CT': ["Joseph's Blue Jays"],
             'IN': ["St. Joseph's (IN)", "Joseph's Pumas"],
@@ -577,13 +578,14 @@ _univ_disambiguations: dict[str, dict[str, list[str | re.Pattern]]] \
             'NY': [],
             'PA': ["Joseph's Hawks", 'Atlantic 10', re.compile(r"Saint Joseph's University\S")]
         },
-    'Smith': {
+        'Smith': {
             'MA': ['Smith Pioneers', re.compile(r'\SSmith College(\W|$)')],
             'NY': []
         }
     }
 """ These are used in `_disambiguation_match`.  If an element of the tuple is present in content, then we assume we have
-that tuple's key.  We use the conferences only in non-national tournaments. """
+that tuple's key.  We use the conferences only in non-national tournaments.
+Most of this is offloaded to univ_disambiguations.json.  The ones here use a regex, which isn't valid json. """
 
 _univ_disambiguation_defaults: dict[tuple[str, str], dict[str, tuple[str | re.Pattern, ...]]] = {
     ('Miami', 'FL'): {
