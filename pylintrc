@@ -1,13 +1,8 @@
 [DESIGN]
 
-# Maximum number of branch for function / method body.
-max-branches=12
-
-# Maximum number of locals for function / method body.
-max-locals=15
-
 # Maximum number of return / yield for function / method body.
-max-returns=6
+# default was 6.  This is because of university.get_state
+max-returns=7
 
 
 [FORMAT]
@@ -15,7 +10,3 @@ max-returns=6
 # Maximum number of characters on a single line.
 # default was 100, but PyCharm allows 120
 max-line-length=120
-
-# Maximum number of lines in a module.
-# default was 1000, but I'm over that. but could I shorten analyze by offloading into a data file?
-max-module-lines=1100

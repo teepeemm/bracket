@@ -140,7 +140,12 @@ class TeamResult:
 
     @classmethod
     def from_nfl_pieces(cls, seed: str, name: str, score: str, disambiguator: dict[str, str]) -> TeamResult:
-        """ Because of how they're formatted, NFL TeamResults can be determined with a single function call """
+        """ Because of how they're formatted, NFL TeamResults can be determined with a single function call.
+        :param seed:
+        :param name:
+        :param score:
+        :param disambiguator:
+        :return: The TeamResult """
         seed_ = re.sub(r'\D', '', seed)
         seed_out = int(seed_) if seed_ else 0
         name_out = university.normalize_team_name(name.strip(), disambiguator)
@@ -149,8 +154,8 @@ class TeamResult:
 
     @classmethod
     def team_from_series(cls, series_data: dict[str, typing.Any]) -> typing.Iterator[TeamResult]:
-        """ Transforms a series of games (eg, best-of-7) into an iterator of individual games
-        by copying the team name and seed """
+        """ :param series_data: A series of games (eg, best-of-7)
+        :return: Individual games (done by copying the team name and seed) """
         for score in series_data['scores']:
             yield cls(series_data['seed'], series_data['team'], score)
 
@@ -161,11 +166,12 @@ class TeamResult:
         return team_data.get('team') or team_data.get('seed') or team_data.get('scores')
 
     @classmethod
-    def get_match_data(cls,
-                       match_info: list[str],
-                       flags: Flags,
+    def get_match_data(cls, match_info: list[str], flags: Flags,
                        disambiguator: dict) -> dict[tuple[str, str], dict]:
-        """ Take a bracket of information a line at a time and parcel the lines into particular matches """
+        """ :param match_info: The lines of a bracket
+        :param flags:
+        :param disambiguator:
+        :return: The bracket separated into rounds and matches. """
         match_data: dict[tuple[str, str], typing.Any] = collections.defaultdict(dict)
         for line in match_info:
             matched = re.search(r'RD(\d+)-(team|seed|scores?)(\d+).*=(.*)$', line)
@@ -233,11 +239,12 @@ class TeamResult:
             team_data['seed'] = 0
 
     @classmethod
-    def game_from_match(cls,
-                        match_info: list[str],
-                        flags: Flags,
+    def game_from_match(cls, match_info: list[str], flags: Flags,
                         disambiguator: dict) -> typing.Generator[Game, None, str]:
-        """ Convert the match information into a series of games """
+        """ :param match_info:
+        :param disambiguator:
+        :param flags:
+        :return: The match information as a series of games """
         match_data: dict[tuple[str, str], dict] = cls.get_match_data(match_info, flags, disambiguator)
         for team_num, team_data in match_data.items():
             cls.fix_seeding(team_num, team_data, flags)
@@ -265,9 +272,8 @@ class TeamResult:
 
     @staticmethod
     def get_conference(team: str, confs: dict[str, set[str]]) -> str:
-        """ Conferences can change, so we have to figure out the conferences for each year in question
-        :param team: The team in question
-        :param confs: A dict of {conference: {teams}} for that year
+        """ :param team: The team in question
+        :param confs: A dict[conference: set[teams]] for that year (since it changes for each year)
         :return: The conference for that team """
         for conf, teams in confs.items():
             if team in teams:
@@ -283,10 +289,9 @@ Game = tuple[TeamResult, TeamResult]
 
 
 def get_bracket(content: str, flags: Flags) -> typing.Iterator[tuple[str, dict]]:
-    """ Find brackets within a Wikipedia page
-    :param content: The content of the page
+    """ :param content: The original content of the page
     :param flags:
-    :return: The source code of the bracket, with some parsing and simplification already done """
+    :return: The source code of each bracket, with some parsing and simplification already done """
     disambiguator = university.get_disambiguator(content, flags)
     for pattern, repl in disambiguator['replacement'].items():
         content = re.sub(rf'\b{pattern}\b', repl, content)
@@ -315,8 +320,8 @@ def get_bracket(content: str, flags: Flags) -> typing.Iterator[tuple[str, dict]]
 
 
 def get_bracket_info(bracket: str) -> list[list[list[str]]]:
-    """ Separate the bracket info from Wikipedia into the items for each match in each round
-    :param bracket: """
+    """ :param bracket: The bracket info, as taken from Wikipedia (reformatted a bit)
+    :return: The bracket info, separated by round and match. """
     bracket_info: list[list[list[str]]] = []
     for line in re.split(r'\s*[|\n]\s*', bracket):
         matched = re.match(r'RD(\d+)-(seed|team|score)(\d+)', line)
@@ -333,7 +338,10 @@ def get_bracket_info(bracket: str) -> list[list[list[str]]]:
 
 
 def get_game_from_nfl_bracket(bracket: str, disambiguator: dict[str, str]) -> typing.Iterator[Game]:
-    """ NFL brackets, unlike the others, have an entire game on one line """
+    """ NFL brackets, unlike the others, have an entire game on one line
+    :param bracket:
+    :param disambiguator:
+    :return: Individual NFL games """
     for line in re.split(r'\s*\n\s*', bracket):
         pieces = line.rstrip('|').split('|')
         if len(pieces) < 6:
@@ -343,11 +351,9 @@ def get_game_from_nfl_bracket(bracket: str, disambiguator: dict[str, str]) -> ty
 
 
 def get_game_from_wikipedia(content: str, flags: Flags) -> typing.Iterator[Game]:
-    """ Find the games in the Wikipedia page.
-    :param content: The content of the page
+    """ :param content: The content of the page
     :param flags:
-    :return: Game results
-    """
+    :return: Game results in a Wikipedia page """
     for bracket, disambiguator in get_bracket(content, flags):
         flags = flags._replace(num_teams=-1)
         num_teams_m = re.match(r'(\d+)TeamBracket\W', bracket)
@@ -399,7 +405,7 @@ def get_source_mtime(directory: str, years: typing.Iterator[int] | typing.Iterat
 def get_potential_titles(description: SubgroupDesc, year: int | None, use_range: bool) -> list[str]:
     """ Determines potential titles that Wikipedia may use for a tournament.
     Sometimes the suffix is `.lower()`ed, and some tournaments have a template.
-    NFL playoffs use YYYY-(YY)YY (see `_get_year_range`), and sometimes that dash is an en-dash.
+    NFL playoffs use YYYY-(YY)YY (see `_get_year_range`), and sometimes that dash is an en-dash (in the url!).
     :param description: the dict describing the details of this tournament
     :param year: The year of the tournament
     :param use_range: Whether to use `_get_year_range` for the year """
@@ -464,7 +470,7 @@ def create_wiki_cache(filename: str, potential_titles: list[str]) -> bool:
     return create_wiki_cache(filename, potential_titles)
 
 
-def write_plot_file(winner, filename: str) -> None:
+def write_plot_file(winner: numpy.ndarray, filename: str) -> None:
     """ Create a plot of winning probability confidence intervals.
     :param winner: The win/loss numpy matrix
     :param filename: """
@@ -593,17 +599,14 @@ def write_group_betas(group: str, nonconference: list[str]) -> None:
 
 
 def identity(entered: str, **_) -> str:
-    """ Returns its argument
-    :param entered: The argument to return
+    """ :param entered: The argument to return
     :param _: Not used. Only present to allow replacements to take keywords """
     return entered
 
 
-def write_overall_reseeding(tourneys: dict[str, typing.Any],
-                            grouper: typing.Callable[..., str] = identity,
+def write_overall_reseeding(tourneys: dict[str, typing.Any], grouper: typing.Callable[..., str] = identity,
                             label: str = '') -> None:
-    """ This function takes awhile
-    :param tourneys:
+    """ :param tourneys:
     :param grouper:
     :param label: """
     try:
@@ -645,10 +648,8 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any],
         output.to_csv('html/reseed_filtered.csv', index=False, columns=columns)
 
 
-def write_group_reseeding(group: str,
-                          tourney_group: dict[str, typing.Any],
-                          grouper: typing.Callable[[str], str] = identity,
-                          label: str = '') -> None:
+def write_group_reseeding(group: str, tourney_group: dict[str, typing.Any],
+                          grouper: typing.Callable[[str], str] = identity, label: str = '') -> None:
     """ Creates the files {group}/{label}reseed[_filtered].csv.
     pgf/simplecsv is not up to handling the larger csvs.
     :param group:
@@ -690,8 +691,7 @@ def write_group_reseeding(group: str,
 
 
 def write_conf_reseeding(group: str, tourney_group: dict[str, typing.Any]) -> None:
-    """ Determine how teams should be reseeded, grouped by conference
-    :param group:
+    """ :param group:
     :param tourney_group: """
     reseeding_file = group + '/conf_reseed.csv'
     try:
@@ -732,10 +732,10 @@ def write_conf_reseeding(group: str, tourney_group: dict[str, typing.Any]) -> No
     output.to_csv('html/'+reseeding_file, index=False, columns=columns)
 
 
-def _update_reseeding(outcomes: collections.defaultdict[str, dict[str, list[int]]],
-                      description: SubgroupDesc,
+def _update_reseeding(outcomes: collections.defaultdict[str, dict[str, list[int]]], description: SubgroupDesc,
                       grouper: typing.Callable[[str], str]) -> None:
-    """ Passes through to _update_reseeding_year
+    """ Passes through to `_update_reseeding_year`, because `write_conf_reseeding` needs to do some dramatic updating
+    for each year.
     :param outcomes:
     :param description:
     :param grouper: """
@@ -743,10 +743,8 @@ def _update_reseeding(outcomes: collections.defaultdict[str, dict[str, list[int]
         _update_reseeding_year(outcomes, description, grouper, year)
 
 
-def _update_reseeding_year(outcomes: collections.defaultdict[str, dict[str, list[int]]],
-                           description: SubgroupDesc,
-                           grouper: typing.Callable[[str], str],
-                           year: int | None) -> None:
+def _update_reseeding_year(outcomes: collections.defaultdict[str, dict[str, list[int]]], description: SubgroupDesc,
+                           grouper: typing.Callable[[str], str], year: int | None) -> None:
     """ :param outcomes: the dict to update
     :param description: passed to get_game
     :param grouper: perhaps coalesce results
@@ -761,13 +759,9 @@ def _update_reseeding_year(outcomes: collections.defaultdict[str, dict[str, list
             outcomes[groups[1]]['losses'].append(seed_diff)
 
 
-def analyze_tourney_subgroup(group: str,
-                             tourney: str,
-                             tourney_subgroup: dict[str, typing.Any],
-                             suffix: str,
-                             is_national: bool) -> None:
-    """
-    :param group: The group containing this tournament.
+def analyze_tourney_subgroup(group: str, tourney: str, tourney_subgroup: dict[str, typing.Any],
+                             suffix: str, is_national: bool) -> None:
+    """ :param group: The group containing this tournament.
     :param tourney: This tournament.
     :param tourney_subgroup: The sub-dictionary of tourney_group that holds the variations
     :param suffix: Taken from the tourney group
@@ -796,12 +790,9 @@ def analyze_tourney_subgroup(group: str,
     write_tourney_states(subgroup_desc, tourney_subgroup)
 
 
-def write_tourney_reseeding(subgroup_desc: SubgroupDesc,
-                            tourney_subgroup: dict[str, typing.Any],
-                            grouper: typing.Callable[[str], str] = identity,
-                            label: str = '') -> None:
-    """ Determine how teams have performed in a tournament.
-    :param subgroup_desc:
+def write_tourney_reseeding(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any],
+                            grouper: typing.Callable[[str], str] = identity, label: str = '') -> None:
+    """ :param subgroup_desc:
     :param tourney_subgroup:
     :param grouper: Collects various teams into grouper(team).  Passed to `_update_reseeding`
     :param label: """
@@ -826,7 +817,6 @@ def write_tourney_reseeding(subgroup_desc: SubgroupDesc,
 
 def write_tourney_states(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any]) -> None:
     """ List all the teams and their states that have participated in a tournament. """
-
     def default_key(group: str, key: str) -> collections.abc.Sequence[str | int]:
         return [university.get_state(key, group)] + [0] * 5
 
@@ -860,8 +850,7 @@ def write_tourney_states(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str
 
 
 def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any]) -> None:
-    """ This creates a 2d array where (row,col) is the number of times row beat col and writes this
-    to a csv in the tournament directory. """
+    """ Creates a 2d array where (row,col) is the number of times row beat col and writes this to a csv. """
     win_loss_file: str = subgroup_desc.directory + '/winloss.csv'
     try:
         if subgroup_desc.source_mtime < os.path.getmtime(win_loss_file):
@@ -881,8 +870,7 @@ def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[s
 
 
 def get_tourneys_of_year(tourney_group: dict[str, typing.Any]) -> dict[int, list[str]]:
-    """ Determine what tournaments happened in each year
-    :param tourney_group: """
+    """ :param tourney_group: """
     tourneys_of_year: dict[int | None, list[str]] = collections.defaultdict(list)
     # start by finding which years have a tournament we should look at
     for tourney, description in tourney_group.items():
@@ -916,8 +904,7 @@ def analyze_tourney_group(group: str, tourney_group: dict[str, typing.Any]) -> N
 
 
 def analyze_overall(tourneys: dict[str, typing.Any]) -> None:
-    """ Analyze the json object.  This is the main function of the module.
-    :param tourneys: The json object to analyze. """
+    """ :param tourneys: The json object to analyze. """
     for group, tourney_group in tourneys.items():
         if not os.path.isdir(group):
             os.mkdir(group)
@@ -932,8 +919,7 @@ def analyze_overall(tourneys: dict[str, typing.Any]) -> None:
 
 
 def analyze_log_reg(winner: numpy.ndarray) -> dict[str, float]:
-    """ Perform a logistic regression on a winloss matrix
-    :param winner: The winloss matrix
+    """ :param winner: The winloss matrix to analyze
     :return: The analysis, with keys 'games', 'rate', and 'loss per game' """
     diff = [winner[1:, 1:].trace(-i) for i in range(1 - MAX_SEED, MAX_SEED)]
     if not sum(diff):
@@ -960,8 +946,7 @@ def analyze_log_reg(winner: numpy.ndarray) -> dict[str, float]:
 
 
 def analyze_winloss(filename: str, show_grids=False) -> None:
-    """ Analyze a winloss matrix file
-    :param filename: The file in question
+    """ :param filename: The file to analyze
     :param show_grids: Whether to print the (probability) matrix along with the analysis """
     winner = numpy.loadtxt(filename, dtype=int, delimiter=',')
     print(filename, analyze_log_reg(winner))
@@ -995,7 +980,8 @@ def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float]:
 
 
 def get_confidence_interval(successes: int, total: int) -> tuple[float, float]:
-    """ Determine a Wilson confidence interval, see Brown reference """
+    """ Determine a Wilson confidence interval, see Brown reference
+    :return: The center and half-width of the interval. """
     kappa = 1.96  # standard deviations to get 95% confidence
     kappa_sq = kappa*kappa
     phat = successes / total
