@@ -1,9 +1,7 @@
 
+# most directories should be ignored
 *
 !*.*
-.idea
-
-*.csv
 
 # the paper
 !paper
@@ -24,6 +22,8 @@ html/*
 !html/script.js
 !html/style.css
 
+*.csv
+*.tex
+.idea
 pywikibot.lwp
 throttle.ctrl
-*.tex
