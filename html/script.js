@@ -32,15 +32,14 @@ document.addEventListener('DOMContentLoaded', getQuery);
 /** Use the search portion of the url to set the values of the widgets. Only happens onload. */
 function getQuery() {
     const searchParams = new URLSearchParams(document.location.search);
-    if ( searchParams.has('file') ) {
-        setFileToPlot(searchParams.get('file'));
-    }
+    setFileToPlot(searchParams.get('file') || '');
     if ( searchParams.has('x') ) {
         document.getElementById('x').value = searchParams.get('x');
     }
     if ( searchParams.has('y') ) {
         document.getElementById('y').value = searchParams.get('y');
     }
+    axesChange();
     if ( searchParams.get('individuate') === 'true' ) {
         document.getElementById('individuate').checked = true;
     }
@@ -52,8 +51,8 @@ function getQuery() {
 }
 
 function addChangeListeners() {
-    ['individuate', 'filter', 'x', 'y']
-        .forEach( (id) => document.getElementById(id).addEventListener('change', replot) );
+    ['individuate', 'filter'].forEach( (id) => document.getElementById(id).addEventListener('change', replot) );
+    ['x', 'y'].forEach( (id) => document.getElementById(id).addEventListener('change', axesChange) );
     document.getElementById('graph').addEventListener('change', graphChange);
     document.getElementById('group').addEventListener('change', groupChange);
     document.getElementById('grouper').addEventListener('change', grouperChange);
@@ -101,7 +100,8 @@ function getFileToPlot() {
     return file;
 }
 
-/** The inverse operation of {@link getFileToPlot}().  Sets the widgets according to the input.
+/** The inverse operation of {@link getFileToPlot}().  Sets the widgets according to the input (which came from the
+ *  url's search query string).
  *  @param {string} file */
 function setFileToPlot(file) {
     let group, rest;
@@ -112,7 +112,7 @@ function setFileToPlot(file) {
         file = rest;
     }
     let graph, grouper;
-    if ( file.endsWith('winloss.csv') ) {
+    if ( file.endsWith('winloss.csv') || ! file ) {
         graph = 'seed_v_fraction';
         file = file.slice(0, -'winloss.csv'.length);
     } else if ( file.endsWith('group_betas.csv') ) {
@@ -200,6 +200,8 @@ function tournamentChange() {
 /** When the #graph selector changes */
 function graphChange() {
     const graph = document.getElementById('graph').value;
+    Array.from(document.getElementsByClassName('graph')).forEach( (span) => span.style.fontWeight = 'normal' );
+    document.querySelector('.graph.'+graph).style.fontWeight = 'bold';
     document.getElementById('seed_v_fraction').style.display = 'none';
     document.getElementById('x_v_y').style.display = 'none';
     if ( graph === 'tourneyData' ) {
@@ -208,6 +210,17 @@ function graphChange() {
     } else {
         document.getElementById(graph).style.display = 'block';
     }
+    axesChange();
+}
+
+function axesChange() {
+    const graph = document.getElementById('graph').value;
+    Array.from(document.getElementsByClassName('x_or_y')).forEach( (dt) => dt.style.fontWeight = 'normal' );
+    if ( graph !== 'seed_v_fraction' ) {
+        document.getElementsByClassName('x_or_y')[document.getElementById('x').value-1].style.fontWeight = 'bold';
+        document.getElementsByClassName('x_or_y')[document.getElementById('y').value-1].style.fontWeight = 'bold';
+    }
+    Array.from(document.getElementsByClassName('logScaled')).forEach( (span) => span.style.display = 'none' );
     maybeUpdateFilters();
     replot();
 }
@@ -317,7 +330,13 @@ function scatterPlotFile(contents) {
     xMax *= xMax < 0 ? .9 : 1.1;
     yMax *= yMax < 0 ? .9 : 1.1;
     const xIsLog = 1 <= xMin && 10*xMin < xMax;
+    if ( xIsLog ) {
+        document.getElementsByClassName('logScaled')[document.getElementById('x').value-1].style.display = 'inline';
+    }
     const yIsLog = 1 <= yMin && 10*yMin < yMax;
+    if ( yIsLog ) {
+        document.getElementsByClassName('logScaled')[document.getElementById('y').value-1].style.display = 'inline';
+    }
     const svg = document.getElementsByTagName('svg')[0];
     const height = parseDecimal(svg.getAttribute('height'));
     const width = parseDecimal(svg.getAttribute('width'));

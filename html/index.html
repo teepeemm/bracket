@@ -3,7 +3,7 @@
  <head>
   <meta charset="utf-8">
   <title>Analyzing Elimination Tournaments</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
  </head>
  <body>
   <h1>Analyzing Elimination Tournaments</h1>
@@ -42,7 +42,7 @@
     <div id="x_v_y">
      <label>Group data by
       <select id="grouper">
-       <option value="none">none</option>
+       <option value="none" selected>none</option>
        <option value="conf" disabled>tournament</option>
        <option value="state">state</option>
        <option value="tz">timezone</option>
@@ -81,12 +81,12 @@
     <dt>Group</dt><dd>The sport (except when it's not)</dd>
     <dt>Tournament</dt><dd>Which tournament within the chosen group</dd>
     <dt>Graph</dt>
-    <dd>Seed differential &amp; fraction won: Chance of winning a game in a tournament</dd>
-    <dd>Individual team data</dd>
-    <dd>Individual tournament data: Number of games &amp; upset rate within the tournament</dd>
-    <dt>Number of games</dt>
-    <dt>Expected reseeding &mu;</dt>
-    <dt>Upset rate &beta;</dt>
+    <dd><span class="graph seed_v_fraction">Seed differential &amp; fraction won:</span> Chance of winning a game in a tournament</dd>
+    <dd><span class="graph x_v_y">Individual team data</span></dd>
+    <dd><span class="graph tourneyData">Individual tournament data:</span> Number of games &amp; upset rate within the tournament</dd>
+    <dt class="x_or_y">Number of games<span class="logScaled"> (logarithmically scaled)</span></dt>
+    <dt class="x_or_y">Upset rate &beta;<span class="logScaled"> (logarithmically scaled)</span></dt>
+    <dt class="x_or_y">Expected reseeding &mu;<span class="logScaled"> (logarithmically scaled)</span></dt>
     <dd>
      Within the data, the probability of a given team winning their game is best modeled by
      <span class="expression">1/(1+exp(-&beta;(s-&mu;))),</span>
@@ -97,7 +97,7 @@
   </section>
   <footer>
    This analysis is based on a forthcoming paper.
-   You can explore the data at <a href="https://github.com/teepeemm/bracket">its Github repository</a>.
+   You can explore the data at <a href="https://github.com/teepeemm/bracket">its GitHub repository</a>.
   </footer>
   <script src="script.js"></script>
  </body>
