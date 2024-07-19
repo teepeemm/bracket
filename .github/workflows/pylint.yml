@@ -21,8 +21,8 @@ jobs:
         pip install numpy
         pip install pandas
         pip install pywikibot
+        pip install scikit-learn
         pip install scipy
-        pip install sklearn
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
