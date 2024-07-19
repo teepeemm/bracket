@@ -8,6 +8,7 @@
 \usepackage{listings}
 \usepackage{siunitx}
 \usepackage{pgfplots}
+\usepackage{tikz-cd}
 \usepackage{subcaption}
 %\usepackage{comment}
 %\usepackage{hyperref}
@@ -18,12 +19,11 @@
 \pgfplotsset{compat=1.18}
 \tikzset{ dots/.style = {mark=*, draw=black, mark size=.5pt} }
 \usetikzlibrary{external}
-\tikzexternalize
+%\usetikzlibrary{matrix}
+%\tikzexternalize
 %\addbibresource{bracket.bib}
 
-\title{Statistics of Seeding in Elimination Tournaments}
-% Elimination Tournament Seeding Statistics
-% Statistics of Seeding of Tournaments of Elimination   :-P
+\title{Seeding Statistics of Elimination Tournaments}
 \author{Timothy Prescott}
 \date{\today}
 
@@ -37,10 +37,20 @@
 \frametitle{Alternative Titles}
 \begin{center}\Large\color{blue}
 \sout{Statistics of Seeding of Tournaments of Elimination}\\
-Statistics of Seeding in Elimination Tournaments\\
-\sout{Seeding Statistics in Elimination Tournaments}\\
-\sout{Elimination Tournament Seeding Statistics}
+\sout{Statistics of Seeding of Elimination Tournaments}\\
+Seeding Statistics of Elimination Tournaments\\
+\sout{Elimination Tournaments' Seeding Statistics}
 \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Exploring Alternative Titles}\centering
+\begin{tikzcd}[tips=false, column sep=1em, row sep=1.5em, ampersand replacement=\&]
+\& \text{St of Se of To of El} \ar{dl}\ar{d}\ar{dr}\\
+\text{St of Se of El To} \ar{d} \ar{dr} \& \text{To of El St of Se} \ar{dl} \ar{dr} \& \text{Se St of To of El} \ar{dl} \ar{d} \\
+\text{El To St of Se} \& \text{Se St of El To} \& \text{To of El Se St} \\
+\& \text{El To Se St} \ar{ul} \ar{u} \ar{ur}
+\end{tikzcd}
 \end{frame}
 
 \begin{frame}
@@ -447,7 +457,7 @@ Seed differential versus fraction of games that a favored team wins in basketbal
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=320,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/reseed_exact_filtered.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/reseed_filtered.csv};
 \end{axis}
 \end{tikzpicture}\\
 Men's
@@ -457,7 +467,7 @@ Men's
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=320,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/reseed_exact_filtered.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/reseed_filtered.csv};
 \end{axis}
 \end{tikzpicture}\\
 Women's
