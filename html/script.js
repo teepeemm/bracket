@@ -27,14 +27,53 @@ Object.values(timezones).forEach( (arr) => arr.forEach( (state) => unisInState[s
 processFile('state.csv', putUnisInState);
 processFile('professional/state.csv', putUnisInState);
 
-['individuate', 'filter', 'x', 'y'].forEach( (id) => document.getElementById(id).addEventListener('change', replot) );
-document.getElementById('graph').addEventListener('change', graphChange);
-document.getElementById('group').addEventListener('change', groupChange);
-document.getElementById('grouper').addEventListener('change', grouperChange);
-document.getElementById('search').addEventListener('change', searchChange);
-document.getElementById('tournament').addEventListener('change', tournamentChange);
+document.addEventListener('DOMContentLoaded', getQuery);
 
-replot();
+/** Use the search portion of the url to set the values of the widgets. Only happens onload. */
+function getQuery() {
+    const searchParams = new URLSearchParams(document.location.search);
+    if ( searchParams.has('file') ) {
+        setFileToPlot(searchParams.get('file'));
+    }
+    if ( searchParams.has('x') ) {
+        document.getElementById('x').value = searchParams.get('x');
+    }
+    if ( searchParams.has('y') ) {
+        document.getElementById('y').value = searchParams.get('y');
+    }
+    if ( searchParams.get('individuate') === 'true' ) {
+        document.getElementById('individuate').checked = true;
+    }
+    if ( searchParams.has('search') ) {
+        document.getElementById('search').value = searchParams.get('search');
+    }
+    replot();
+    addChangeListeners();
+}
+
+function addChangeListeners() {
+    ['individuate', 'filter', 'x', 'y']
+        .forEach( (id) => document.getElementById(id).addEventListener('change', replot) );
+    document.getElementById('graph').addEventListener('change', graphChange);
+    document.getElementById('group').addEventListener('change', groupChange);
+    document.getElementById('grouper').addEventListener('change', grouperChange);
+    document.getElementById('search').addEventListener('change', searchChange);
+    document.getElementById('tournament').addEventListener('change', tournamentChange);
+}
+
+/** Use the state of the widgets to construct the search portion of the url, so that {@link getQuery}() will get
+ *  back to this state. */
+function setQuery() {
+    let query = 'file=' + getFileToPlot() + '&x=' + document.getElementById('x').value + '&y='
+        + document.getElementById('y').value;
+    if ( document.getElementById('individuate').checked ) {
+        query += '&individuate=true';
+    }
+    if ( document.getElementById('search').value ) {
+        query += '&search=' + document.getElementById('search').value;
+    }
+    window.history.pushState(null, '', './?'+query);
+}
 
 /** @return {string} What file should be used, according to the current settings */
 function getFileToPlot() {
@@ -62,18 +101,60 @@ function getFileToPlot() {
     return file;
 }
 
+/** The inverse operation of {@link getFileToPlot}().  Sets the widgets according to the input.
+ *  @param {string} file */
+function setFileToPlot(file) {
+    let group, rest;
+    if ( file.includes('/') ) {
+        [group, rest] = file.split('/', 2);
+        document.getElementById('group').value = group;
+        groupChange();
+        file = rest;
+    }
+    let graph, grouper;
+    if ( file.endsWith('winloss.csv') ) {
+        graph = 'seed_v_fraction';
+        file = file.slice(0, -'winloss.csv'.length);
+    } else if ( file.endsWith('group_betas.csv') ) {
+        graph = 'tourneyData';
+        file = file.slice(0, -'group_betas.csv'.length);
+    } else if ( file.endsWith('reseed.csv') ) {
+        graph = 'x_v_y';
+        file = file.slice(0, -'reseed.csv'.length);
+        ['conf', 'state', 'tz'].forEach( (option) => {
+            if ( file.endsWith(option+'_') ) {
+                grouper = option;
+                file = file.slice(0, -option.length-1);
+            }
+        });
+    }
+    if ( group && file && file.endsWith('_') ) {
+        const tourney = file.slice(0, -1);
+        document.getElementById('tournament').value = tourney;
+        tournamentChange();
+    }
+    document.getElementById('graph').value = graph;
+    graphChange();
+    if ( graph === 'x_v_y' ) {
+        document.getElementById('grouper').value = grouper;
+        grouperChange();
+    }
+}
+
 /** Redraw the graph */
 function replot() {
     const file = getFileToPlot();
     const graph = document.getElementById('graph').value;
     const plotter = graph === 'seed_v_fraction' ? winLossPlotter : scatterPlotter;
     processFile(file, plotter);
+    setQuery();
 }
 
 /** When the #group selector changes */
 function groupChange() {
     const group = document.getElementById('group').value;
     const tourneySelector = document.getElementById('tournament');
+    document.getElementById('grouper').value = 'none';
     toggleWidget(tourneySelector, group !== 'all');
     toggleWidget(document.querySelector('#graph option[value="tourneyData"]'), group !== 'all');
     toggleWidget(document.querySelector('#grouper [value="conf"]'), group !== 'all');
