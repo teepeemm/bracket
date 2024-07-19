@@ -10,4 +10,4 @@ jobs:
 #    - name: Install modules
 #      run: yarn
     - name: Analyzing the code with eslint
-      run: npm eslint html/script.js
+      run: npx eslint html/script.js
