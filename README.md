@@ -5,16 +5,12 @@ If you're not as programmatically inclined,
 you can use a 
 [GUI with JavaScript](https://sites.und.edu/timothy.prescott/bracket/)
 
-There are two main novel contributions of this repository:
-1. The various tournaments in `tourneys.json`
-2. The name normalization in `university.py`
-
 I've tried to be consistent on how to handle renaming and merging,
 but may not have entirely succeeded.
 It's also possible that a .txt file was downloaded
 under slightly different conditions in `tourneys.json`.
 
-To run script this yourself, you will need the Python module pywikibot
+To run this script yourself, you will need the Python module pywikibot
 (available via pip).  You will also need numpy and pandas.
 
 From start to finish, the script takes about 30 (wild guess) minutes.

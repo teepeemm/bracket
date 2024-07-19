@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[notref,notcite]{showkeys}
+%\usepackage[notref,notcite]{showkeys}
 
 \usepackage{csvsimple-l3}
 \usepackage{booktabs}
@@ -83,7 +83,7 @@ the source for this bracket is
 | RD1-score08='''68'''
 ...
 \end{lstlisting}
-Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first number indicates the round, and the second numbers the teams within that round; teams numbered $2n-1$ and $2n$ will play each other.  Combining these results, we determine how often teams with a given seeding are victorious in 2582 (men's tournament) and 1843 (women's tournament) games through the year 2023. %, as shown in \autoref{tab:mD1_WL_prob}.
+Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first number indicates the round, and the second numbers the teams within that round; teams numbered $2n-1$ and $2n$ will play each other.  Combining these results, we determine how often teams with a given seeding are victorious in 2766 (men's tournament) and 2309 (women's tournament) games through the year 2023. %, as shown in \autoref{tab:mD1_WL_prob}.
 %\begin{table}
 %\caption{\label{tab:mD1_WL_prob}Percent of matches that a team seeded \emph{row} defeated a team seeded \emph{columns} worse.}
 %\tiny
@@ -121,7 +121,7 @@ In the women's tournament, upsets with a seed differential of 7 or more occurred
 % women upset: 9+8+16+11+32 = 76, women non upset: 282+174+150+134+111+1 = 852
 A Fisher test shows that such upsets are more likely in the men's tournament ($p=\num{3.8e-12}$).
 
-With $\beta=0.276$ and $p(x)=(1+\exp(-\beta x))^{-1}$, we are able to perform a calculation from the introduction.  The probability $P$ that there are no upsets in the first round of the women's tournament is $\prod_{i=1}^8 p(2i-1)^4\approx0.29\%$. The probability that the only upset is a single seed $k$ (losing to a seed $17-k$) is $P\cdot p(17-2k)^{-4}\cdot4p(17-2k)^3(1-p(17-2k))=4P(1-p(17-2k))/p(17-2k)$.  Therefore, the probability that there is at most one upset in the first round is
+With $\beta=0.276$ and $p(x)=(1+\exp(-\beta x))^{-1}$, we are able to perform a calculation from the introduction.  The probability $P$ that there are no upsets in the first round of the women's tournament is $\prod_{i=1}^8 p(2i-1)^4\approx0.29\%$. The probability that the only upset is a single seed $k$ (losing to a seed $17-k$) is $P\cdot p(17-2k)^{-4}\cdot4p(17-2k)^3(1-p(17-2k))=4P\cdot(1-p(17-2k))/p(17-2k)$.  Therefore, the probability that there is at most one upset in the first round is
 \[P+\sum_{k=1}^8 4P\frac{1-p(17-2k)}{p(17-2k)}\approx2.4\%.\]
 
 We are interested in the question of how a team performs in a game after an upset win.  Are they tired from having over-exerted themselves, more experienced from having won a tournament game, or better than previously appreciated because we can now condition on them beating a supposedly superior opponent?  As %summarized in \autoref{tab:round_from_seeds} and
@@ -577,7 +577,7 @@ We would like to calculate conferences' expected reseeding to compare how confer
 %\section{College Tournaments}
 Wikipedia has many more tournaments to analyze.  We tabulate the collegiate tournaments in \autoref{tab:tourney_count}, and note that we also can perform our calculations on brackets from the MLB, NBA, NFL, NHL, and WNBA.
 \begin{table}\centering
-\caption{\label{tab:tourney_count}Number of collegiate tournaments with brackets in Wikipedia.}
+\caption{\label{tab:tourney_count}Breakdown of 172 collegiate tournaments with brackets in Wikipedia.}
 \begin{tabular}{l *4{S[table-format=2]}}\toprule
 \multirow{2}{*}{Sport} & \multicolumn2c{Men's} & \multicolumn2c{Women's} \\
 & {Conference} & {National} & {Conference} & {National} \\\midrule
@@ -589,7 +589,8 @@ Football & 0 & 4 & 0 & 0 \\
 Volleyball & 0 & 1 & 0 & 1 \\
 Field hockey & 0 & 0 & 0 & 1 \\
 Lacrosse & 0 & 1 & 0 & 0 \\
-Tennis & 0 & 1 & 0 & 1 \\\bottomrule
+Tennis & 0 & 1 & 0 & 1 \\\addlinespace
+Total & 88 & 27 & 42 & 15 \\\bottomrule
 \end{tabular}
 \end{table}
 Because our analysis does not uncover new information, we will not repeat it here.
