@@ -53,6 +53,7 @@ function getQuery() {
     addChangeListeners();
 }
 
+/** Runs after the search query has been loaded. */
 function addChangeListeners() {
     ['individuate', 'filter'].forEach( (id) => document.getElementById(id).addEventListener('change', replot) );
     ['x', 'y'].forEach( (id) => document.getElementById(id).addEventListener('change', axesChange) );
@@ -219,6 +220,7 @@ function graphChange() {
     axesChange();
 }
 
+/** When the #x or #y selectors change. */
 function axesChange() {
     const graph = document.getElementById('graph').value;
     Array.from(document.getElementsByClassName('x_or_y')).forEach( (dt) => {
@@ -469,7 +471,7 @@ function plotWinLossFile(contents) {
         }
         successCounter[diff] = successes;
         totalCounter[diff] = total;
-        if ( 10 < total && ! spreadX ) {
+        if ( ( 10 < total ) && ! spreadX ) {
             plotConfidenceInterval(diff/maxSeed, getConfidenceInterval(successes, total));
         }
     }
@@ -683,7 +685,7 @@ function fixFloatingPoint(number) {
 /** @param {string[]} row
  *  @return {boolean} */
 function rowNonTrivial(row) {
-    return -16 < Number(row[3]) && Number(row[3]) < 16 && 0.01 < Number(row[2]);
+    return ( -16 < Number(row[3]) ) && ( Number(row[3]) < 16 ) && ( 0.01 < Number(row[2]) );
 }
 
 /** @param {number} min

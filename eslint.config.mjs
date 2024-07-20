@@ -13,7 +13,6 @@ import js from "@eslint/js";
 // });
 
 export default [
-    // js.configs.recommended,
     js.configs.all,
     // ...compat.extends("google"),
     {
@@ -37,12 +36,12 @@ export default [
         "no-loop-func": "off", // See getLogisticBestFitRate
         "no-magic-numbers": "off", // I'm happy with the magic numbers I have
         "no-ternary": "off", // Sometimes useful
-        "no-use-before-define": ["error", {"functions": false}],
+        "no-use-before-define": ["error", {functions: false}],
         "one-var": ["error", "consecutive"],
         "operator-linebreak": ["error", "before"], // Operators should be at the beginning of lines
         "sort-keys": "off", // Different order can be useful
         "sort-vars": "off", // Different order can be useful, and sometimes necessary
         strict: "off", // Since I have one file, I don't need to worry about how I declare my functions
-        yoda: "off", // Because I prefer < to >
+        yoda: ["error", "never", {onlyEquality: true}], // I would prefer exceptRange, but that gives false positives
     },
 }];
