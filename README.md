@@ -10,10 +10,7 @@ but may not have entirely succeeded.
 It's also possible that a .txt file was downloaded
 under slightly different conditions in `tourneys.json`.
 
-To run this script yourself, you will need the Python module pywikibot
-(available via pip).  You will also need numpy and pandas.
-
-From start to finish, the script takes about 30 (wild guess) minutes.
+From start to finish, `python analyze.py` takes about 30 (wild guess) minutes.
 But it saves its results along the way,
 so if you get bored you can interrupt and restart the process.
 You can also do this if Pywikibot's throttling starts to become too onerous.

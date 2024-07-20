@@ -27,11 +27,11 @@ import os
 import re
 import time
 import typing
-from sklearn.linear_model import LogisticRegression  # type: ignore
 
 import numpy  # type: ignore
 import pandas  # type: ignore
 import pywikibot  # type: ignore
+from sklearn.linear_model import LogisticRegression  # type: ignore
 
 import university
 from university import Flags

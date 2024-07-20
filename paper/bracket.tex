@@ -23,7 +23,7 @@
 \title{Seeding Statistics of Elimination Tournaments}
 % Elimination Tournaments' Seeding Statistics
 % Statistics of Seeding of Tournaments of Elimination   :-P
-\author{Timothy Prescott}
+\author{Timothy Prescott\footnote{University of North Dakota}}
 \date{\today}
 
 \begin{document}
@@ -33,9 +33,11 @@
 \tableofcontents
 
 \begin{abstract}
-We develop and provide Python code to analyze seedings in elimination tournaments.  We are able to apply this code to fifty-six thousand games to estimate the probability of an upset solely as a function of the difference in seeding.  We are also able to examine how well or poorly a team performs compared to its seeding.  We conclude that the only team that is consistently underrated is \textbackslash your\_favorite\_team, while the only team that is consistently overrated is \textbackslash your\_hated\_rival.
+We develop and provide Python code to statistically analyze seedings in elimination tournaments.  We are able to apply this code to fifty-six thousand games to estimate the probability of an upset solely as a logistic function of the difference in seeding.  We are also able to examine how well or poorly a team performs compared to its seeding.  We conclude that the only team that is consistently underrated is \textbackslash your\_favorite\_team, while the only team that is consistently overrated is \textbackslash your\_hated\_rival.
 \end{abstract}
 
+\noindent
+{\small\textbf{\textit{Keywords---}} logistic regression, statistical modeling, elimination tournament, Python}
 
 \section{Introduction}
 A notable occurrence during the 2024 NCAA Division I Men's Basketball Tournament (commonly known as March Madness) was that \#11 North Carolina State reached the Final Four, beating teams seeded 6, 14, 2, and 4.  Another notable occurrence was that the only upset in the first round of the women's tournament was by \#11 Middle Tennessee.  We will estimate that the probability of the first was 1.3\%, while the probability of the second was 2.4\%.
@@ -802,7 +804,11 @@ Throughout the past century, conferences memberships have been in constant flux.
 It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{https://github.com/teepeemm/bracket}.  For the less programmatically minded, we provide an online interface at \url{https://sites.und.edu/timothy.prescott/bracket/} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
 
 \printbibliography
+\thanks{No potential competing interest was reported by the author.}
 \end{document}
+
+word count:
+texcount bracket.tex: 2640
 
 
 S(z) = 1/(1+e^{-z})
