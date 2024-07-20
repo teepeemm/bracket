@@ -270,7 +270,7 @@ function updateFiltersUsing(universities) {
         universities.forEach( (state) => usedStatesObj[state || 'Unknown'] = 1 );
     } else if ( document.getElementById('grouper').value === 'none' ) {
         universities.forEach( (university) => {
-            const stateUni = Object.entries(unisInState).find( ([state, unis]) => unis.includes(university) )
+            const stateUni = Object.entries(unisInState).find( (entry) => entry[1].includes(university) )
                 || ['Unknown'];
             const state = stateUni[0];
             usedStatesObj[state] = 1;
@@ -283,8 +283,8 @@ function updateFiltersUsing(universities) {
             .filter( (timezone) => universities.includes(timezone)
                 || ( timezone === 'Unknown' && universities.includes('') ) )
         : Object.entries(timezones)
-            .filter( ([timezone, states]) => states.some( (state) => usedStates.includes(state) ) )
-            .map( ([timezone, states]) => timezone );
+            .filter( (entry) => entry[1].some( (state) => usedStates.includes(state) ) )
+            .map( ([timezone]) => timezone );
     document.getElementById('filterTimezone').replaceChildren(...usedTimezones.map( (timezone) => {
         const option = document.createElement('option');
         option.setAttribute('value', 'tz-'+timezone);
@@ -343,7 +343,7 @@ function scatterPlotFile(contents) {
     createScatterFrame([xMin, xMax], xIsLog, [yMin, yMax], yIsLog);
     const teamList = document.getElementById('teamList');
     teamList.replaceChildren();
-    data.forEach( (row, index) => {
+    data.forEach( (row) => {
         teamList.append(setElementAttributes(document.createElement('option'), {'value': row[0]}));
         const xDatum = +row[xIndex];
         const yDatum = +row[yIndex];
