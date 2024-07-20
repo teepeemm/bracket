@@ -1,0 +1,6 @@
+
+numpy
+pandas
+pywikibot  # Not quite as standard, but still in pip
+scipy  # only needed for paper.py
+scikit-learn  # AKA sklearn
