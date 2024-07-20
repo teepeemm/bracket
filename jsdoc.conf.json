@@ -4,6 +4,6 @@
     },
     "opts": {
         "access": "all",
-        "destination": "docs"
+        "destination": "docs/js"
     }
 }
