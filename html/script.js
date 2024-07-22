@@ -254,8 +254,10 @@ function searchChange() {
     if ( search.value.length < 4 ) {
         return;
     }
-    setElementAttributesNS(document.querySelector(`svg circle[title="${search.value}"]`),
-        {'stroke': 'red', 'fill': 'red', 'r': 3});
+    const searchResult = document.querySelector(`svg circle[title^="${search.value} ("]`);
+    if ( searchResult ) {
+        setElementAttributesNS(searchResult, {'stroke': 'red', 'fill': 'red', 'r': 3});
+    }
 }
 
 /** Wait until the universities have loaded, and then {@link updateFiltersUsing}(string[]). */
