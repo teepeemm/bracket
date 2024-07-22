@@ -257,8 +257,8 @@ And many many many more.
 \begin{axis}[width=\linewidth-3pt,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,scale only axis,
 y axis line style=-,x axis line style=<->,clip=false,xtick={-10,10},ticklabel style={font=\footnotesize},tickwidth=.3cm]
 % analyze.get_team_performance('bbm', 'D1', 'North Carolina')
-\addplot[domain=-15:15]{1/(1+exp(-.192*(x-2.78)))};
-\addplot[dots](2.78,.5)node[below right]{\tiny$\mu=2.78$};
+\addplot[domain=-15:15]{1/(1+exp(-.192*(x+2.78)))};
+\addplot[dots](-2.78,.5)node[left]{\tiny$\mu=-2.78$};
 \addplot[dots](8,1)node[above]{\tiny11};
 \addplot[dots](3,1)node[below]{\tiny7};
 \addplot[dots](2,1)node[above]{\tiny4};
@@ -301,8 +301,8 @@ $N=136$, $\beta=0.192$.%}
 \begin{axis}[width=\linewidth-3pt,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,scale only axis,
 y axis line style=-,x axis line style=<->,clip=false,xtick={-10,10},ticklabel style={font=\footnotesize},tickwidth=.3cm]
 % analyze.get_team_performance('bbw', 'D1', 'Tennessee')
-\addplot[domain=-15:15]{1/(1+exp(-.304*(x-1.92)))};
-\addplot[dots](1.92,.5)node[below right]{\tiny$\mu=1.92$};
+\addplot[domain=-15:15]{1/(1+exp(-.304*(x+1.92)))};
+\addplot[dots](-1.92,.5)node[left]{\tiny$\mu=-1.92$};
 \addplot[dots](5,1)node[below]{\tiny6};
 \addplot[dots](1,1)node[below]{\tiny13};
 \addplot[dots](-1,1)node[below]{\tiny7};

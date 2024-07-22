@@ -228,8 +228,8 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \subcaptionbox{\label{fig:bbm_D1_UNC}North Carolina men. $\beta=0.192$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,y axis line style=-,x axis line style=<->,xlabel={Seed differential},clip=false,xtick={-10,10},ticklabel style={font=\small},tickwidth=.3cm]
-\addplot[domain=-15:15]{1/(1+exp(-.192*(x-2.78)))};
-\addplot[dots](2.78,.5)node[below right]{\small$\mu=2.78$};
+\addplot[domain=-15:15]{1/(1+exp(-.192*(x+2.78)))};
+\addplot[dots](-2.78,.5)node[left]{\small$\mu=-2.78$};
 \addplot[dots](8,1)node[above]{\tiny11};
 \addplot[dots](3,1)node[below]{\tiny7};
 \addplot[dots](2,1)node[above]{\tiny4};
@@ -266,8 +266,8 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \subcaptionbox{\label{fig:bbw_D1_Tenn}Tennessee women. $\beta=0.304$}[.48\textwidth]{
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,y axis line style=-,x axis line style=<->,xlabel={Seed differential},clip=false,xtick={-10,10},ticklabel style={font=\small},tickwidth=.3cm]
-\addplot[domain=-15:15]{1/(1+exp(-.304*(x-1.92)))};
-\addplot[dots](1.92,.5)node[below right]{\small$\mu=1.92$};
+\addplot[domain=-15:15]{1/(1+exp(-.304*(x+1.92)))};
+\addplot[dots](-1.92,.5)node[left]{\small$\mu=-1.92$};
 \addplot[dots](5,1)node[below]{\tiny6};
 \addplot[dots](1,1)node[below]{\tiny13};
 \addplot[dots](-1,1)node[below]{\tiny7};
@@ -349,7 +349,11 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 }
 \caption{\label{fig:bb_D1_game_v_mu}(Logarithmic) number of games versus expected reseeding in each NCAA Division I basketball tournament.}
 \end{figure}
-We observe a slight negative trend of reseeding for the teams that have a large number of games (the right most four men's teams are perennial contenders Kentucky, Kansas, Duke, and North Carolina, while the right three women's teams are Stanford, Connecticut, and Tennessee).  Teams that have a favorable seeding rarely play a better seed, and are therefore unable to show that they should have been even more favorably seeded.  Consequently, the occasional upset they experience causes their expected reseeding to be worse.
+We observe a slight negative trend of reseeding for the teams that have a large number of games (the right most four men's teams are perennial contenders Kentucky, Kansas, Duke, and North Carolina, while the right three women's teams are Stanford, Connecticut, and Tennessee).
+Such teams have a large amount of victories against lower ranking teams, so that the logistic best fit is pulled up and toward a negative $\mu$.
+% on the other hand, we can also say:
+%  Teams that have a favorable seeding rarely play a better seed, and are therefore unable to show that they should have been even more favorably seeded. Consequently, the occasional upset they experience causes their expected reseeding to be worse.
+% so we can argue either way, which isn't great
 
 Having failed to identify any bias for or against a particular team, we consider the possibility that a \emph{group} of teams may experience some bias.  We repeat the calculation of $\mu$, now grouping teams by their state in \autoref{fig:bb_D1_game_v_mu_by_state} and (slightly inaccurately) grouping the states by timezone in \autoref{fig:bb_D1_game_v_mu_by_timezone}.
 \begin{figure}
