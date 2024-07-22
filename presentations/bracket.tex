@@ -342,7 +342,7 @@ $N=163$, $\beta=0.304$
 \frametitle{\# Games v expected reseeding}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/D1/reseed.csv};
@@ -355,7 +355,7 @@ Men's
 \hfill
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/D1/reseed.csv};
@@ -371,7 +371,7 @@ Women's
 \frametitle{Same thing, but grouped by state}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+\begin{axis}[width=.99\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=450,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},
 	xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
@@ -383,7 +383,7 @@ Men's
 \hfill
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+\begin{axis}[width=.99\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=450,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},
 	xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
@@ -427,7 +427,7 @@ Women's
 \frametitle{Again, but every college basketball tournament}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
+\begin{axis}[width=.97\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.202*x))};
 % analyze.analyze_winloss('bbm/winloss.csv')
@@ -438,7 +438,7 @@ Men's. $\beta=0.202$
 \end{minipage}\hfill
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
+\begin{axis}[width=.97\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.284*x))};
 % analyze.analyze_winloss('bbw/winloss.csv')
@@ -454,7 +454,7 @@ Seed differential versus fraction of games that a favored team wins in basketbal
 \frametitle{And how to reseed}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=320,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/reseed_filtered.csv};
@@ -464,7 +464,7 @@ Men's
 \end{minipage}\hfill
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=320,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/reseed_filtered.csv};
@@ -480,7 +480,7 @@ Women's
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \pgfplotstableread[col sep=comma]{../bbm/group_betas.csv}\datatable
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=->,
+\begin{axis}[width=.97\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=->,
   xmin=20,xmax=3000,ymin=0,ymax=.8,xmode=log,xtick={30,100,300,1000,3000},xticklabels={30,100,300,1k,3k},
   xlabel={\# of games},ylabel={$\beta$}]
  \addplot[scatter,only marks,draw=black,scatter/classes={0={mark=*,mark size=.5pt},1={mark=+,mark size=2pt}},
@@ -492,7 +492,7 @@ Men's
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \pgfplotstableread[col sep=comma]{../bbw/group_betas.csv}\datatable
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=->,
+\begin{axis}[width=.97\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=->,
   xmin=20,xmax=3000,ymin=0,ymax=.8,xmode=log,xtick={30,100,300,1000,3000},xticklabels={30,100,300,1k,3k},
   xlabel={\# of games},ylabel={$\beta$}]
  \addplot[scatter,only marks,draw=black,scatter/classes={0={mark=*,mark size=.5pt},1={mark=+,mark size=2pt}},
@@ -534,8 +534,8 @@ Women's
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \pgfplotstableread[col sep=comma]{../bbm/conf_reseed.csv}\datatable
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
-  xmin=9.1,xmax=1000,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200,500},xticklabels={10,20,50,100,200,500},xlabel style={yshift=-7ex},
+\begin{axis}[width=.99\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+  xmin=9.1,xmax=1000,ymin=-10,ymax=10,xmode=log,xtick={20,50,200,500},xticklabels={20,50,200,500},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
  \addplot[scatter,only marks,draw=black,scatter/classes={0={mark=+,mark size=2pt},1={mark=*,mark size=.5pt}},
   scatter src=explicit symbolic] table[x=Games,y=Reseed,meta=ConferenceIsKnown]\datatable;
@@ -548,8 +548,8 @@ Men's
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \pgfplotstableread[col sep=comma]{../bbw/conf_reseed.csv}\datatable
-\begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
-  xmin=9.1,xmax=1000,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200,500},xticklabels={10,20,50,100,200,500},xlabel style={yshift=-7ex},
+\begin{axis}[width=.99\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+  xmin=9.1,xmax=1000,ymin=-10,ymax=10,xmode=log,xtick={20,50,200,500},xticklabels={20,50,200,500},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
  \addplot[scatter,only marks,draw=black,scatter/classes={0={mark=+,mark size=2pt},1={mark=*,mark size=.5pt}},
   scatter src=explicit symbolic] table[x=Games,y=Reseed,meta=ConferenceIsKnown]\datatable;
@@ -563,7 +563,7 @@ Men's
 
 \begin{frame}
 \frametitle{Much more we can do}
-Number of collegiate tournaments with brackets in Wikipedia.\\
+172 collegiate tournaments with brackets in Wikipedia.\\
 \begin{tabular}{l @{} *4{S[table-format=2]}}\toprule
 \multirow{2}{*}{Sport} & \multicolumn2c{Men's} & \multicolumn2c{Women's} \\
 & {Conference} & {National} & {Conference} & {National} \\\midrule
@@ -584,7 +584,7 @@ Also MLB, NBA, NFL, NHL, and WNBA.
 \frametitle{One last plot of winning fraction}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.208*x))};
 % analyze.analyze_winloss('winloss.csv')
@@ -595,7 +595,7 @@ Separated seed differentials.
 \end{minipage}\hfill
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
-\begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.208*x))};
 % analyze.write_simple_plot_file('winloss.csv', 'winlosssimpleplot.tex')

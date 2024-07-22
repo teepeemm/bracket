@@ -160,6 +160,9 @@ The seeds must add to 17 if and only if the teams meet in round one.  Teams meet
 In \autoref{tab:D1_WL_prob_upset}, we examine the intervals from \autoref{fig:D1_WL_prob} that correspond to the second round after one first round upset.  The fraction of wins is slightly more in favor of an upset, but not significantly so.
 \begin{table}\caption{\label{tab:D1_WL_prob_upset}Fraction of time that the better team wins in the second round, after one first round upset.  (Minimum 10 games.)}
 \centering
+\newbox\menswidest
+\newbox\womenswidest
+\setbox\menswidest=\hbox{$69\pm15$}
 \begin{tabular}{ c *2{S[table-format=2(2), uncertainty-mode=separate]} }\toprule
 Seeds & {Men's (\%)} & {Women's (\%)} \\\midrule
 1 v \phantom19 & 89(6) & 93(5) \\
@@ -169,7 +172,7 @@ Seeds & {Men's (\%)} & {Women's (\%)} \\\midrule
 5 v 13 & 79(15) \\
 6 v 14 & 80(16) \\\addlinespace
 overall & 75(5) & 84(5)\\
-\autoref{fig:D1_WL_prob} prediction & 78.4 & 90.1 \\\bottomrule
+\autoref{fig:D1_WL_prob} prediction & {\makebox[\wd\menswidest][l]{78.4}} & 90.1 \\\bottomrule
 \end{tabular}
 \end{table}
 %In \autoref{fig:D1_WL_prob_upset}, we plot the intervals from \autoref{fig:D1_WL_prob} that correspond to the second round after one first round upset in the men's (left) and women's (right) tournaments, along with logistic regressions for this filtered data.
