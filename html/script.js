@@ -19,7 +19,8 @@ const svgNamespace = 'http://www.w3.org/2000/svg',
     },
     tournamentsOfGroup = {},
     contentsOfFile = {},
-    unisInState = {};
+    unisInState = {},
+    labelWidth = 15;
 
 Object.values(timezones).forEach( (arr) => {
     arr.forEach( (state) => {
@@ -140,7 +141,7 @@ function setFileToPlot(fileIn) {
     }
     document.getElementById('graph').value = graph;
     graphChange();
-    if ( graph === 'x_v_y' ) {
+    if ( graph === 'x_v_y' && grouper ) {
         document.getElementById('grouper').value = grouper;
         grouperChange();
     }
@@ -217,6 +218,7 @@ function graphChange() {
     } else {
         document.getElementById(graph).style.display = 'block';
     }
+    maybeUpdateFilters();
     axesChange();
 }
 
@@ -233,7 +235,6 @@ function axesChange() {
     Array.from(document.getElementsByClassName('logScaled')).forEach( (span) => {
         span.style.display = 'none'
     });
-    maybeUpdateFilters();
     replot();
 }
 
@@ -346,8 +347,8 @@ function scatterPlotFile(contents) {
     const xIsLog = 1 <= xMin && 10*xMin < xMax,
         yIsLog = 1 <= yMin && 10*yMin < yMax,
         [svg] = document.getElementsByTagName('svg'),
-        height = parseDecimal(svg.getAttribute('height')),
-        width = parseDecimal(svg.getAttribute('width')),
+        height = parseDecimal(svg.getAttribute('height'))-labelWidth,
+        width = parseDecimal(svg.getAttribute('width'))-labelWidth,
         teamList = document.getElementById('teamList');
     if ( xIsLog ) {
         document.getElementsByClassName('logScaled')[document.getElementById('x').value-1].style.display = 'inline';
@@ -356,6 +357,7 @@ function scatterPlotFile(contents) {
         document.getElementsByClassName('logScaled')[document.getElementById('y').value-1].style.display = 'inline';
     }
     createScatterFrame([xMin, xMax], xIsLog, [yMin, yMax], yIsLog);
+    addAxesLabels(svg, height, width);
     teamList.replaceChildren();
     data.forEach( (row) => {
         teamList.append(setElementAttributes(document.createElement('option'), {'value': row[0]}));
@@ -370,7 +372,7 @@ function scatterPlotFile(contents) {
         group.append(
             title,
             setElementAttributesNS(document.createElementNS(svgNamespace, 'circle'), {
-                'cx': getPoint(xMin, xDatum, xMax, xIsLog)*width, 'stroke': 'black', 'r': 2, 'stroke-width': 1,
+                'cx': getPoint(xMin, xDatum, xMax, xIsLog)*width+labelWidth, 'stroke': 'black', 'r': 2, 'stroke-width': 1,
                 'cy': (1-getPoint(yMin, yDatum, yMax, yIsLog))*height, 'fill': 'black', 'title': textContent,
             }),
         );
@@ -378,32 +380,32 @@ function scatterPlotFile(contents) {
     });
 }
 
-/** @param {number[]} xLoc
+/** @param {number[]} xRange
  *  @param {boolean} xIsLog
- *  @param {number[]} yLoc
+ *  @param {number[]} yRange
  *  @param {boolean} yIsLog */
-function createScatterFrame(xLoc, xIsLog, yLoc, yIsLog) {
-    const [xMin, xMax] = xLoc,
-        [yMin, yMax] = yLoc,
+function createScatterFrame(xRange, xIsLog, yRange, yIsLog) {
+    const [xMin, xMax] = xRange,
+        [yMin, yMax] = yRange,
         [svg] = document.getElementsByTagName('svg'),
-        height = parseDecimal(svg.getAttribute('height')),
-        width = parseDecimal(svg.getAttribute('width')),
+        height = parseDecimal(svg.getAttribute('height'))-labelWidth,
+        width = parseDecimal(svg.getAttribute('width'))-labelWidth,
         x0 = xMin * xMax > 0 || xIsLog ? 0 : getPoint(xMin, 0, xMax, false),
         y0 = yMin * yMax > 0 || yIsLog ? 0 : getPoint(yMin, 0, yMax, false),
         yAxis = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'x1': x0*width, 'y1': 0, 'x2': x0*width, 'y2': height, 'stroke': 'black', 'stroke-width': 1,
+            'x1': x0*width+labelWidth, 'y1': 0, 'x2': x0*width+labelWidth, 'y2': height, 'stroke': 'black', 'stroke-width': 1,
         }),
         xAxis = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'x1': 0, 'y1': (1-y0)*height, 'x2': width, 'y2': (1-y0)*height, 'stroke': 'black', 'stroke-width': 1,
+            'x1': labelWidth, 'y1': (1-y0)*height, 'x2': width+labelWidth, 'y2': (1-y0)*height, 'stroke': 'black', 'stroke-width': 1,
         }),
         xTickLocations = getTickLocations(xMin, xMax, xIsLog),
         xTicks = xTickLocations.map( (loc) => setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'x1': getPoint(xMin, loc, xMax, xIsLog)*width, 'y1': (1-y0-1/20)*height, 'stroke-width': 1,
-            'x2': getPoint(xMin, loc, xMax, xIsLog)*width, 'y2': (1-y0+1/20)*height, 'stroke': 'black',
+            'x1': getPoint(xMin, loc, xMax, xIsLog)*width+labelWidth, 'y1': (1-y0-1/50)*height, 'stroke-width': 1,
+            'x2': getPoint(xMin, loc, xMax, xIsLog)*width+labelWidth, 'y2': (1-y0+1/50)*height, 'stroke': 'black',
         })),
-        xLabels = xTickLocations.map( (loc) => {
+        xTickLabels = xTickLocations.map( (loc) => {
             const text = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
-                'x': getPoint(xMin, loc, xMax, xIsLog)*width, 'y': (1-y0 + (y0?1:-1)/20)*height,
+                'x': getPoint(xMin, loc, xMax, xIsLog)*width+labelWidth, 'y': (1-y0 + (y0?1:-1)/50)*height,
                 'text-anchor': 'middle', 'dominant-baseline': ( y0? 'hanging' : 'alphabetic' ),
             });
             text.textContent = fixFloatingPoint(loc);
@@ -411,18 +413,38 @@ function createScatterFrame(xLoc, xIsLog, yLoc, yIsLog) {
         }),
         yTickLocations = getTickLocations(yMin, yMax, yIsLog),
         yTicks = yTickLocations.map( (loc) => setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'x1': (x0-1/20)*width, 'y1': (1-getPoint(yMin, loc, yMax, yIsLog))*height, 'stroke-width': 1,
-            'x2': (x0+1/20)*width, 'y2': (1-getPoint(yMin, loc, yMax, yIsLog))*height, 'stroke': 'black',
+            'x1': (x0-1/50)*width+labelWidth, 'y1': (1-getPoint(yMin, loc, yMax, yIsLog))*height, 'stroke-width': 1,
+            'x2': (x0+1/50)*width+labelWidth, 'y2': (1-getPoint(yMin, loc, yMax, yIsLog))*height, 'stroke': 'black',
         })),
-        yLabels = yTickLocations.map( (loc) => {
+        yTickLabels = yTickLocations.map( (loc) => {
             const text = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
-                'x': (x0+1/20)*width, 'y': (1-getPoint(yMin, loc, yMax, yIsLog))*height,
+                'x': (x0+1/40)*width+labelWidth, 'y': (1-getPoint(yMin, loc, yMax, yIsLog))*height,
                 'text-anchor': 'start', 'dominant-baseline': 'middle',
             });
             text.textContent = fixFloatingPoint(loc);
             return text;
         });
-    svg.replaceChildren(xAxis, yAxis, ...xTicks, ...xLabels, ...yTicks, ...yLabels);
+    svg.replaceChildren(xAxis, yAxis, ...xTicks, ...xTickLabels, ...yTicks, ...yTickLabels);
+}
+
+function addAxesLabels(svg, height, width) {
+    const graph = document.getElementById('graph').value;
+    let xContent = document.getElementById('x').selectedOptions[0].textContent,
+        yContent = document.getElementById('y').selectedOptions[0].textContent;
+    if ( graph === 'seed_v_fraction' ) {
+        xContent = 'Seed differential';
+        yContent = 'Fraction won';
+    }
+    const xLabel = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
+        'text-anchor': 'middle', 'x': width/2, 'y': height+10,
+    });
+    xLabel.textContent = xContent;
+    svg.appendChild(xLabel);
+    const yLabel = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
+        'dominant-baseline': 'central', 'text-anchor': 'middle', 'transform': `rotate(-90, 5, ${height/2})`, 'x': 5, 'y': height/2,
+    });
+    yLabel.textContent = yContent;
+    svg.appendChild(yLabel);
 }
 
 /** @param {number} min
@@ -495,7 +517,8 @@ function winLossPlotter(contents) {
     if ( typeof contents === 'string' ) {
         plotWinLossFile(contents);
     } else {
-        contentsOfFile[this.responseURL.slice(document.location.href.length)] = this.responseText;
+        const baseUrl = document.location.origin + document.location.pathname;
+        contentsOfFile[this.responseURL.slice(baseUrl.length)] = this.responseText;
         plotWinLossFile(this.responseText);
     }
 }
@@ -507,7 +530,8 @@ function scatterPlotter(contents) {
     if ( typeof contents === 'string' ) {
         scatterPlotFile(contents);
     } else {
-        contentsOfFile[this.responseURL.slice(document.location.href.length)] = this.responseText;
+        const baseUrl = document.location.origin + document.location.pathname;
+        contentsOfFile[this.responseURL.slice(baseUrl.length)] = this.responseText;
         scatterPlotFile(this.responseText);
     }
     searchChange();
@@ -541,21 +565,22 @@ function processFile(file, processor) {
 /** Draw the axes for a win loss plot */
 function createWinLossFrame() {
     const [svg] = document.getElementsByTagName('svg'),
-        height = parseDecimal(svg.getAttribute('height')),
-        width = parseDecimal(svg.getAttribute('width')),
+        height = parseDecimal(svg.getAttribute('height'))-labelWidth,
+        width = parseDecimal(svg.getAttribute('width'))-labelWidth,
         halfWayPoint = setElementAttributesNS(document.createElementNS(svgNamespace, 'circle'), {
-            'cx': 0, 'cy': height/2, 'fill': 'black', 'r': 3, 'stroke': 'black', 'stroke-width': 1,
+            'cx': labelWidth, 'cy': height/2, 'fill': 'black', 'r': 3, 'stroke': 'black', 'stroke-width': 1,
         }),
         yAxis = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'stroke': 'black', 'stroke-width': 2, 'x1': 0, 'x2': 0, 'y1': 0, 'y2': height,
+            'stroke': 'black', 'stroke-width': 1, 'x1': labelWidth, 'x2': labelWidth, 'y1': 0, 'y2': height,
         }),
         xTop = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'stroke': 'black', 'stroke-width': 2, 'x1': 0, 'x2': width, 'y1': 0, 'y2': 0,
+            'stroke': 'black', 'stroke-width': 1, 'x1': labelWidth, 'x2': width+labelWidth, 'y1': 0, 'y2': 0,
         }),
         xBottom = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'stroke': 'black', 'stroke-width': 2, 'x1': 0, 'x2': width, 'y1': height, 'y2': height,
+            'stroke': 'black', 'stroke-width': 1, 'x1': labelWidth, 'x2': width+labelWidth, 'y1': height, 'y2': height,
         });
     svg.replaceChildren(halfWayPoint, yAxis, xTop, xBottom);
+    addAxesLabels(svg, height, width);
 }
 
 /** Plots sigmoid( rate*x ) on [0,maxX]
@@ -563,20 +588,19 @@ function createWinLossFrame() {
  *  @param {float} maxX */
 function plotSigmoid(rate, maxX) {
     const [svg] = document.getElementsByTagName('svg'),
-        height = parseDecimal(svg.getAttribute('height')),
+        height = parseDecimal(svg.getAttribute('height'))-labelWidth,
         reseed = 0,
-        width = parseDecimal(svg.getAttribute('width'));
+        width = parseDecimal(svg.getAttribute('width'))-labelWidth;
     let lastX = 0,
         lastSlope = rate*derivSigmoid(rate*(lastX-reseed)),
         lastY = sigmoid(rate*(lastX-reseed)),
-        pathD = `M0 ${height*(1-lastY)}`;
+        pathD = `M${labelWidth} ${height*(1-lastY)}`;
     while ( lastX < maxX ) {
         const nextX = lastX+1,
             nextY = sigmoid(rate*(nextX-reseed)),
             nextSlope = rate*derivSigmoid(rate*(nextX-reseed)),
             [midX, midY] = constrainedIntersection([lastX, lastY], lastSlope, [nextX, nextY], nextSlope);
-        pathD += ` Q ${width*midX/maxX} ${height*(1-midY)} ${width*nextX/maxX} ${height*(1-nextY)}`;
-        // X pathD += ' Q '+width*midX/maxX+' '+height*(1-midY)+' '+width*nextX/maxX+' '+height*(1-nextY);
+        pathD += ` Q ${width*midX/maxX+labelWidth} ${height*(1-midY)} ${width*nextX/maxX+labelWidth} ${height*(1-nextY)}`;
         lastX = nextX;
         lastY = nextY;
         lastSlope = nextSlope;
@@ -613,12 +637,12 @@ function getLogisticBestFitRate(successCounter, totalCounter) {
  *  @param {{center: float, halfWidth: float}} confidenceInterval for a binomial random variable */
 function plotConfidenceInterval(xFrac, confidenceInterval) {
     const [svg] = document.getElementsByTagName('svg'),
-        height = parseDecimal(svg.getAttribute('height')),
-        width = parseDecimal(svg.getAttribute('width')),
+        height = parseDecimal(svg.getAttribute('height'))-labelWidth,
+        width = parseDecimal(svg.getAttribute('width'))-labelWidth,
         {center, halfWidth} = confidenceInterval;
     svg.append(setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-        'x1': xFrac*width, 'y1': (1-center+halfWidth)*height, 'stroke-width': 2,
-        'x2': xFrac*width, 'y2': (1-center-halfWidth)*height, 'stroke': 'black',
+        'x1': xFrac*width+labelWidth, 'y1': (1-center+halfWidth)*height, 'stroke-width': 2,
+        'x2': xFrac*width+labelWidth, 'y2': (1-center-halfWidth)*height, 'stroke': 'black',
     }));
 }
 
