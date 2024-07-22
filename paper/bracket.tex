@@ -263,7 +263,7 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \end{axis}
 \end{tikzpicture}%
 }\hfill
-\subcaptionbox{\label{fig:bbw_D1_Tenn}Tennessee women. $\beta=0.304$}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbw_D1_Tenn}Tennessee women. $\beta=0.304$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,y axis line style=-,x axis line style=<->,xlabel={Seed differential},clip=false,xtick={-10,10},ticklabel style={font=\small},tickwidth=.3cm]
 \addplot[domain=-15:15]{1/(1+exp(-.304*(x+1.92)))};
@@ -325,7 +325,7 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 %\end{figure}
 
 \begin{figure}
-\subcaptionbox{\label{fig:bbm_D1_game_v_mu}Men's}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbm_D1_game_v_mu}Men's}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
@@ -336,7 +336,7 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 \end{axis}
 \end{tikzpicture}
 }\hfill
-\subcaptionbox{\label{fig:bbw_D1_game_v_mu}Women's}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbw_D1_game_v_mu}Women's}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
@@ -357,7 +357,7 @@ Such teams have a large amount of victories against lower ranking teams, so that
 
 Having failed to identify any bias for or against a particular team, we consider the possibility that a \emph{group} of teams may experience some bias.  We repeat the calculation of $\mu$, now grouping teams by their state in \autoref{fig:bb_D1_game_v_mu_by_state} and (slightly inaccurately) grouping the states by timezone in \autoref{fig:bb_D1_game_v_mu_by_timezone}.
 \begin{figure}
-\subcaptionbox{\label{fig:bbm_D1_game_v_mu_by_state}Men's, omitting DE (0-7); HI (1-4); ND (2-5); SD (0-6); AK, ME, NH (all 0-0).}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbm_D1_game_v_mu_by_state}Men's, omitting DE (0-7); HI (1-4); ND (2-5); SD (0-6); AK, ME, NH (all 0-0).}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=450,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},
@@ -369,7 +369,7 @@ Having failed to identify any bias for or against a particular team, we consider
 \end{axis}
 \end{tikzpicture}
 }\hfill
-\subcaptionbox{\label{fig:bbw_D1_game_v_mu_by_state}Women's, omitting AK (0-0), DE (3-6), HI (1-8), ID (0-14), NH (0-7), ND (0-1), RI (2-7), VT (1-7), WY (0-2).}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbw_D1_game_v_mu_by_state}Women's, omitting AK (0-0), DE (3-6), HI (1-8), ID (0-14), NH (0-7), ND (0-1), RI (2-7), VT (1-7), WY (0-2).}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=450,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},
@@ -385,7 +385,7 @@ Having failed to identify any bias for or against a particular team, we consider
 \end{figure}
 %
 \begin{figure}
-\subcaptionbox{\label{fig:bbm_D1_game_v_mu_by_timezone}Men's, omitting Alaska (0-0) and Hawaii (1-4).}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbm_D1_game_v_mu_by_timezone}Men's, omitting Alaska (0-0) and Hawaii (1-4).}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=100,xmax=3200,ymin=-2,ymax=3,xmode=log,xtick={100,200,500,1000,2000},xticklabels={100,200,500,1000,2000},
@@ -397,7 +397,7 @@ Having failed to identify any bias for or against a particular team, we consider
 \end{axis}
 \end{tikzpicture}
 }\hfill
-\subcaptionbox{\label{fig:bbw_D1_game_v_mu_by_timezone}Women's, omitting Alaska (0-0) and Hawaii (1-8).}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbw_D1_game_v_mu_by_timezone}Women's, omitting Alaska (0-0) and Hawaii (1-8).}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=100,xmax=3200,ymin=-2,ymax=3,xmode=log,xtick={100,200,500,1000,2000},xticklabels={100,200,500,1000,2000},
@@ -454,7 +454,7 @@ Using the reseeding results in a better (less negative) average log-likelihood.
 \section{College Basketball Tournaments}
 Wikipedia has brackets for many other basketball tournaments, most notably 32 (32) different conference tournaments [with occasional changing names] determining a champion for an automatic bid to the men's (women's) national tournament.  There are also 7 (4) other tournaments with a national scope.  We again begin by plotting seed differential against fraction of games won by the favored team in \autoref{fig:bb_WL_prob},
 \begin{figure}
-\subcaptionbox{\label{fig:bbm_WL_prob}Men's. $\beta=0.202$}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbm_WL_prob}Men's. $\beta=0.202$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
@@ -464,7 +464,7 @@ Wikipedia has brackets for many other basketball tournaments, most notably 32 (3
 \end{axis}
 \end{tikzpicture}
 }\hfill
-\subcaptionbox{\label{fig:bbw_WL_prob}Women's. $\beta=0.284$}[.48\textwidth]{
+\subcaptionbox{\label{fig:bbw_WL_prob}Women's. $\beta=0.284$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
@@ -607,7 +607,7 @@ Because our analysis does not uncover new information, we will not repeat it her
 \begin{comment}
 We first analyze baseball and softball, plotting the seed differential versus fraction of games won in \autoref{fig:basesoft_WL_prob}
 \begin{figure}
-\subcaptionbox{\label{fig:baseball_WL_prob}Baseball. $\beta=0.201$}[.48\textwidth]{
+\subcaptionbox{\label{fig:baseball_WL_prob}Baseball. $\beta=0.201$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
@@ -617,7 +617,7 @@ We first analyze baseball and softball, plotting the seed differential versus fr
 \end{axis}
 \end{tikzpicture}
 }\hfill
-\subcaptionbox{\label{fig:softball_WL_prob}Softball. $\beta=0.150$}[.48\textwidth]{
+\subcaptionbox{\label{fig:softball_WL_prob}Softball. $\beta=0.150$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
@@ -711,7 +711,7 @@ and the performance of each conference within national tournaments in \autoref{f
 
 We are also able to analyze soccer tournaments.  Unfortunately, of the 27 tournaments we identify in Wikipedia, only 5 are women's tournaments, leading us to combine the genders for our analysis.  As has been our habit, we first plot seed differential versus fraction of games won in \autoref{fig:soccer_WL_prob}.  We continue by examining number of games versus upset rate in \autoref{fig:soccer_game_v_rate}.
 \begin{figure}
-\captionbox{\label{fig:soccer_WL_prob}Seed differential versus fraction of games that a favored team wins in soccer tournaments, with 95\% Wilson confidence intervals and the logistic best fit. $\beta=0.214$}[.48\textwidth]{
+\captionbox{\label{fig:soccer_WL_prob}Seed differential versus fraction of games that a favored team wins in soccer tournaments, with 95\% Wilson confidence intervals and the logistic best fit. $\beta=0.214$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=19.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
@@ -721,7 +721,7 @@ We are also able to analyze soccer tournaments.  Unfortunately, of the 27 tourna
 \end{axis}
 \end{tikzpicture}
 }\hfill
-\captionbox{\label{fig:soccer_game_v_rate}(Logarithmic) number of games versus upset rate in bat and ball tournaments. National tournaments denoted with +.}[.48\textwidth]{
+\captionbox{\label{fig:soccer_game_v_rate}(Logarithmic) number of games versus upset rate in bat and ball tournaments. National tournaments denoted with +.}[.48\textwidth]{%
 \begin{tikzpicture}
 \pgfplotstableread[col sep=comma]{../soccer/group_betas.csv}\datatable
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=->,

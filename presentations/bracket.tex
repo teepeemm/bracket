@@ -136,7 +136,7 @@ axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \end{tikzpicture}%\\
 %Men's. $\beta=0.161$
 %\end{minipage}%
-~
+\hfill
 %\begin{minipage}{.48\textwidth}\centering
 \begin{tikzpicture}
 \begin{axis}[width=.48\linewidth-30pt,height=.48\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,scale only axis,
@@ -616,18 +616,4 @@ Try (most of) it yourself:\\
 \end{center}
 \end{frame}
 
-\end{document}
-
-\section{Further Analysis}
-% github, html: group/filter by conference/state
-% seed diff v fraction won
-% #games v reseeding for all teams
-% #games v beta in tournaments
-% #games v reseeding grouped by conference
-
-Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer be true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
-
-It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{https://github.com/teepeemm/bracket}.  For the less programmatically minded, we provide an online interface at \url{https://sites.und.edu/timothy.prescott/bracket/} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
-
-\printbibliography
 \end{document}
