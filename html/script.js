@@ -372,8 +372,8 @@ function scatterPlotFile(contents) {
         group.append(
             title,
             setElementAttributesNS(document.createElementNS(svgNamespace, 'circle'), {
-                'cx': getPoint(xMin, xDatum, xMax, xIsLog)*width+labelWidth, 'stroke': 'black', 'r': 2, 'stroke-width': 1,
-                'cy': (1-getPoint(yMin, yDatum, yMax, yIsLog))*height, 'fill': 'black', 'title': textContent,
+                'cx': getPoint(xMin, xDatum, xMax, xIsLog)*width+labelWidth, 'stroke': 'black', 'stroke-width': 1,
+                'cy': (1-getPoint(yMin, yDatum, yMax, yIsLog))*height, 'fill': 'black', 'r': 2, 'title': textContent,
             }),
         );
         svg.append(group);
@@ -393,10 +393,14 @@ function createScatterFrame(xRange, xIsLog, yRange, yIsLog) {
         x0 = xMin * xMax > 0 || xIsLog ? 0 : getPoint(xMin, 0, xMax, false),
         y0 = yMin * yMax > 0 || yIsLog ? 0 : getPoint(yMin, 0, yMax, false),
         yAxis = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'x1': x0*width+labelWidth, 'y1': 0, 'x2': x0*width+labelWidth, 'y2': height, 'stroke': 'black', 'stroke-width': 1,
+            'stroke': 'black', 'stroke-width': 1,
+            'x1': x0*width+labelWidth, 'y1': 0,
+            'x2': x0*width+labelWidth, 'y2': height,
         }),
         xAxis = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
-            'x1': labelWidth, 'y1': (1-y0)*height, 'x2': width+labelWidth, 'y2': (1-y0)*height, 'stroke': 'black', 'stroke-width': 1,
+            'stroke': 'black', 'stroke-width': 1,
+            'x1': labelWidth, 'y1': (1-y0)*height,
+            'x2': width+labelWidth, 'y2': (1-y0)*height,
         }),
         xTickLocations = getTickLocations(xMin, xMax, xIsLog),
         xTicks = xTickLocations.map( (loc) => setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
@@ -441,7 +445,8 @@ function addAxesLabels(svg, height, width) {
     xLabel.textContent = xContent;
     svg.appendChild(xLabel);
     const yLabel = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
-        'dominant-baseline': 'central', 'text-anchor': 'middle', 'transform': `rotate(-90, 5, ${height/2})`, 'x': 5, 'y': height/2,
+        'dominant-baseline': 'central', 'text-anchor': 'middle', 'transform': `rotate(-90, 5, ${height/2})`,
+        'x': 5, 'y': height/2,
     });
     yLabel.textContent = yContent;
     svg.appendChild(yLabel);
@@ -600,7 +605,8 @@ function plotSigmoid(rate, maxX) {
             nextY = sigmoid(rate*(nextX-reseed)),
             nextSlope = rate*derivSigmoid(rate*(nextX-reseed)),
             [midX, midY] = constrainedIntersection([lastX, lastY], lastSlope, [nextX, nextY], nextSlope);
-        pathD += ` Q ${width*midX/maxX+labelWidth} ${height*(1-midY)} ${width*nextX/maxX+labelWidth} ${height*(1-nextY)}`;
+        pathD
+            += ` Q ${width*midX/maxX+labelWidth} ${height*(1-midY)} ${width*nextX/maxX+labelWidth} ${height*(1-nextY)}`;
         lastX = nextX;
         lastY = nextY;
         lastSlope = nextSlope;
