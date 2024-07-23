@@ -159,6 +159,10 @@ Upsets with seed differential 7 or higher are significantly more likely ($p=\num
 \frametitle{After an upset}
 Fraction of time that the better seeded team wins in the second round, after one first round upset.  (Minimum 10 games.)
 \begin{center}
+\newbox\menswidest
+\setbox\menswidest=\hbox{$69\pm15$}
+\newbox\womenswidest
+\setbox\womenswidest=\hbox{$68\pm13$}
 \begin{tabular}{ c *2{S[table-format=2(2), separate-uncertainty]} }\toprule
 Seeds & {Men's (\%)} & {Women's (\%)} \\\midrule
 1 v \phantom19 & 89(6) & 93(5) \\
@@ -168,7 +172,7 @@ Seeds & {Men's (\%)} & {Women's (\%)} \\\midrule
 5 v 13 & 79(15) \\
 6 v 14 & 80(16) \\\addlinespace
 overall & 75(5) & 84(5)\\
-prediction & 78.4 & 90.1 \\\bottomrule
+prediction & {\makebox[\wd\menswidest][l]{78.4}} & {\makebox[\wd\womenswidest][l]{90.1}} \\\bottomrule
 \end{tabular}
 \end{center}
 An upset may lead to another upset, but not significantly so.
@@ -177,13 +181,13 @@ An upset may lead to another upset, but not significantly so.
 \begin{frame}
 \frametitle{Play-in winners}
 Number of games won in first round in the men's tournament, by seed, where the worse seed was (not) the winner of a play-in game.  Also significance of the statement ``Play-in winners are more likely to have an upset in their first round.''
-\begin{center}
-\begin{tabular}{ c *{10}{S[table-format=2]} }\toprule
-Seed & {6} & 11 & {5} & 12 & {4} & 13 & {3} & 14 & {1} & 16 \\\cmidrule(r){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(l){10-11}
-Play-in & 9 & 9 & 3 & 1 & 0 & 1 & 1 & 0 & 33 & 1 \\
-Non-play-in & 40 & 30 & 50 & 34 & 68 & 19 & 78 & 19 & 53 & 1 \\\addlinespace
+\begin{center}\scriptsize
+\begin{tabular}{ @{} c *{10}{S[table-format=2]} *{2}{S[table-format=3]} @{} }\toprule
+Seed & {6} & 11 & {5} & 12 & {4} & 13 & {3} & 14 & {1} & 16 & \multicolumn2c{Overall} \\\cmidrule(r){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(l){12-13}
+Play-in & 9 & 9 & 3 & 1 & 0 & 1 & 1 & 0 & 33 & 1 & 46 & 12\\
+Non-play-in & 40 & 30 & 50 & 34 & 68 & 19 & 78 & 19 & 53 & 1 & 289 & 103 \\\addlinespace
 % eg, scipy.stats.fisher_exact([[9,9],[40,30]],'less'), etc.
-$p$ & \multicolumn2c{0.39} & \multicolumn2c{0.87} & \multicolumn2c{0.23} & \multicolumn2c{1} & \multicolumn2c{0.63}
+$p$ & \multicolumn2c{0.39} & \multicolumn2c{0.87} & \multicolumn2c{0.23} & \multicolumn2c{1} & \multicolumn2c{0.63} & \multicolumn2c{0.86}
 \\\bottomrule
 \end{tabular}
 \end{center}

@@ -313,6 +313,9 @@ def print_calcs_for_paper(page: int = -1) -> None:
         print(scipy.stats.fisher_exact([[0, 1], [68, 19]], 'less')[1])
         print(scipy.stats.fisher_exact([[1, 0], [78, 19]], 'less')[1])
         print(scipy.stats.fisher_exact([[33, 1], [53, 1]], 'less')[1])
+        # overall
+        print(scipy.stats.fisher_exact([[46, 12], [289, 103]], 'less')[1])
+        # women's
         print(scipy.stats.fisher_exact([[3, 1], [2, 2]], 'less')[1])
         print(scipy.stats.fisher_exact([[4, 0], [4, 0]], 'less')[1])
     if page in (6, -1):

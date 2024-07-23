@@ -161,8 +161,9 @@ In \autoref{tab:D1_WL_prob_upset}, we examine the intervals from \autoref{fig:D1
 \begin{table}\caption{\label{tab:D1_WL_prob_upset}Fraction of time that the better team wins in the second round, after one first round upset.  (Minimum 10 games.)}
 \centering
 \newbox\menswidest
-\newbox\womenswidest
 \setbox\menswidest=\hbox{$69\pm15$}
+\newbox\womenswidest
+\setbox\womenswidest=\hbox{$68\pm13$}
 \begin{tabular}{ c *2{S[table-format=2(2), uncertainty-mode=separate]} }\toprule
 Seeds & {Men's (\%)} & {Women's (\%)} \\\midrule
 1 v \phantom19 & 89(6) & 93(5) \\
@@ -172,7 +173,7 @@ Seeds & {Men's (\%)} & {Women's (\%)} \\\midrule
 5 v 13 & 79(15) \\
 6 v 14 & 80(16) \\\addlinespace
 overall & 75(5) & 84(5)\\
-\autoref{fig:D1_WL_prob} prediction & {\makebox[\wd\menswidest][l]{78.4}} & 90.1 \\\bottomrule
+\autoref{fig:D1_WL_prob} prediction & {\makebox[\wd\menswidest][l]{78.4}} & {\makebox[\wd\womenswidest][l]{90.1}} \\\bottomrule
 \end{tabular}
 \end{table}
 %In \autoref{fig:D1_WL_prob_upset}, we plot the intervals from \autoref{fig:D1_WL_prob} that correspond to the second round after one first round upset in the men's (left) and women's (right) tournaments, along with logistic regressions for this filtered data.
@@ -203,15 +204,15 @@ overall & 75(5) & 84(5)\\
 
 In 2001, the men's tournament added a ``play-in'' game, where the last two teams to make the tournament played each other for the last spot.  (The NCAA initially referred to this as the first round, but later branded this the ``First Four'' so that ``first round'' would still refer to the round with 64 teams.  We use the ``later'' terminology.)  The play-in game expanded to eight teams for four spots in 2011.  We are interested in the question of how the play-in winners perform in their first round game: are they tired from having played earlier in the week, more experienced from having played a tournament game, or better than previously appreciated because we can now condition on them beating a supposedly equivalent opponent?  We are able to identify play-in games by looking for identically high seeded teams.  We then record how the winning team performs in their first round game, and summarize according to their seed in \autoref{tab:play_in_subsequent}.
 \begin{table}
-\centering\footnotesize
+\centering%\small
 \caption{\label{tab:play_in_subsequent}Number of games won in first round in the men's tournament, by seed, where the worse seed was (not) the winner of a play-in game.  Also significance of the statement ``Play-in winners are more likely to have an upset in their first round.''}
-\begin{tabular}{ @{} c *{10}{S[table-format=2]} S[table-format=1] S[table-format=2] S[table-format=1] S[table-format=2] @{} }\toprule
-& \multicolumn{10}c{Men's} & \multicolumn4c{Women's}\\\cmidrule(r){2-11}\cmidrule(l){12-15}
-Seed & {6} & 11 & {5} & 12 & {4} & 13 & {3} & 14 & {1} & 16 & 6 & 11 & 1 & 16 \\
-\cmidrule(r){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(lr){12-13}\cmidrule(l){14-15}
-Play-in & 9 & 9 & 3 & 1 & 0 & 1 & 1 & 0 & 33 & 1 & 3 & 1 & 4 & 0 \\
-Non-play-in & 40 & 30 & 50 & 34 & 68 & 19 & 78 & 19 & 53 & 1 & 2 & 2 & 4 & 0 \\\addlinespace
-$p$ & \multicolumn2c{0.39} & \multicolumn2c{0.87} & \multicolumn2c{0.23} & \multicolumn2c{1} & \multicolumn2c{0.63} & \multicolumn2c{0.93} & \multicolumn2c{1}
+\begin{tabular}{ @{} c *{10}{S[table-format=2]} *{2}{S[table-format=3]} @{} }\toprule
+%& \multicolumn{10}c{By individual seed} \\\cmidrule(lr){2-11}\cmidrule(l){12-13}
+Seed & {6} & 11 & {5} & 12 & {4} & 13 & {3} & 14 & {1} & 16 & \multicolumn2c{Overall} \\ %& 6 & 11 & 1 & 16 \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(l){12-13}%\cmidrule(l){14-15}
+Play-in & 9 & 9 & 3 & 1 & 0 & 1 & 1 & 0 & 33 & 1 & 46 & 12 \\ %3 & 1 & 4 & 0 \\
+Non-play-in & 40 & 30 & 50 & 34 & 68 & 19 & 78 & 19 & 53 & 1 & 289 & 103 \\\addlinespace % 2 & 2 & 4 & 0 \\\addlinespace
+$p$ & \multicolumn2c{0.39} & \multicolumn2c{0.87} & \multicolumn2c{0.23} & \multicolumn2c{1} & \multicolumn2c{0.63} & \multicolumn2c{0.86} %\multicolumn2c{0.93} & \multicolumn2c{1}
 \\\bottomrule
 \end{tabular}
 \end{table}
