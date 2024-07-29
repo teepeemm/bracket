@@ -21,7 +21,7 @@ const svgNamespace = 'http://www.w3.org/2000/svg',
     tournamentsOfGroup = {},
     contentsOfFile = {},
     unisInState = {},
-    labelWidth = 15;
+    labelWidth = 20;
 
 Object.values(timezones).forEach( (arr) => {
     arr.forEach( (state) => {
@@ -445,13 +445,13 @@ function addAxesLabels(svg, height, width) {
         yContent = 'Fraction won';
     }
     const xLabel = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
-        'text-anchor': 'middle', 'x': width/2, 'y': height+10,
+        'text-anchor': 'middle', 'x': width/2, 'y': height+15,
     });
     xLabel.textContent = xContent;
     svg.appendChild(xLabel);
     const yLabel = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
-        'dominant-baseline': 'central', 'text-anchor': 'middle', 'transform': `rotate(-90, 5, ${height/2})`,
-        'x': 5, 'y': height/2,
+        'dominant-baseline': 'central', 'text-anchor': 'middle', 'transform': `rotate(-90, 7, ${height/2})`,
+        'x': 7, 'y': height/2,
     });
     yLabel.textContent = yContent;
     svg.appendChild(yLabel);
@@ -479,7 +479,6 @@ function getTickLocations(min, max, isLog) {
 
 /** @param {string} contents */
 function plotWinLossFile(contents) {
-    createWinLossFrame();
     const spreadX = document.getElementById('individuate').checked,
         winLossMatrix = contents.split('\n').map( (line) => line.split(',').map(parseDecimal) ),
         maxRowSeed = winLossMatrix.findLastIndex( (row) => row.reduce( (a, b) => a+b ) ),
@@ -487,6 +486,7 @@ function plotWinLossFile(contents) {
         maxSeed = Math.max(16, maxRowSeed, maxColSeed),
         successCounter = Array(maxSeed+1),
         totalCounter = Array(maxSeed+1);
+    createWinLossFrame(maxSeed);
     for ( let diff = 1; diff < maxSeed; diff += 1 ) {
         let total = 0,
             successes = 0,
@@ -572,8 +572,9 @@ function processFile(file, processor) {
     }
 }
 
-/** Draw the axes for a win loss plot. */
-function createWinLossFrame() {
+/** Draw the axes for a win loss plot.
+ *  @param {number} maxSeed */
+function createWinLossFrame(maxSeed) {
     const [svg] = document.getElementsByTagName('svg'),
         height = parseDecimal(svg.getAttribute('height'))-labelWidth,
         width = parseDecimal(svg.getAttribute('width'))-labelWidth,
@@ -588,8 +589,34 @@ function createWinLossFrame() {
         }),
         xBottom = setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
             'stroke': 'black', 'stroke-width': 1, 'x1': labelWidth, 'x2': width+labelWidth, 'y1': height, 'y2': height,
+        }),
+        xTickLocations = [5, 10, 15],
+        xTicks = xTickLocations.map( (loc) => setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
+            'x1': getPoint(0, loc, maxSeed, false)*width+labelWidth, 'y1': (1-1/50)*height, 'stroke-width': 1,
+            'x2': getPoint(0, loc, maxSeed, false)*width+labelWidth, 'y2': (1+1/50)*height, 'stroke': 'black',
+        })),
+        xTickLabels = xTickLocations.map( (loc) => {
+            const text = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
+                'x': getPoint(0, loc, maxSeed, false)*width+labelWidth, 'y': (1-1/50)*height,
+                'text-anchor': 'middle', 'dominant-baseline': 'alphabetic' ,
+            });
+            text.textContent = fixFloatingPoint(loc);
+            return text;
+        }),
+        yTickLocations = [.2, .4, .6, .8],
+        yTicks = yTickLocations.map( (loc) => setElementAttributesNS(document.createElementNS(svgNamespace, 'line'), {
+            'x1': labelWidth-width/50, 'y1': (1-loc)*height, 'stroke-width': 1,
+            'x2': labelWidth+width/50, 'y2': (1-loc)*height, 'stroke': 'black',
+        })),
+        yTickLabels = yTickLocations.map( (loc) => {
+            const text = setElementAttributesNS(document.createElementNS(svgNamespace, 'text'), {
+                'x': labelWidth+width/40, 'y': (1-loc)*height,
+                'text-anchor': 'start', 'dominant-baseline': 'middle',
+            });
+            text.textContent = fixFloatingPoint(loc);
+            return text;
         });
-    svg.replaceChildren(halfWayPoint, yAxis, xTop, xBottom);
+    svg.replaceChildren(halfWayPoint, yAxis, xTop, xBottom, ...xTicks, ...xTickLabels, ...yTicks, ...yTickLabels);
     addAxesLabels(svg, height, width);
 }
 
