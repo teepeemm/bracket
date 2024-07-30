@@ -311,6 +311,7 @@ def get_bracket(content: str, flags: Flags) -> typing.Iterator[tuple[str, dict]]
                     r'\{\{(?i:CBSB) [^}]*title=([^}]*)(?=\||\}\})[^}]*\}\}',
                     r'\{\{\s*(?i:nowrap|strikethrough)\|([^}]*)\}\}',
                     r'\{\{(?i:csoc link)[^}]*title=([^}]*)(?=\||\}\})[^}]*\}\}',
+                    r'\{\{(?i:center)\|([^}]*)\}\}',
                     r'\{\{Alternative links\|[^}]*title=([^}]*)(?=\||\}\})[^}]*\}\}'):
         content = re.sub(extract, r'\1', content, flags=re.MULTILINE | re.DOTALL)
     content = content.replace(' & ', ' and ')
