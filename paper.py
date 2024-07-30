@@ -4,6 +4,7 @@ import collections
 import itertools
 import json
 import math
+import re
 import typing
 
 import numpy  # type: ignore
@@ -386,5 +387,51 @@ def sigmoid(x: float) -> float:
     return 1 / (1 + math.exp(-x))
 
 
+def file_has_unseeded_seeding(filename: str) -> bool:
+    flags = analyze.Flags()
+    with open(filename, encoding='utf-8') as fp:
+        for bracket, _ in analyze.get_bracket(fp.read(), flags):
+            if not re.search(r'\d+TeamBracket-NFL', bracket) \
+                    and re.search(r'\d+TeamBracket\W', bracket) \
+                    and 'TeamBracket-NoSeeds' not in bracket \
+                    and 'TeamBracket-Compact-NoSeeds' not in bracket \
+                    and not re.search(r'\|\s*seeds\s*=\s*n', bracket) \
+                    and not re.search(r'\|\s*RD\d+-seed\d+\s*=', bracket):
+                return True
+    return False
+
+
+def find_unseeded_seeding_in(group: str, tourney_group: dict) -> dict[str, list[int]]:
+    unseeded_seeding_years = collections.defaultdict(list)
+    for tourney, description_json in tourney_group.items():
+        if tourney in ('comment', 'suffix', 'nonconference'):
+            continue
+        subgroup_desc_vals = analyze.SubgroupDesc(
+            group=group,
+            directory=f'{group}/{tourney}',
+            suffix=tourney_group.get('suffix', ''),
+            tourney=tourney,
+            is_national='nonconference' not in tourney_group or tourney in tourney_group['nonconference']
+        )
+        description = subgroup_desc_vals._replace(**description_json)
+        for year in analyze.get_years(description.years):
+            filename = f'{description.directory.rstrip("_")}/{year}.txt'
+            if file_has_unseeded_seeding(filename):
+                unseeded_seeding_years[tourney].append(year)
+    return unseeded_seeding_years
+
+
+def find_unseeded_seeding() -> None:
+    with open('tourneys.json', encoding='utf-8') as _json_file:
+        _tourneys = json.load(_json_file)
+    unseeded_seeding = {
+        group: find_unseeded_seeding_in(group, tourney_group) for group, tourney_group in _tourneys.items()
+    }
+    for group, tourneys in unseeded_seeding.items():
+        print(group, 'has ', sum((len(years) for years in tourneys.values())))
+    with open('unseeded_seeding.json', 'w') as unseeded_file:
+        json.dump(unseeded_seeding, unseeded_file, indent=4)
+
+
 if __name__ == '__main__':
-    pass
+    find_unseeded_seeding()
