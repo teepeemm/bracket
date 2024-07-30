@@ -22,11 +22,11 @@ __version__ = '2024-06-24'
 
 class Flags(typing.NamedTuple):
     """ Some short booleans (and one sometimes string) that we may pass in """
-    is_tennis: bool
-    is_professional: str | typing.Literal[False]
-    num_teams: int
-    multi_elim: bool
-    is_national: bool
+    is_tennis: bool = False
+    is_professional: str | typing.Literal[False] = False
+    num_teams: int = -1
+    multi_elim: bool = False
+    is_national: bool = False
 
 
 _team_name_from = collections.defaultdict(set)
