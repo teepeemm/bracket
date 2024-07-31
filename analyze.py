@@ -220,8 +220,7 @@ class TeamResult:
             # from https://en.wikipedia.org/wiki/Module:Team_bracket/doc#Parameters
             # "For round 1, this value defaults to the conventional seed allocation for tournaments."
             # It'd be more satisfying to code this, but that'd be longer (and I'm not sure of the algorithm)
-            # there also appear to be a few instances where Wikipedia does this but should be told not to:
-            # bbm/NCAA/1953, bbm/NIT/1938, baseball/NCAA2/1976
+            # see also issue #3
             default_seeding = {
                 2: ['', 1, 2],
                 3: ['', 2, 3],
