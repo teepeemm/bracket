@@ -388,13 +388,16 @@ def sigmoid(x: float) -> float:
 
 
 def file_has_unseeded_seeding(filename: str) -> bool:
+    """ Does this file have seeding that it shouldn't?  This is a consequence of
+    https://en.wikipedia.org/wiki/Module:Team_bracket/doc#Parameters
+    "RD_n-seed_m: ... For round 1, this value defaults to the conventional seed allocation for tournaments. "
+    :param filename:
+    :return: filename has a bracket that should not have seeding but Wikipedia may automatically seed """
     flags = analyze.Flags()
     with open(filename, encoding='utf-8') as fp:
         for bracket, _ in analyze.get_bracket(fp.read(), flags):
-            if not re.search(r'\d+TeamBracket-NFL', bracket) \
-                    and re.search(r'\d+TeamBracket\W', bracket) \
-                    and 'TeamBracket-NoSeeds' not in bracket \
-                    and 'TeamBracket-Compact-NoSeeds' not in bracket \
+            if re.search(r'\d+TeamBracket(?!-NFL)\W', bracket) \
+                    and not re.search('TeamBracket-(Compact-)?NoSeeds', bracket) \
                     and not re.search(r'\|\s*seeds\s*=\s*n', bracket) \
                     and not re.search(r'\|\s*RD\d+-seed\d+\s*=', bracket):
                 return True
@@ -402,6 +405,9 @@ def file_has_unseeded_seeding(filename: str) -> bool:
 
 
 def find_unseeded_seeding_in(group: str, tourney_group: dict) -> dict[str, list[int]]:
+    """ :param group:
+    :param tourney_group:
+    :return: Of all the years in this group, which `file_has_unseeded_seeding()`? """
     unseeded_seeding_years = collections.defaultdict(list)
     for tourney, description_json in tourney_group.items():
         if tourney in ('comment', 'suffix', 'nonconference'):
@@ -421,7 +427,9 @@ def find_unseeded_seeding_in(group: str, tourney_group: dict) -> dict[str, list[
     return unseeded_seeding_years
 
 
-def find_unseeded_seeding() -> None:
+def write_unseeded_seeding() -> None:
+    """ Determine which `file_has_unseeded_seeding()` and write this information to a file.  Also print a summary
+    to the console. """
     with open('tourneys.json', encoding='utf-8') as _json_file:
         _tourneys = json.load(_json_file)
     unseeded_seeding = {
@@ -429,9 +437,9 @@ def find_unseeded_seeding() -> None:
     }
     for group, tourneys in unseeded_seeding.items():
         print(group, 'has ', sum((len(years) for years in tourneys.values())))
-    with open('unseeded_seeding.json', 'w') as unseeded_file:
+    with open('unseeded_seeding.json', 'w', encoding='utf-8') as unseeded_file:
         json.dump(unseeded_seeding, unseeded_file, indent=4)
 
 
 if __name__ == '__main__':
-    find_unseeded_seeding()
+    pass
