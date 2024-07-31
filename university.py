@@ -527,7 +527,7 @@ can_drop = {
 }
 """ Whether we can drop the literal word at the end of a name. """
 
-_prof_disambiguations: dict[str, dict[str, dict[str, tuple[()]]]] = {
+_prof_disambiguations: dict[str, dict[str, dict[str, typing.Iterable]]] = {
     'MLB': {
         'Florida': {'Marlins': ()},
         'Los Angeles': {'Angels': (), 'Dodgers': ()},
@@ -553,7 +553,7 @@ _prof_disambiguations: dict[str, dict[str, dict[str, tuple[()]]]] = {
 """ Used by `get_disambiguator`. """
 
 with open('univ_disambiguations.json', encoding='utf-8') as _json:
-    _univ_disambiguations: dict[str, dict[str, list[str | re.Pattern]]] \
+    _univ_disambiguations: dict[str, dict[str, typing.Iterable[str | re.Pattern]]] \
         = json.load(_json) | {
         'Northeastern': {
             'CO': ['Northeastern Junior College'],
@@ -587,7 +587,7 @@ with open('univ_disambiguations.json', encoding='utf-8') as _json:
 have that tuple's key.  We use the conferences only in non-national tournaments.
 Most of this is offloaded to univ_disambiguations.json.  The ones here use a regex, which isn't valid json. """
 
-_univ_disambiguation_defaults: dict[tuple[str, str], dict[str, tuple[str | re.Pattern, ...]]] = {
+_univ_disambiguation_defaults: dict[tuple[str, str], dict[str, typing.Iterable]] = {
     ('Miami', 'FL'): {
         'FL': ('Miami Hurricanes', 'Atlantic Coast Conference', 'Big East'),
         'OH': ('Miami Red', 'Mid-American Conference', 'NCHC')
