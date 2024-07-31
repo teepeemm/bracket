@@ -404,7 +404,8 @@ def file_has_unseeded_seeding(filename: str) -> bool:
     return False
 
 
-def find_unseeded_seeding_in(group: str, tourney_group: dict) -> dict[str, list[int]]:
+def find_unseeded_seeding_in(group: str,
+                             tourney_group: dict) -> collections.defaultdict[str, list[typing.Optional[int]]]:
     """ :param group:
     :param tourney_group:
     :return: Of all the years in this group, which `file_has_unseeded_seeding()`? """
