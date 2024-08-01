@@ -298,7 +298,7 @@ def get_bracket(content: str, flags: Flags) -> typing.Iterator[tuple[str, dict]]
         content = content.replace(remove, '')
     for remove in ('<ref[^/>]*>.*?</ref>', '<ref [^/>]*/>', "'{2,}", '<!--.*?-->', r'\{\{efn.*?\}\}',
                    '<sup>[^<>]*</sup>', r'<br\s*/?>', r'\{\{#tag:ref[^}]*\}\}', r'\{\{sup[^}]*\}\}',
-                   '<small>[^<>]*</small>', r'\{\{small.*?\}\}', r'\{\{flagicon\|[^}]*\}\}', r'[†*^~#]',
+                   '<small>[^<>]*</small>', r'\{\{[Ss]mall.*?\}\}', r'\{\{flagicon\|[^}]*\}\}', r'[†*^~#]',
                    r'<s>([^<]*)</s>',  # replaced => should delete.  vacated => we'll delete as well
                    r'\{\{s\|[^}]*\}\}'
                    ):
@@ -634,13 +634,13 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any], grouper: typing.Cal
                 is_national=tourney in tourney_group.get('nonconference', (tourney,)),
                 suffix=tourney_group.get('suffix', ''))
             _update_reseeding(outcomes, description, functools.partial(grouper, group=group))
-    reseeding: list[dict[str, str | int]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
-        [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
-    df = pandas.DataFrame(reseeding)
-    output = df.sort_values('Team')
+    reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()]
+    if not reseeding:
+        return
+    df = pandas.DataFrame(reseeding).sort_values('Team')
     columns = ['Team', 'Games', 'Rate', 'Reseed']
-    output.to_csv(f'{label}reseed.csv', index=False, columns=columns)
-    output.to_csv(f'html/{label}reseed.csv', index=False, columns=columns)
+    df.to_csv(f'{label}reseed.csv', index=False, columns=columns)
+    df.to_csv(f'html/{label}reseed.csv', index=False, columns=columns)
     if not label:
         indexer = (9 < df.Games) & (-10 < df.Reseed) & (df.Reseed < 10)
         output = df[indexer].sort_values('Team')
@@ -676,13 +676,12 @@ def write_group_reseeding(group: str, tourney_group: dict[str, typing.Any],
             is_national=tourney in tourney_group.get('nonconference', (tourney,)),
             suffix=tourney_group.get('suffix', ''))
         _update_reseeding(outcomes, description, grouper)
-    reseeding: list[dict[str, str | int]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
+    reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
         [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
-    df = pandas.DataFrame(reseeding)
-    output = df.sort_values('Team')
+    df = pandas.DataFrame(reseeding).sort_values('Team')
     columns = ['Team', 'Games', 'Rate', 'Reseed']
-    output.to_csv(f'{group}/{label}reseed.csv', index=False, columns=columns)
-    output.to_csv(f'html/{group}/{label}reseed.csv', index=False, columns=columns)
+    df.to_csv(f'{group}/{label}reseed.csv', index=False, columns=columns)
+    df.to_csv(f'html/{group}/{label}reseed.csv', index=False, columns=columns)
     if not label:
         indexer = (9 < df.Games) & (-10 < df.Reseed) & (df.Reseed < 10)
         output = df[indexer].sort_values('Team')
