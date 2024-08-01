@@ -11,14 +11,7 @@
             1939
         ]
     },
-    "bbw": {
-        "D1": [
-            1983
-        ],
-        "WNIT": [
-            2012
-        ]
-    },
+    "bbw": {},
     "baseball": {
         "NCAA1": [
             1947,
@@ -41,19 +34,8 @@
         ]
     },
     "softball": {},
-    "soccer": {
-        "MoVall": [
-            2020
-        ],
-        "Southern": [
-            2020
-        ]
-    },
+    "soccer": {},
     "ih": {},
     "professional": {},
-    "other": {
-        "VolleyballW": [
-            2020
-        ]
-    }
+    "other": {}
 }
