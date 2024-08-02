@@ -184,11 +184,10 @@ class TeamResult:
                 else:
                     match_data[team_num]['team'] = university.normalize_team_name(matched.group(4).strip(),
                                                                                   disambiguator)
-                    if flags.is_professional and isinstance(flags.is_professional, str):
-                        # that second half is unnecessary, but it convinces mypy that we have a str
+                    if flags.is_professional:
                         match_data[team_num]['team'] = \
                             university.normalize_professional_name(match_data[team_num]['team'],
-                                                                   flags.is_professional)
+                                                                   flags.tourney)
             elif item_type == 'seed':
                 match_data[team_num]['seed'] = matched.group(4).strip()
             elif 'score' in item_type:
@@ -375,12 +374,16 @@ def get_game(description: SubgroupDesc, year: int | None) -> typing.Iterator[Gam
     filename = f'{description.directory.rstrip("_")}/{year}.txt'
     if not os.path.isfile(filename) or os.path.getmtime(filename) + SECONDS_PER_YEAR < time.time():
         potential_titles = get_potential_titles(description, year, description.tourney == 'NFL_')
+        if not year:
+            breakpoint()
+            raise Exception
         if not create_wiki_cache(filename, potential_titles):
             return
     flags = Flags(
         multi_elim=description.multi_elim,
         is_tennis=description.directory == 'other/Tennis',
-        is_professional=description.group == 'professional' and description.tourney,
+        is_professional=description.group == 'professional',
+        tourney=description.tourney,
         is_national=description.is_national,
         num_teams=-1
     )
@@ -858,7 +861,7 @@ def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[s
         pass
     tourney_winner = numpy.zeros((MAX_SEED + 1, MAX_SEED + 1), dtype=int)
     for description_dict in tourney_subgroup.values():
-        description = SubgroupDesc(**description_dict)._replace(**subgroup_desc._asdict())
+        description = subgroup_desc._replace(**description_dict)
         for year in get_years(description.years):
             for game in get_game(description, year):
                 tourney_winner[game[0].seed, game[1].seed] += 1
