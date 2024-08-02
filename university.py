@@ -23,7 +23,8 @@ __version__ = '2024-06-24'
 class Flags(typing.NamedTuple):
     """ Some short booleans (and one sometimes string) that we may pass in """
     is_tennis: bool = False
-    is_professional: str | typing.Literal[False] = False
+    is_professional: bool = False
+    tourney: str = ''
     num_teams: int = -1
     multi_elim: bool = False
     is_national: bool = False
@@ -669,7 +670,7 @@ def get_disambiguator(content: str, flags: Flags) -> dict[str, dict[str, str]]:
         }
     }
     _disambiguations: dict[str, dict[str, typing.Iterable[str | re.Pattern]]]\
-        = _prof_disambiguations[flags.is_professional.rstrip('_')] if flags.is_professional else _univ_disambiguations
+        = _prof_disambiguations[flags.tourney.rstrip('_')] if flags.is_professional else _univ_disambiguations
     # USC usually means Trojans (and definitely in a bracket). That will override
     if 'Gamecocks' in content or 'South Car' in content:
         disambiguator['replacement']['USC'] = 'South Carolina'
