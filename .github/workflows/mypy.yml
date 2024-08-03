@@ -14,10 +14,10 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-#    - name: Install dependencies
-#      run: |
-#        python -m pip install --upgrade pip
-#        pip install pylint
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade mypy
+        pip install mypy
 #        pip install numpy
 #        pip install pandas
 #        pip install pywikibot
