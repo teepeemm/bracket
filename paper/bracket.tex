@@ -14,6 +14,17 @@
 \usepackage{mathtools}
 \usepackage{hyperref}
 
+% for publication
+%\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota}}
+%\newcommand\githuburl{https://github.com/teepeemm/bracket}
+%\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
+
+% for refereeing
+\usepackage[nomarkers]{endfloat}
+\newcommand\authorinfo{Author Name\footnote{Affiliation}}
+\newcommand\githuburl{https://github.com/username/bracket}
+\newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
+
 \pgfplotsset{compat=1.18}
 \tikzset{ dots/.style = {mark=*, draw=black, mark size=.5pt} }
 \usetikzlibrary{external}
@@ -23,7 +34,7 @@
 \title{Seeding Statistics of Elimination Tournaments}
 % Elimination Tournaments' Seeding Statistics
 % Statistics of Seeding of Tournaments of Elimination   :-P
-\author{Timothy Prescott\footnote{University of North Dakota}}
+\author{\authorinfo}
 \date{\today}
 
 \begin{document}
@@ -801,15 +812,10 @@ We do however provide one final plot of seed differential versus fraction of gam
 
 
 \section{Further Analysis}
-% github, html: group/filter by conference/state
-% seed diff v fraction won
-% #games v reseeding for all teams
-% #games v beta in tournaments
-% #games v reseeding grouped by conference
 
 Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer be true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
 
-It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{https://github.com/teepeemm/bracket}.  For the less programmatically minded, we provide an online interface at \url{https://sites.und.edu/timothy.prescott/bracket/} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
+It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{\githuburl}.  For the less programmatically minded, we provide an online interface at \url{\interfaceurl} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
 
 \printbibliography
 \thanks{No potential competing interest was reported by the author.}
@@ -833,8 +839,3 @@ L(l(x),p(x))_m = xe^(mx)l(x) / (1+e^(mx))
 p(-1)=S(-m)=1/(1+e^m))
 e^m = 1/p(-1) - 1
 m = ln(1/p(-1) - 1)
-
-
-# my edits
-# https://en.wikipedia.org/w/index.php?title=1981_NCAA_Division_III_basketball_tournament&diff=prev&oldid=1219802469
-# https://en.wikipedia.org/w/index.php?title=1977_Pacific_Coast_Athletic_Association_men%27s_basketball_tournament&diff=prev&oldid=1219661417
