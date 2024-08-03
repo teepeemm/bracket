@@ -951,7 +951,7 @@ def analyze_winloss(filename: str, show_grids=False) -> None:
     print(winner.sum(axis=(0, 1)), 'total games. ', winner[1:, 1:].sum(axis=(0, 1)), 'games between ranked teams')
     if show_grids:
         print(winner[1:, 1:])
-        winner_loser = numpy.ma.MaskedArray(winner + winner.T, copy=True, mask=(winner + winner.T) < 6)
+        winner_loser: numpy.ndarray = numpy.ma.MaskedArray(winner + winner.T, copy=True, mask=(winner + winner.T) < 6)
         probs = winner / winner_loser
         print(probs[1:, 1:].filled(numpy.nan))
 
