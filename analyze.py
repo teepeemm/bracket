@@ -3,14 +3,12 @@
 A key file for `__main__` is tourneys.json.  In that file, the highest level is a 'group', consisting of a sport (and
 gender in the case of basketball) (although the last group is 'other'). Within a group, each line is another object
 corresponding to a tournament with a name and years that tournament occurred. See `get_years()` for that last item.
-Often, a tournament changed their name over the years. In that case, we distinguish the tournaments within the json file
-by appending one or more `_` to the key. This leads to the same directory, and we consolidate the data for the
-tournament.
+Often, a tournament changed their name over the years, so we distinguish the tournaments within the json file by
+appending one or more `_` to the key. This leads to the same directory, and we consolidate the data for the tournament.
 
-This will attempt to locate tournaments through the latest complete year.  This means that as a year progresses,
-tournaments that have recently finished will not be evaluated until the end of the calendar year. Note that
-FootballFCS and NFL finish their brackets in the following year, so that just after a superbowl is the best time to
-get the latest tournaments.
+This will attempt to locate tournaments through the latest complete year, so that as a year progresses, tournaments that
+have recently finished will not be evaluated until the end of the calendar year. Note that FootballFCS and NFL finish
+their brackets in the following year, so that just after a superbowl is the best time to get the latest tournaments.
 
 The output csv files that are used by the html GUI are also copied to that directory, with a notable name change:
 because I can publish all files in a folder but not a folder itself, files of the form {group}/{tournament}/{file}
@@ -37,7 +35,7 @@ import university
 from university import Flags
 
 __author__ = 'Timothy Prescott'
-__version__ = '2024-06-12'
+__version__ = '2024-08-02'
 
 numpy.set_printoptions(precision=2, linewidth=106)
 
@@ -46,7 +44,6 @@ MAX_SEED: typing.Final[int] = 20  # 2006 soccer/md2. tennis goes much higher
 SECONDS_PER_YEAR: typing.Final[int] = 365*24*60*60
 
 Year = typing.Union[int, list[typing.Union[int, list[int], None]]]
-# Description = dict[str,str|Year]
 
 K = typing.TypeVar('K')
 V = typing.TypeVar('V')
@@ -80,16 +77,14 @@ def _get_years_none(_: None) -> typing.Iterator[None]:
 
 @get_years.register
 def _get_years_int(arg: int) -> typing.Iterator[int]:
-    """ If get_years took a single int, then it's the starting year and the
-    tournament is still ongoing. """
+    """ If get_years took a single int, then it's the starting year and the tournament is still ongoing. """
     yield from range(arg, CURRENT_YEAR)  # does not include the current year
 
 
 @get_years.register
 def _get_years_list(arg: list) -> typing.Iterator[int]:
-    """ If get_years took a list, it's a bit more complicated.  A list of two
-    ints is a range (but including the endpoints).  Otherwise, an int is a
-    single year. And [int,falsy] is a starting year that's still ongoing. """
+    """ If get_years took a list, it's a bit more complicated.  A list of two ints is a range (but including the
+    endpoints).  Otherwise, an int is a single year. And [int,falsy] is a starting year that's still ongoing. """
     if len(arg) == 2 and isinstance(arg[0], int) and isinstance(arg[1], int):
         yield from range(arg[0], arg[1] + 1)
     else:
@@ -403,9 +398,9 @@ def get_source_mtime(directory: str, years: typing.Iterator[int] | typing.Iterat
 
 
 def get_potential_titles(description: SubgroupDesc, year: int | None, use_range: bool) -> list[str]:
-    """ Determines potential titles that Wikipedia may use for a tournament.
-    Sometimes the suffix is `.lower()`ed, and some tournaments have a template.
-    NFL playoffs use YYYY-(YY)YY (see `_get_year_range`), and sometimes that dash is an en-dash (in the url!).
+    """ Determines potential titles that Wikipedia may use for a tournament. Sometimes the suffix is `.lower()`ed, and
+    some tournaments have a template. NFL playoffs use YYYY-(YY)YY (see `_get_year_range`), and sometimes that dash is
+    an en-dash (in the url!).
     :param description: the dict describing the details of this tournament
     :param year: The year of the tournament
     :param use_range: Whether to use `_get_year_range` for the year """
@@ -439,9 +434,8 @@ def _get_year_range(year_in: int) -> str:
 
 def create_wiki_cache(filename: str, potential_titles: list[str]) -> bool:
     """ Gets the site's contents from Wikipedia and caches them to a file.
-    (Tail) recursively checks each potential title, and uses the first that works.
     :param filename: The cache file to use
-    :param potential_titles: The potential sites in Wikipedia.
+    :param potential_titles: The potential sites in Wikipedia, used for tail recursion.
     :return: Whether the site was found """
     if not potential_titles:
         print(filename, 'does not exist')
@@ -615,8 +609,6 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any], grouper: typing.Cal
                             for group, tourney_group in tourneys.items()
                             for tourney, description in tourney_group.items()
                             if tourney not in ('suffix', 'comment', 'nonconference')))
-        # description should be a SubgroupDesc in the previous command, but since we only need the years entry,
-        # we stick with a dict
         if source_mtime < os.path.getmtime(f'{label}reseed.csv'):
             return
     except FileNotFoundError:
@@ -650,8 +642,7 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any], grouper: typing.Cal
 
 def write_group_reseeding(group: str, tourney_group: dict[str, typing.Any],
                           grouper: typing.Callable[[str], str] = identity, label: str = '') -> None:
-    """ Creates the files {group}/{label}reseed[_filtered].csv.
-    pgf/simplecsv is not up to handling the larger csvs.
+    """ Creates the files {group}/{label}reseed[_filtered].csv. pgf/simplecsv is not up to handling the larger csvs.
     :param group:
     :param tourney_group:
     :param grouper: Collects various teams into grouper(team).  Passed to `_update_reseeding`
@@ -661,7 +652,6 @@ def write_group_reseeding(group: str, tourney_group: dict[str, typing.Any],
                                              get_years(description.get('years', None)))
                             for tourney, description in tourney_group.items()
                             if tourney not in ('suffix', 'comment', 'nonconference')))
-        # again, description should be a SubgroupDesc
         if source_mtime < os.path.getmtime(f'{group}/{label}reseed.csv'):
             return
     except FileNotFoundError:
@@ -733,8 +723,7 @@ def write_conf_reseeding(group: str, tourney_group: dict[str, typing.Any]) -> No
 
 def _update_reseeding(outcomes: collections.defaultdict[str, dict[str, list[int]]], description: SubgroupDesc,
                       grouper: typing.Callable[[str], str]) -> None:
-    """ Passes through to `_update_reseeding_year`, because `write_conf_reseeding` needs to do some dramatic updating
-    for each year.
+    """ Passes through to `_update_reseeding_year`, because `write_conf_reseeding` needs to update for each year.
     :param outcomes:
     :param description:
     :param grouper: """
