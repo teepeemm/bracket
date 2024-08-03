@@ -388,18 +388,20 @@ def sigmoid(x: float) -> float:
 
 
 def bracket_has_unseeded_seeding(bracket: str) -> bool:
-    return re.search(r'\d+TeamBracket(?!-NFL)(?!-2Elim)\W', bracket) \
-        and not re.search('TeamBracket-(Compact-)?NoSeeds', bracket) \
-        and not re.search(r'\|\s*seeds\s*=\s*n', bracket) \
-        and not re.search(r'RD\d+-seed\d+', bracket)
+    """ Does this bracket have seeding that it shouldn't?  This is a consequence of
+    https://en.wikipedia.org/wiki/Module:Team_bracket/doc#Parameters
+    "RD_n-seed_m: ... For round 1, this value defaults to the conventional seed allocation for tournaments. "
+    :param bracket:
+    :return: bracket should not have seeding but Wikipedia may automatically seed """
+    return bool(re.search(r'\d+TeamBracket(?!-NFL)(?!-2Elim)\W', bracket)
+                and not re.search('TeamBracket-(Compact-)?NoSeeds', bracket)
+                and not re.search(r'\|\s*seeds\s*=\s*n', bracket)
+                and not re.search(r'RD\d+-seed\d+', bracket))
 
 
 def file_has_unseeded_seeding(filename: str) -> bool:
-    """ Does this file have seeding that it shouldn't?  This is a consequence of
-    https://en.wikipedia.org/wiki/Module:Team_bracket/doc#Parameters
-    "RD_n-seed_m: ... For round 1, this value defaults to the conventional seed allocation for tournaments. "
-    :param filename:
-    :return: filename has a bracket that should not have seeding but Wikipedia may automatically seed """
+    """ :param filename:
+    :return: some `bracket_has_unseeded_seeding` """
     flags = analyze.Flags()
     with open(filename, encoding='utf-8') as fp:
         return any((bracket_has_unseeded_seeding(bracket) for bracket, _ in analyze.get_bracket(fp.read(), flags)))
