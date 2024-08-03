@@ -51,13 +51,11 @@ V = typing.TypeVar('V')
 
 class KeyDefaultDict(dict[K, V]):
     """ A defaultdict where the `default_factory` takes the missing key as its argument """
-    def __init__(self, default_factory: typing.Callable[[K], V] = None) -> None:
+    def __init__(self, default_factory: typing.Callable[[K], V]) -> None:
         super().__init__()
         self.default_factory = default_factory
 
     def __missing__(self, key: K) -> V:
-        if self.default_factory is None:
-            raise KeyError(key)
         ret = self[key] = self.default_factory(key)
         return ret
 
