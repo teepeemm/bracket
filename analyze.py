@@ -54,7 +54,7 @@ V = typing.TypeVar('V')
 
 class KeyDefaultDict(dict[K, V]):
     """ A defaultdict where the `default_factory` takes the missing key as its argument """
-    def __init__(self, default_factory: typing.Callable[[K], V] = None):
+    def __init__(self, default_factory: typing.Callable[[K], V] = None) -> None:
         super().__init__()
         self.default_factory = default_factory
 
@@ -374,9 +374,6 @@ def get_game(description: SubgroupDesc, year: int | None) -> typing.Iterator[Gam
     filename = f'{description.directory.rstrip("_")}/{year}.txt'
     if not os.path.isfile(filename) or os.path.getmtime(filename) + SECONDS_PER_YEAR < time.time():
         potential_titles = get_potential_titles(description, year, description.tourney == 'NFL_')
-        if not year:
-            breakpoint()
-            raise Exception
         if not create_wiki_cache(filename, potential_titles):
             return
     flags = Flags(
@@ -809,7 +806,7 @@ def write_tourney_reseeding(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[
     for description in tourney_subgroup.values():
         subgroup_desc = subgroup_desc._replace(**description)
         _update_reseeding(outcomes, subgroup_desc, grouper)
-    reseeding: list[dict[str, str | int]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
+    reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
         [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
     output = pandas.DataFrame(reseeding).sort_values(['Team', 'Games'])
     columns = ['Team', 'Games', 'Rate', 'Reseed']
@@ -817,10 +814,22 @@ def write_tourney_reseeding(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[
     output.to_csv('html/'+'_'.join(reseeding_file.rsplit('/', 1)), index=False, columns=columns)
 
 
+class TeamGameCounter(typing.NamedTuple):
+    """ Utility class for `write_tourney_states`. """
+    state: str
+    """ The state of the team in question. """
+    game_counter: list[int] = [0]*5
+    """ The number of games played under different seeding conditions """
+
+    def as_list(self) -> list[str | int]:
+        """ :return: The list form, to pass to a DataFrame constructor """
+        return [self.state, *self.game_counter]
+
+
 def write_tourney_states(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any]) -> None:
     """ List all the teams and their states that have participated in a tournament. """
-    def default_key(group: str, key: str) -> collections.abc.Sequence[str | int]:
-        return [university.get_state(key, group)] + [0] * 5
+    def default_key(group: str, key: str) -> TeamGameCounter:
+        return TeamGameCounter(university.get_state(key, group))
 
     state_file: str = subgroup_desc.directory + '/state.csv'
     try:
@@ -828,27 +837,26 @@ def write_tourney_states(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str
             return
     except FileNotFoundError:
         pass
-    states: KeyDefaultDict[str, list[str | int]] = \
+    states: KeyDefaultDict[str, TeamGameCounter] = \
         KeyDefaultDict(functools.partial(default_key, subgroup_desc.group))
     for description in tourney_subgroup.values():
         subgroup_desc = subgroup_desc._replace(**description)
         for year in get_years(description.get('years', None)):
             for game in get_game(subgroup_desc, year):
                 if game[0].seed and game[1].seed:
-                    indices = 2, 2
+                    indices = 1, 1
                 elif game[0].seed:
-                    indices = 3, 2
+                    indices = 2, 3
                 elif game[1].seed:
-                    indices = 4, 3
+                    indices = 3, 2
                 else:
-                    indices = 5, 5
-                for index, indice in enumerate(indices):
-                    states[game[index].team][1] += 1
-                    states[game[index].team][indice] += 1
+                    indices = 4, 4
+                for team_result, index in zip(game, indices):
+                    states[team_result.team].game_counter[0] += 1
+                    states[team_result.team].game_counter[index] += 1
     columns = ['State', 'Total', 'Both seeded', 'Seeded', 'Opp seeded', 'Not seeded']
-    towrite = pandas.DataFrame(data=states.values(), columns=columns, index=states.keys()).rename_axis(index='Team')
-    output = towrite.sort_index(axis='index')
-    output.to_csv(state_file)
+    pandas.DataFrame(data=[v.as_list() for v in states.values()], columns=columns,
+                     index=states.keys()).rename_axis(index='Team').sort_index(axis='index').to_csv(state_file)
 
 
 def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any]) -> None:
@@ -872,15 +880,16 @@ def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[s
 
 
 def get_tourneys_of_year(tourney_group: dict[str, typing.Any]) -> dict[int, list[str]]:
-    """ :param tourney_group: """
-    tourneys_of_year: dict[int | None, list[str]] = collections.defaultdict(list)
+    """ :param tourney_group:
+    :return: The tournaments that have a bracket for each particular year """
+    tourneys_of_year: dict[int, list[str]] = collections.defaultdict(list)
     # start by finding which years have a tournament we should look at
     for tourney, description in tourney_group.items():
         if tourney in ('suffix', 'nonconference', 'comment'):
             continue
         for year in get_years(description.get('years', None)):  # NFL does not get to analyze_confs
-            tourneys_of_year[year].append(tourney)
-    tourneys_of_year.pop(None, None)
+            if year:
+                tourneys_of_year[year].append(tourney)
     return tourneys_of_year
 
 
@@ -960,10 +969,11 @@ def analyze_winloss(filename: str, show_grids=False) -> None:
         print(probs[1:, 1:].filled(numpy.nan))
 
 
-def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float]:
+def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float | str]:
     """ Compute the logistic regression in the form 1/(1+exp(-rate(x-reseed))).
     :param win_loss_seeds: A dictionary with keys 'wins' and 'losses' and values the corresponding lists
     :return: A dictionary with keys 'Games', 'Rate', and 'Reseed' """
+    # technically returns a dict[str, float], but it will be |'ed into a dict[str, str], so this makes mypy happy
     x = win_loss_seeds['wins'] + win_loss_seeds['losses']
     y = [1] * len(win_loss_seeds['wins']) + [0] * len(win_loss_seeds['losses'])
     if len(set(y)) == 1:
@@ -986,10 +996,10 @@ def get_confidence_interval(successes: int, total: int) -> tuple[float, float]:
     :return: The center and half-width of the interval. """
     kappa = 1.96  # standard deviations to get 95% confidence
     kappa_sq = kappa*kappa
-    phat = successes / total
-    qhat = (total - successes) / total
+    p_hat = successes / total
+    q_hat = (total - successes) / total
     center = (successes + kappa_sq / 2) / (total + kappa_sq)
-    half_width = kappa * total ** .5 * (phat * qhat + kappa_sq / (4 * total)) ** .5 / (total + kappa_sq)
+    half_width = kappa * total ** .5 * (p_hat * q_hat + kappa_sq / (4 * total)) ** .5 / (total + kappa_sq)
     return center, half_width
 
 
