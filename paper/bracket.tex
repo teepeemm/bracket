@@ -1,11 +1,10 @@
 \documentclass{article}
-%\usepackage[notref,notcite]{showkeys}
 
 \usepackage{csvsimple-l3}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{graphicx}
-\usepackage{biblatex}
+\usepackage[style=nature]{biblatex}
 \usepackage{listings}
 \usepackage{siunitx}
 \usepackage{pgfplots}
@@ -14,16 +13,19 @@
 \usepackage{mathtools}
 \usepackage{hyperref}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % for publication
-%\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota}}
+%\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
 %\newcommand\githuburl{https://github.com/teepeemm/bracket}
 %\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
 
 % for refereeing
-\usepackage[nomarkers]{endfloat}
-\newcommand\authorinfo{Author Name\footnote{Affiliation}}
+\usepackage[nomarkers,tablesfirst]{endfloat}
+\newcommand\authorinfo{Author Name\footnote{University of Affiliation, \url{first.last@affiliation.edu}}}
 \newcommand\githuburl{https://github.com/username/bracket}
 \newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
+\addtocounter{page}{-1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pgfplotsset{compat=1.18}
 \tikzset{ dots/.style = {mark=*, draw=black, mark size=.5pt} }
@@ -39,11 +41,24 @@
 
 \begin{document}
 
+\noindent
+Cover sheet\\
+Author: Timothy Prescott\\
+ORCiD: \url{https://orcid.org/0009-0009-0555-8074}\\
+Facebook (private): \url{https://www.facebook.com/timothy.prescott.908}\\
+Email: \url{timothy.prescott@und.edu}\\
+Affiliation: University of North Dakota\\
+Title: Seeding Statistics of Elimination Tournaments\\
+Github repository for article: \url{https://github.com/teepeemm/bracket}\\
+Online interface for article: \url{https://sites.und.edu/timothy.prescott/bracket/}
+
+\clearpage
+
 \maketitle
 
 \tableofcontents
 
-\begin{abstract}
+\begin{abstract}\noindent
 We develop and provide Python code and a website to statistically analyze seedings in elimination tournaments.  We are able to apply this code to fifty-six thousand games to estimate the probability of an upset solely as a logistic function of the difference in seeding.  We are also able to examine how well or poorly a team performs compared to its seeding.  We conclude that the only team that is consistently underrated is \textbackslash your\_favorite\_team, while the only team that is consistently overrated is \textbackslash your\_hated\_rival.
 \end{abstract}
 
@@ -169,7 +184,7 @@ The seeds must add to 17 if and only if the teams meet in round one.  Teams meet
 % 34-x-y=9
 % 25=x+y
 In \autoref{tab:D1_WL_prob_upset}, we examine the intervals from \autoref{fig:D1_WL_prob} that correspond to the second round after one first round upset.  The fraction of wins is slightly more in favor of an upset, but not significantly so.
-\begin{table}\caption{\label{tab:D1_WL_prob_upset}Fraction of time that the better team wins in the second round, after one first round upset.  (Minimum 10 games.)}
+\begin{table}\caption{\label{tab:D1_WL_prob_upset}Fraction of time that the favored team wins in the second round, after one first round upset.  (Minimum 10 games.)}
 \centering
 \newbox\menswidest
 \setbox\menswidest=\hbox{$69\pm15$}
@@ -598,7 +613,7 @@ We would like to calculate conferences' expected reseeding to compare how confer
 %\section{College Tournaments}
 Wikipedia has many more tournaments to analyze.  We tabulate the collegiate tournaments in \autoref{tab:tourney_count}, and note that we also can perform our calculations on brackets from the MLB, NBA, NFL, NHL, and WNBA.
 \begin{table}\centering
-\caption{\label{tab:tourney_count}Breakdown of 172 collegiate tournaments with brackets in Wikipedia.}
+\caption{\label{tab:tourney_count}Tabulation of 172 collegiate tournaments with brackets in Wikipedia.}
 \begin{tabular}{l *4{S[table-format=2]}}\toprule
 \multirow{2}{*}{Sport} & \multicolumn2c{Men's} & \multicolumn2c{Women's} \\
 & {Conference} & {National} & {Conference} & {National} \\\midrule
@@ -816,13 +831,14 @@ We do however provide one final plot of seed differential versus fraction of gam
 Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer be true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
 
 It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{\githuburl}.  For the less programmatically minded, we provide an online interface at \url{\interfaceurl} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
+\bigskip
 
+\thanks{No potential competing interests were reported by the author.}
 \printbibliography
-\thanks{No potential competing interest was reported by the author.}
 \end{document}
 
 word count:
-texcount bracket.tex: 2640
+texcount bracket.tex: 2639
 
 
 S(z) = 1/(1+e^{-z})
