@@ -380,7 +380,7 @@ def get_game(description: SubgroupDesc, year: int | None) -> typing.Iterator[Gam
     with open(filename, encoding='utf-8') as fp:
         for game in get_game_from_wikipedia(fp.read(), flags):
             if game[0].score < game[1].score:
-                game = game[1], game[0]
+                game = game[::-1]
             yield game
 
 
@@ -525,13 +525,15 @@ def write_reseeding_approx(group: str | None, directories: typing.Iterable[str])
     combined = pandas.concat(reseed_files)
     combined['GamesRate'] = combined['Games']*combined['Rate']
     combined['GamesReseed'] = combined['Games']*combined['Reseed']
+    combined['GamesLogit'] = combined['Games']*combined['Logit']
     grouped = combined.groupby('Team').sum()
     grouped['One'] = 1
     grouped['Games'] = grouped[['Games', 'One']].max(axis='columns')
     grouped['Rate'] = grouped['GamesRate'] / grouped['Games']
     grouped['Reseed'] = grouped['GamesReseed'] / grouped['Games']
-    grouped.to_csv(reseed_file, columns=['Games', 'Rate', 'Reseed'])
-    grouped.to_csv('html/'+reseed_file, columns=['Games', 'Rate', 'Reseed'])
+    grouped['Logit'] = grouped['GamesLogit'] / grouped['Games']
+    grouped.to_csv(reseed_file, columns=['Games', 'Rate', 'Logit', 'Reseed'])
+    grouped.to_csv('html/'+reseed_file, columns=['Games', 'Rate', 'Logit', 'Reseed'])
 
 
 def write_states(group: str | None, directories: typing.Iterable[str]) -> None:
@@ -628,7 +630,7 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any], grouper: typing.Cal
     if not reseeding:
         return
     df = pandas.DataFrame(reseeding).sort_values('Team')
-    columns = ['Team', 'Games', 'Rate', 'Reseed']
+    columns = ['Team', 'Games', 'Rate', 'Logit', 'Reseed']
     df.to_csv(f'{label}reseed.csv', index=False, columns=columns)
     df.to_csv(f'html/{label}reseed.csv', index=False, columns=columns)
     if not label:
@@ -665,9 +667,9 @@ def write_group_reseeding(group: str, tourney_group: dict[str, typing.Any],
             suffix=tourney_group.get('suffix', ''))
         _update_reseeding(outcomes, description, grouper)
     reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
-        [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
+        [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Logit': 0, 'Reseed': 0}]
     df = pandas.DataFrame(reseeding).sort_values('Team')
-    columns = ['Team', 'Games', 'Rate', 'Reseed']
+    columns = ['Team', 'Games', 'Rate', 'Logit', 'Reseed']
     df.to_csv(f'{group}/{label}reseed.csv', index=False, columns=columns)
     df.to_csv(f'html/{group}/{label}reseed.csv', index=False, columns=columns)
     if not label:
@@ -710,11 +712,11 @@ def write_conf_reseeding(group: str, tourney_group: dict[str, typing.Any]) -> No
             _update_reseeding_year(outcomes, description, functools.partial(TeamResult.get_conference, confs=confs),
                                    year)
     reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Conference': k} for k, v in outcomes.items()] or \
-        [{'Conference': 'Unknown', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
+        [{'Conference': 'Unknown', 'Games': 0, 'Rate': 0, 'Logit': 0, 'Reseed': 0}]
     df = pandas.DataFrame(reseeding)
     df['ConferenceIsKnown'] = (df['Conference'] != 'Unknown').astype(int)
     output = df.sort_values(['Conference', 'Games'])
-    columns = ['Conference', 'Games', 'Rate', 'Reseed', 'ConferenceIsKnown']
+    columns = ['Conference', 'Games', 'Rate', 'Logit', 'Reseed', 'ConferenceIsKnown']
     output.to_csv(reseeding_file, index=False, columns=columns)
     output.to_csv('html/'+reseeding_file, index=False, columns=columns)
 
@@ -794,9 +796,9 @@ def write_tourney_reseeding(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[
         subgroup_desc = subgroup_desc._replace(**description)
         _update_reseeding(outcomes, subgroup_desc, grouper)
     reseeding: list[dict[str, str | float]] = [calc_log_reg(v) | {'Team': k} for k, v in outcomes.items()] or \
-        [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Reseed': 0}]
+        [{'Team': 'NA', 'Games': 0, 'Rate': 0, 'Logit': 0, 'Reseed': 0}]
     output = pandas.DataFrame(reseeding).sort_values(['Team', 'Games'])
-    columns = ['Team', 'Games', 'Rate', 'Reseed']
+    columns = ['Team', 'Games', 'Rate', 'Logit', 'Reseed']
     output.to_csv(reseeding_file, index=False, columns=columns)
     output.to_csv('html/'+'_'.join(reseeding_file.rsplit('/', 1)), index=False, columns=columns)
 
@@ -959,7 +961,7 @@ def analyze_winloss(filename: str, show_grids=False) -> None:
 def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float | str]:
     """ Compute the logistic regression in the form 1/(1+exp(-rate(x-reseed))).
     :param win_loss_seeds: A dictionary with keys 'wins' and 'losses' and values the corresponding lists
-    :return: A dictionary with keys 'Games', 'Rate', and 'Reseed' """
+    :return: A dictionary with keys 'Games', 'Rate', 'Logit', and 'Reseed' """
     # technically returns a dict[str, float], but it will be |'ed into a dict[str, str], so this makes mypy happy
     x = win_loss_seeds['wins'] + win_loss_seeds['losses']
     y = [1] * len(win_loss_seeds['wins']) + [0] * len(win_loss_seeds['losses'])
@@ -967,6 +969,7 @@ def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float | str]
         return {
             'Games': len(x),
             'Rate': 0,
+            'Logit': 0,
             'Reseed': 16 if win_loss_seeds['losses'] else -16
         }
     xx = numpy.array(x).reshape(-1, 1)
@@ -974,6 +977,7 @@ def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float | str]
     return {
         'Games': len(x),
         'Rate': clf.coef_[0, 0],
+        'Logit': clf.intercept_[0],
         'Reseed': - clf.intercept_[0] / clf.coef_[0, 0] if clf.coef_[0, 0] else 0
     }
 
