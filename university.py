@@ -147,7 +147,8 @@ _professional_renames: dict[str, dict[str, str]] = {
         'San Diego': 'Los Angeles Clippers',
         'San Francisco': 'Golden State',
         'Seattle': 'Oklahoma City',
-        'Syracuse': 'Philadelphia'
+        'Syracuse': 'Philadelphia',
+        'Tri Cities': 'Atlanta',
     },
     'NFL': {
         'Los Angeles Raiders': 'Vegas',
@@ -697,6 +698,7 @@ def get_disambiguator(content: str, flags: Flags) -> dict[str, dict[str, str]]:
 
 
 _professional_states: dict[str, str] = {
+    'Anderson': 'IN',
     'Carolina': 'NC',
     'Columbus': 'OH',
     'Jacksonville': 'FL',
@@ -704,6 +706,7 @@ _professional_states: dict[str, str] = {
     'New England': 'MA',
     'Oakland': 'CA',
     'Rochester': 'NY',
+    'Sheboygan': 'WI',
 }
 """ The state that a professional team plays in. """
 
