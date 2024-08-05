@@ -923,11 +923,7 @@ def analyze_log_reg(winner: numpy.ndarray) -> dict[str, float]:
     :return: The analysis, with keys 'games', 'rate', and 'loss per game' """
     diff = [winner[1:, 1:].trace(-i) for i in range(1 - MAX_SEED, MAX_SEED)]
     if not sum(diff):
-        return {
-            'games': 0,
-            'rate': 0,
-            'loss per game': 0
-        }
+        return { 'games': 0, 'rate': 0, 'loss per game': 0 }
     diff_rev = [*reversed(diff)]
     x, y = [], []
     for n, (wins, losses) in enumerate(zip(diff, diff_rev), start=1 - MAX_SEED):
@@ -967,9 +963,7 @@ def calc_log_reg(win_loss_seeds: dict[str, list[int]]) -> dict[str, float | str]
     y = [1] * len(win_loss_seeds['wins']) + [0] * len(win_loss_seeds['losses'])
     if len(set(y)) == 1:
         return {
-            'Games': len(x),
-            'Rate': 0,
-            'Logit': 0,
+            'Games': len(x), 'Rate': 0, 'Logit': 0,
             'Reseed': 16 if win_loss_seeds['losses'] else -16
         }
     xx = numpy.array(x).reshape(-1, 1)
