@@ -59,14 +59,16 @@
       <select id="x">
        <option value="1" selected>Number of games</option>
        <option value="2">Upset avoidance rate</option>
-       <option value="3">Expected reseeding</option>
+       <option value="3">Even log odds</option>
+       <option value="4">Expected reseeding</option>
       </select>
      </label>
      <label>y
       <select id="y">
        <option value="1">Number of games</option>
        <option value="2">Upset avoidance rate</option>
-       <option value="3" selected>Expected reseeding</option>
+       <option value="3">Even log odds</option>
+       <option value="4" selected>Expected reseeding</option>
       </select>
      </label><br>
      <label>Highlight team: <input type="text" list="teamList" id="search"></label>
@@ -87,11 +89,12 @@
     <dd><span class="graph tourneyData">Individual tournament data:</span> Number of games &amp; upset avoidance rate within the tournament</dd>
     <dt class="x_or_y">Number of games<span class="logScaled"> (logarithmically scaled)</span></dt>
     <dt class="x_or_y">Upset avoidance rate &beta;<span class="logScaled"> (logarithmically scaled)</span></dt>
+    <dt class="x_or_y">Log odds against an evenly seeded opponent<span class="logScaled"> (logarithmically scaled)</span></dt>
     <dt class="x_or_y">Expected reseeding &mu;<span class="logScaled"> (logarithmically scaled)</span></dt>
     <dd>
      Within the data, the probability of a given team winning their game is best modeled by
      <span class="expression">1/(1+exp(-&beta;(s-&mu;))),</span>
-     where s is the difference in seeding of the teams.
+     where s is the difference in seeding of the teams and -&beta;&mu; is the log odds against an evenly seeded opponent.
      Within a tournament, <span class="expression">&mu;=0</span> because of symmetry.
     </dd>
    </dl>

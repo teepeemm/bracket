@@ -333,7 +333,7 @@ function passesUserFilter([uni]) {
 
 /** @param {string} contents */
 function scatterPlotFile(contents) {
-    // Row: [Team, Games, Rate, Reseed]
+    // Row: [Team, Games, Rate, Logit, Reseed]
     const xIndex = document.getElementById('x').value,
         yIndex = document.getElementById('y').value,
         data = contents.split('\n').slice(1).filter(getStringLength).map( (line) => line.split(',') )
