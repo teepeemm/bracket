@@ -586,6 +586,8 @@ def write_group_betas(group: str, nonconference: list[str]) -> None:
                 'Rate': beta,
                 'IsNational': int(conference in nonconference)
             })
+        elif not win_loss.sum(axis=(0, 1)):
+            print(group, conference, 'has no games')
     df = pandas.DataFrame(group_beta)
     out_df = df.sort_values('Rate', ascending=False)
     out_df.to_csv(output, index=False)
