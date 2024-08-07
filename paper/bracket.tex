@@ -12,18 +12,22 @@
 \usepackage{mathtools}
 \usepackage{hyperref}
 
+\usepackage[nomarkers,tablesfirst]{endfloat}
+
+\setcounter{secnumdepth}{0}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % for publication
-%\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
-%\newcommand\githuburl{https://github.com/teepeemm/bracket}
-%\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
+\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
+\newcommand\githuburl{https://github.com/teepeemm/bracket}
+\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
+\newcommand\showJournal{\footnotetext{For submission to Scatterplot}}
 
 % for refereeing
-\usepackage[nomarkers,tablesfirst]{endfloat}
-\newcommand\authorinfo{Author Name\footnote{University of Affiliation, \url{first.last@affiliation.edu}}}
-\newcommand\githuburl{https://github.com/username/bracket}
-\newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
-\addtocounter{page}{-1}
+%\newcommand\authorinfo{Author Name\footnote{University of Affiliation, \url{first.last@affiliation.edu}}}
+%\newcommand\githuburl{https://github.com/username/bracket}
+%\newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
+%\newcommand\showJournal{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pgfplotsset{compat=1.18}
@@ -40,21 +44,6 @@
 
 \begin{document}
 
-\noindent
-Cover sheet\\
-Author: Timothy Prescott\\
-ORCiD: \url{https://orcid.org/0009-0009-0555-8074}\\
-Facebook (private): \url{https://www.facebook.com/timothy.prescott.908}\\
-Email: \url{timothy.prescott@und.edu}\\
-Affiliation: University of North Dakota\\
-Title: Seeding Statistics of Elimination Tournaments\\
-Github repository for article (private during double blind review):\\
-\url{https://github.com/teepeemm/bracket}\\
-Online interface for article:\\
-\url{https://sites.und.edu/timothy.prescott/bracket/}
-
-\clearpage
-
 \maketitle
 
 \tableofcontents
@@ -64,7 +53,9 @@ We develop and provide Python code and a website to statistically analyze seedin
 \end{abstract}
 
 \noindent
-{\small\textbf{\textit{Keywords---}} logistic regression, statistical modeling, elimination tournament, Python}
+{\small\textbf{\textit{Keywords---}} logistic regression, statistical analysis, elimination tournament, Python, data visualization}
+
+\showJournal
 
 \section{Introduction}
 A notable occurrence during the 2024 NCAA Division I Men's Basketball Tournament (commonly known as March Madness) was that \#11 North Carolina State reached the Final Four, beating teams seeded 6, 14, 2, and 4.  Another notable occurrence was that the only upset in the first round of the women's tournament was by \#11 Middle Tennessee.  We will estimate that the probability of the first was 1.3\%, while the probability of the second was 2.4\%.
@@ -783,10 +774,13 @@ We do however provide one final plot of seed differential versus fraction of gam
 Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer be true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
 
 It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{\githuburl}.  For the less programmatically minded, we provide an online interface at \url{\interfaceurl} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
-\bigskip
 
-\thanks{No potential competing interests were reported by the author.}
-\printbibliography
+\section{Disclosure Statement}
+
+No potential competing interests were reported by the author.
+
+\printbibliography[heading=bibintoc]
+
 \end{document}
 
 word count:
