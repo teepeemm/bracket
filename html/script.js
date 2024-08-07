@@ -771,7 +771,7 @@ function fixFloatingPoint(number) {
 /** @param {string[]} row
  *  @returns {boolean} */
 function rowNonTrivial(row) {
-    return ( -16 < Number(row[3]) ) && ( Number(row[3]) < 16 ) && ( 0.01 < Number(row[2]) );
+    return ( -16 < Number(row[4]) ) && ( Number(row[4]) < 16 ); // && ( 0.01 < Number(row[2]) );
 }
 
 /** @param {number} min
