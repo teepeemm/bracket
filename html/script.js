@@ -32,7 +32,40 @@ Object.values(timezones).forEach( (arr) => {
 processFile('state.csv', putUnisInState);
 processFile('professional/state.csv', putUnisInState);
 
-document.addEventListener('DOMContentLoaded', getQuery);
+document.addEventListener('DOMContentLoaded', main);
+
+/** Originally, {@link getTournaments}(string, string) was called when we loaded a new group.  But that led to a race
+ *  condition we kept losing in {@link getQuery}().  Now, we load all the groups at the start, so we no longer have to
+ *  worry about it. */
+async function main() {
+    for ( const option of document.querySelectorAll('#group option+option') ) {
+        const file = `${option.value}/group_betas.csv`,
+            result = await makeRequest(file);
+        getTournaments(file, result);
+    }
+    getQuery();
+}
+
+/** Perform an XMLHttpRequest.  Copied from {@link https://stackoverflow.com/a/30008115/2336725}.
+ *  @param {string} url
+ *  @returns {Promise} So that awaiting the return will give the url's contents */
+function makeRequest(url) {
+    return new Promise(function(resolve) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onload = function() {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(xhr.response);
+            } else {
+                throw this.status;
+            }
+        };
+        xhr.onerror = function() {
+            throw this.status;
+        };
+        xhr.send();
+    });
+}
 
 /** Use the search portion of the url to set the values of the widgets. Only happens onload. */
 function getQuery() {
@@ -53,6 +86,7 @@ function getQuery() {
     }
     replot();
     addChangeListeners();
+    setQuery();  // All the `replot`ting has been changing the query, let's try to get it back
 }
 
 /** Runs after the search query has been loaded. */
@@ -167,11 +201,7 @@ function groupChange() {
     toggleWidget(document.querySelector('#grouper [value="conf"]'), group !== 'all');
     tourneySelector.value = 'all';
     if ( group !== 'all' ) {
-        if ( group in tournamentsOfGroup ) {
-            listTournaments(group);
-        } else {
-            processFile(`${group}/group_betas.csv`, getTournaments);
-        }
+        listTournaments(group);
     }
     tournamentChange();
 }
@@ -510,14 +540,15 @@ function plotWinLossFile(contents) {
     plotSigmoid(getLogisticBestFitRate(successCounter, totalCounter), maxSeed);
 }
 
-/** Determine which tournaments appear within a group.
- *  @this XMLHttpRequest */
-function getTournaments() {
-    const [group] = this.responseURL.split('/').slice(-2),
-        tournaments = this.responseText.split('\n').slice(1, -1).map( (line) => line.split(',')[0] );
+/** Determine which tournaments appear within a group.  This function only happens at the end of `groupChange`,
+ *  so we follow up with `tournamentChange`.
+ *  @param {string} file
+ *  @param {string} contents */
+function getTournaments(file, contents) {
+    const [group] = file.split('/').slice(-2),
+        tournaments = contents.split('\n').slice(1, -1).map( (line) => line.split(',')[0] );
     tournaments.sort();
     tournamentsOfGroup[group] = tournaments;
-    listTournaments(group);
 }
 
 /** Constructs a win/loss plot of the given contents.
