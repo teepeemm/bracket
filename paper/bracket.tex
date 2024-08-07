@@ -1,6 +1,5 @@
 \documentclass{article}
 
-\usepackage{csvsimple-l3}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{graphicx}
@@ -204,31 +203,6 @@ overall & 75(5) & 84(5)\\
 \autoref{fig:D1_WL_prob} prediction & {\makebox[\wd\menswidest][l]{78.4}} & {\makebox[\wd\womenswidest][l]{90.1}} \\\bottomrule
 \end{tabular}
 \end{table}
-%In \autoref{fig:D1_WL_prob_upset}, we plot the intervals from \autoref{fig:D1_WL_prob} that correspond to the second round after one first round upset in the men's (left) and women's (right) tournaments, along with logistic regressions for this filtered data.
-%\begin{figure}
-%\subcaptionbox{\label{fig:mD1_WL_prob_upset}Men's. $\beta=0.140$}[.48\textwidth]{%
-%\begin{tikzpicture}
-%\begin{axis}[width=\linewidth,height=\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
-%\addplot[dots](0,.5);
-%\addplot[domain=0:15]{1/(1+exp(-.136*x))};
-%% analyze.write_plot_file_round('bbm/D1/winloss.csv','bbm/D1/winlossRd2.tex',lambda r,c:c-r!=8)
-%\input{../bbm/D1/winlossRd2}
-%\end{axis}
-%\end{tikzpicture}%
-%}\hfill
-%\subcaptionbox{\label{fig:wD1_WL_prob_upset}Women's. $\beta=0.218$}[.48\textwidth]{%
-%\begin{tikzpicture}
-%\begin{axis}[width=\linewidth,height=\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
-%\addplot[dots](0,.5);
-%\addplot[domain=0:15]{1/(1+exp(-.218*x))};
-%% analyze.write_plot_file_round('bbw/D1/winloss.csv','bbw/D1/winlossRd2.tex',lambda r,c:c-r!=8)
-%\input{../bbw/D1/winlossRd2}
-%\end{axis}
-%\end{tikzpicture}
-%}
-%\caption{\label{fig:D1_WL_prob_upset}Seed differential versus fraction of games that a favored team wins in their tournament in the second round after one first round upset, with 95\% Wilson confidence intervals and the logistic best fit.}
-%\end{figure}
-%The smaller value of $\beta$ does indicate that an upset is more likely to occur again.
 
 In 2001, the men's tournament added a ``play-in'' game, where the last two teams to make the tournament played each other for the last spot.  (The NCAA initially referred to this as the first round, but later branded this the ``First Four'' so that ``first round'' would still refer to the round with 64 teams.  We use the ``later'' terminology.)  The play-in game expanded to eight teams for four spots in 2011.  We are interested in the question of how the play-in winners perform in their first round game: are they tired from having played earlier in the week, more experienced from having played a tournament game, or better than previously appreciated because we can now condition on them beating a supposedly equivalent opponent?  We are able to identify play-in games by looking for identically high seeded teams.  We then record how the winning team performs in their first round game, and summarize according to their seed in \autoref{tab:play_in_subsequent}.
 \begin{table}
@@ -336,24 +310,6 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 The logistic function $(1+\exp(-\beta(x-\mu)))^{-1}$ for $\beta=0.192$ and $\mu=-2.78$ suggests that UNC performs about 2.78 seedings worse than expected and that the log of their odds against an evenly seeded opponent is $-\beta\mu=0.534$, while $\beta=0.304$ and $\mu=-1.92$ suggests that Tennessee performs about 1.92 seedings worse and has log odds of $0.584$.  The larger $\beta$ also indicates that Tennessee is more likely to avoid an upset (for better and worse).
 
 Of the 313 (299) teams that have participated in the men's (women's) tournament, 131 (110) have at least 10 games in the tournament and at least 1 win.  Of these, only 7 men's (1 women's) teams have $\beta<0.01$, causing a large $\mu$.  Repeating the calculation of $\mu$ for the remaining 124 (109) teams and plotting the number of games along with the team's $\mu$ gives us \autoref{fig:bb_D1_game_v_mu}, while plotting the number of games along with the team's log odds gives us \autoref{fig:bb_D1_game_v_logit}.
-%\begin{figure}
-%\subcaptionbox{\label{fig:bbm_D1_game_v_mu}Rate versus expected reseeding in the men's tournament.}[.48\textwidth]{
-%\begin{tikzpicture}
-%\begin{axis}[width=\linewidth,height=\linewidth,axis y line=left,axis x line=center,y axis line style=<->,xmin=-.2,xmax=1.4,ymin=-10,ymax=10,xlabel={Rate $\beta$},ylabel={Expected reseeding $\mu$}]
-% \csvreader[head to column names, filter fp = {\Games>9 && \Reseed!=16}]
-%   {../bbm/D1/reseed.csv}{}{\addplot[dots](\Rate,\Reseed);}
-%\end{axis}
-%\end{tikzpicture}
-%}\hfill
-%\subcaptionbox{\label{fig:bbw_D1_game_v_mu}Rate versus expected reseeding in the women's tournament.}[.48\textwidth]{
-%\begin{tikzpicture}
-%\begin{axis}[width=\linewidth,height=\linewidth,axis y line=left,axis x line=center,y axis line style=<->,xmin=-.2,xmax=1.4,ymin=-10,ymax=10,xlabel={Rate $\beta$},ylabel={Expected reseeding $\mu$}]
-% \csvreader[head to column names, filter fp = {\Games>9 && \Reseed!=16}] %  && \Reseed<10 && -10<\Reseed
-%   {../bbw/D1/reseed.csv}{}{\addplot[dots](\Rate,\Reseed);}
-%\end{axis}
-%\end{tikzpicture}
-%}
-%\end{figure}
 
 \begin{figure}
 \subcaptionbox{\label{fig:bbm_D1_game_v_mu}Men's}[.48\textwidth]{%
@@ -362,8 +318,6 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/D1/reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbm/D1/reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -373,8 +327,6 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/D1/reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbw/D1/reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }
@@ -388,8 +340,6 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 	xmin=9.1,xmax=170,ymin=-3,ymax=7,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Even log odds},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Logit,only marks]{../bbm/D1/reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbm/D1/reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -399,8 +349,6 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 	xmin=9.1,xmax=170,ymin=-3,ymax=7,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Even log odds},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Logit,only marks]{../bbw/D1/reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbw/D1/reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }
@@ -422,8 +370,6 @@ Having failed to identify any bias for or against a particular team, we consider
 	xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/D1/state_reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbm/D1/state_reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -434,8 +380,6 @@ Having failed to identify any bias for or against a particular team, we consider
 	xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/D1/state_reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbw/D1/state_reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }
@@ -450,8 +394,6 @@ Having failed to identify any bias for or against a particular team, we consider
 	xlabel={\# Games},ylabel={Expected reseeding},nodes near coords,point meta=explicit symbolic,mark size=2pt,
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10,coordinate style/.condition={-.8<y&&y<-.5}{below}] % ,xlabel style={yshift=-7ex}
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{../bbm/D1/tz_reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbm/D1/state_reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -464,8 +406,6 @@ Having failed to identify any bias for or against a particular team, we consider
 	coordinate style/.condition={-.8<y&&y<-.5}{below}
 	]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{../bbw/D1/tz_reseed.csv};
-% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
-%   {../bbw/D1/state_reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
 \end{axis}
 \end{tikzpicture}
 }
@@ -517,7 +457,6 @@ Wikipedia has brackets for many other basketball tournaments, most notably 32 (3
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.202*x))};
-% analyze.analyze_winloss('bbm/winloss.csv')
 \input{../bbm/winlossplot}
 \end{axis}
 \end{tikzpicture}
@@ -527,7 +466,6 @@ Wikipedia has brackets for many other basketball tournaments, most notably 32 (3
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.284*x))};
-% analyze.analyze_winloss('bbw/winloss.csv')
 \input{../bbw/winlossplot}
 \end{axis}
 \end{tikzpicture}
@@ -619,8 +557,6 @@ We would like to calculate conferences' expected reseeding to compare how confer
   xlabel={\# of games},ylabel={Expected reseeding}]
  \addplot[scatter,only marks,draw=black,scatter/classes={0={mark=+,mark size=2pt},1={mark=*,mark size=.5pt}},
   scatter src=explicit symbolic] table[x=Games,y=Reseed,meta=ConferenceIsKnown]\datatable;
-% \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/conf_reseed.csv};
-% \addplot[black,mark=+,mark size=2pt](649,-0.766035771331451);  % can I automate "Conference == ''" ?
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -632,8 +568,6 @@ We would like to calculate conferences' expected reseeding to compare how confer
   xlabel={\# of games},ylabel={Expected reseeding}]
  \addplot[scatter,only marks,draw=black,scatter/classes={0={mark=+,mark size=2pt},1={mark=*,mark size=.5pt}},
   scatter src=explicit symbolic] table[x=Games,y=Reseed,meta=ConferenceIsKnown]\datatable;
-% \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/conf_reseed.csv};
-% \addplot[black,mark=+,mark size=2pt](494,-0.156496429184286);  % ditto
 \end{axis}
 \end{tikzpicture}
 }
@@ -670,7 +604,6 @@ We first analyze baseball and softball, plotting the seed differential versus fr
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.201*x))};
-% analyze.analyze_winloss('baseball/winloss.csv')
 \input{../baseball/winlossplot}
 \end{axis}
 \end{tikzpicture}
@@ -680,7 +613,6 @@ We first analyze baseball and softball, plotting the seed differential versus fr
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.15*x))};
-% analyze.analyze_winloss('softball/winloss.csv')
 \input{../softball/winlossplot}
 \end{axis}
 \end{tikzpicture}
@@ -774,7 +706,6 @@ We are also able to analyze soccer tournaments.  Unfortunately, of the 27 tourna
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=19.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:19]{1/(1+exp(-.214*x))};
-% analyze.analyze_winloss('soccer/winloss.csv')
 \input{../soccer/winlossplot}
 \end{axis}
 \end{tikzpicture}
@@ -820,16 +751,8 @@ In \autoref{fig:soccer_game_v_mu}, we plot how many games teams have played vers
 \end{figure}
 \end{comment}
 
-% seed diff v fraction won
-% #games v reseeding for all teams
-% #games v beta in tournaments
-% #games v reseeding grouped by conference
-
 
 %\section{Professional Tournaments}
-
-% seed diff v fraction won
-% #games v reseeding for all teams
 
 We do however provide one final plot of seed differential versus fraction of games won in \autoref{fig:WL_prob}, using the entirety of our data.  In \autoref{fig:WL_prob_split}, we keep identical seed differentials separate, as our habit.  In \autoref{fig:WL_prob_unified}, we coalesce the seed differentials to provide a single confidence interval for each seed differential.
 \begin{figure}
@@ -838,7 +761,6 @@ We do however provide one final plot of seed differential versus fraction of gam
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.208*x))};
-% analyze.analyze_winloss('winloss.csv')
 \input{../winlossplot}
 \end{axis}
 \end{tikzpicture}%
@@ -848,7 +770,6 @@ We do however provide one final plot of seed differential versus fraction of gam
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.208*x))};
-% analyze.write_simple_plot_file('winloss.csv', 'winlosssimpleplot.tex')
 \input{../winlosssimpleplot}
 \end{axis}
 \end{tikzpicture}
