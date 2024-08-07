@@ -38,30 +38,23 @@ document.addEventListener('DOMContentLoaded', main);
  *  condition we kept losing in {@link getQuery}().  Now, we load all the groups at the start, so we no longer have to
  *  worry about it. */
 async function main() {
-    for ( const option of document.querySelectorAll('#group option+option') ) {
-        const file = `${option.value}/group_betas.csv`,
-            result = await makeRequest(file);
-        getTournaments(file, result);
-    }
+    const promises = Array.from(document.querySelectorAll('#group option+option')).map( (option) => {
+        const file = `${option.value}/group_betas.csv`;
+        return makeRequest(file).then(getTournaments.bind(null, file));
+    });
+    await Promise.all(promises);
     getQuery();
 }
 
-/** Perform an XMLHttpRequest.  Copied from {@link https://stackoverflow.com/a/30008115/2336725}.
+/** Perform an XMLHttpRequest.  Modified from {@link https://stackoverflow.com/a/30008115/2336725}.
  *  @param {string} url
  *  @returns {Promise} So that awaiting the return will give the url's contents */
 function makeRequest(url) {
-    return new Promise(function(resolve) {
+    return new Promise( (resolve) => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url);
-        xhr.onload = function() {
-            if (this.status >= 200 && this.status < 300) {
-                resolve(xhr.response);
-            } else {
-                throw this.status;
-            }
-        };
-        xhr.onerror = function() {
-            throw this.status;
+        xhr.onload = () => {
+            resolve(xhr.response);
         };
         xhr.send();
     });
