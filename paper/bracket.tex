@@ -18,16 +18,16 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % for publication
-\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
-\newcommand\githuburl{https://github.com/teepeemm/bracket}
-\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
-\newcommand\showJournal{\footnotetext{For submission to Scatterplot}}
+%\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
+%\newcommand\githuburl{https://github.com/teepeemm/bracket}
+%\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
+%\newcommand\showJournal{\footnotetext{For submission to Scatterplot}}
 
 % for refereeing
-%\newcommand\authorinfo{Author Name\footnote{University of Affiliation, \url{first.last@affiliation.edu}}}
-%\newcommand\githuburl{https://github.com/username/bracket}
-%\newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
-%\newcommand\showJournal{}
+\newcommand\authorinfo{Author Name\footnote{University of Affiliation, \url{first.last@affiliation.edu}}}
+\newcommand\githuburl{https://github.com/username/bracket}
+\newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
+\newcommand\showJournal{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pgfplotsset{compat=1.18}
@@ -62,7 +62,7 @@ A notable occurrence during the 2024 NCAA Division I Men's Basketball Tournament
 
 Bracket construction has been analyzed by \cite{Schwenk} and \cite{Seltzer}, while \cite{Wittry} examined upsets in the tournament.  Making accurate upset predictions is popular and profitable (see \cite{Chartier}), so that a driver of statistical research over the past few years has been to analyze teams' performance throughout the season in order to predict more accurately than others how each team will perform in the tournament.
 
-We will develop and provide Python code to analyze these tournaments.  Because a team's performance will vary from year to year, we will need to compare how a team performed with how they were seeded in a particular tournament (which we use to approximate how they were anticipated to perform).
+We will develop and provide Python code to analyze these tournaments.  Because a team's performance will vary from year to year, we will want to compare how a team performed with how they were seeded in a particular tournament (which we use to approximate how they were anticipated to perform).
 
 
 \section{NCAA Division I Basketball Tournament}
@@ -111,14 +111,16 @@ Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first
 %\input{../bbm/D1/winlossprobs}
 %\end{tabular}
 %\end{table}
-In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team wins as a function of the seed differential, along with their 95\% confidence intervals (using the Wilson interval\cite{Brown}).  We also plot the logistic best fits (determined using Python's Scikit\cite{scikit-learn}) $(1+\exp(-\beta x))^{-1}$ for $\beta=0.161$ (men's) and $\beta=0.276$ (women's).
+In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team wins as a function of the seed differential, along with their 95\% confidence intervals (using the Wilson interval\cite{Brown}).
+
+We also plot the logistic best fits (determined using Python's Scikit\cite{scikit-learn}).  Letting $Y=1$ for victory, $Y=0$ for defeat, and $S$ denote the seed differential of a game, the average log-likelihood $\bar\ell$ is the expected value of $Y\ln p(S)+(1-Y)\ln(1-p(S))$.  The logistic function is the function of the form $p(x)=(1+\exp(-\beta x-\beta\mu))^{-1}$ that maximizes $\bar\ell$.  We find that $\beta=0.161$ for the men's tournament, and $\beta=0.276$ for the women's.
 \begin{figure}
 \subcaptionbox{\label{fig:mD1_WL_prob}Men's. $\beta=0.161$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.161*x))};
-\input{../bbm/D1/winlossplot}
+\input{data/bbm/D1/winlossplot}
 \end{axis}
 \end{tikzpicture}%
 }\hfill
@@ -127,13 +129,13 @@ In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.276*x))};
-\input{../bbw/D1/winlossplot}
+\input{data/bbw/D1/winlossplot}
 \end{axis}
 \end{tikzpicture}
 }
 \caption{\label{fig:D1_WL_prob}Seed differential versus fraction of games that a favored team wins in the NCAA Division I basketball tournament, with 95\% Wilson confidence intervals and the logistic best fit.  Identical seed differentials have been slightly spread to avoid overlap.}
 \end{figure}
-Because a win for a given seed differential corresponds to a loss for that negated seed differential, the logistic curves are symmetric about $(0,0.5)$, and we only plot the curve for nonnegative seed differentials.  The confidence intervals do not inspire much confidence in this best fit, but we will be able to add more data as we proceed with our analysis.
+Because a win for a given seed differential corresponds to a loss for that negated seed differential, the logistic curves are symmetric about $(0,0.5)$, so that $\mu=0$, and we only plot the curve for nonnegative seed differentials.  The confidence intervals do not inspire much confidence in this best fit, but we will be able to add more data as we proceed with our analysis.
 
 A $\beta$ that is 70\% larger in the women's tournament than the men's tournament indicates that dramatic upsets are much less likely to occur.  In the men's tournament, upsets with a seed differential of 7 or more occurred 225 times out of 1225 games, or 18\% of the time.
 % men upset: 31+38+47+45+58+2+4 = 225, men non upset: 328+195+180+150+126+15+3+1+2 = 1000
@@ -195,7 +197,7 @@ overall & 75(5) & 84(5)\\
 \end{tabular}
 \end{table}
 
-In 2001, the men's tournament added a ``play-in'' game, where the last two teams to make the tournament played each other for the last spot.  (The NCAA initially referred to this as the first round, but later branded this the ``First Four'' so that ``first round'' would still refer to the round with 64 teams.  We use the ``later'' terminology.)  The play-in game expanded to eight teams for four spots in 2011.  We are interested in the question of how the play-in winners perform in their first round game: are they tired from having played earlier in the week, more experienced from having played a tournament game, or better than previously appreciated because we can now condition on them beating a supposedly equivalent opponent?  We are able to identify play-in games by looking for identically high seeded teams.  We then record how the winning team performs in their first round game, and summarize according to their seed in \autoref{tab:play_in_subsequent}.
+In 2001, the men's tournament added a ``play-in'' game, where the last two teams to make the tournament played each other for the last spot.  The play-in game expanded to eight teams for four spots in 2011.  (The NCAA initially referred to this as the first round, but later branded this the ``First Four'' so that ``first round'' would still refer to the round with 64 teams.  We use the ``later'' terminology.)  We are interested in the question of how the play-in winners perform in their first round game: are they tired from having played earlier in the week, more experienced from having played a tournament game, or better than previously appreciated because we can now condition on them beating a supposedly equivalent opponent?  We are able to identify play-in games by looking for identically high seeded teams.  We then record how the winning team performs in their first round game, and summarize according to their seed in \autoref{tab:play_in_subsequent}.
 \begin{table}
 \centering%\small
 \caption{\label{tab:play_in_subsequent}Number of games won in first round in the men's tournament, by seed, where the worse seed was (not) the winner of a play-in game.  Also significance of the statement ``Play-in winners are more likely to have an upset in their first round.''}
@@ -213,7 +215,7 @@ Each seed has 88 total games from 22 years and 4 games per seed per year.  Of th
 
 Each year, the bracket's unveiling is met with inevitable second guessing that a team should be seeded differently.  Fans (and foes) of a particular team will often claim that team over (or under) performs in the tournament, or even that the team consistently receives (un)favorable bias from the selection committee.
 
-We are able to examine these claims by recording how a team performs each year during the tournament.  But while collecting this data, we quickly run into a problem: the millions of Wikipedia editors (unsurprisingly) have not entered the team names consistently.  For example, eventually we see twelve of the twenty four possible configurations of S[o[uth[ern]]] Conn[ecticut] [St[ate]], only some of which use a period for the abbreviations, that should all become ``Southern Connecticut''.  Even within a single bracket (presumably one editor), a team tends to have a more abbreviated name in later rounds. We will therefore devote a large portion of our code to normalizing the team names that appear by expanding most abbreviations and dropping unnecessary words, occasionally resulting in a team name that is slightly different than what the media and fans customarily use.
+We are able to examine these claims by recording how a team performs each year during the tournament.  But while collecting this data, we quickly run into a problem: the millions of Wikipedia editors (unsurprisingly) have not entered the team names consistently.  For example, eventually we see twelve of the twenty four possible configurations of S[o[uth[ern]]] Conn[ecticut] [St[ate]], only some of which use a period for the abbreviations, that will all become ``Southern Connecticut''.  Even within a single bracket (presumably one editor), a team tends to have a more abbreviated name in later rounds. We will therefore devote a large portion of our code to normalizing the team names that appear by expanding most abbreviations and dropping unnecessary words, occasionally resulting in a team name that is slightly different than what the media and fans customarily use.
 
 Once team names have been normalized, we still have a problem of ambiguity.  We will convert ``USC'' to ``Southern California'' or ``South Carolina'', often by looking for which mascot appears elsewhere on the page (a conference is also helpful).  Similarly, ``Saint John's'' will become ``Saint John's New York'' or ``Saint John's Minnesota'' along with scores of other disambiguations.
 
@@ -308,7 +310,7 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/D1/reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbm/D1/reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -317,7 +319,7 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/D1/reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbw/D1/reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }
@@ -330,7 +332,7 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-3,ymax=7,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Even log odds},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
- \addplot[dots] table[col sep=comma,x=Games,y=Logit,only marks]{../bbm/D1/reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Logit,only marks]{data/bbm/D1/reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -339,7 +341,7 @@ Of the 313 (299) teams that have participated in the men's (women's) tournament,
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
 	xmin=9.1,xmax=170,ymin=-3,ymax=7,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Even log odds},
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10]
- \addplot[dots] table[col sep=comma,x=Games,y=Logit,only marks]{../bbw/D1/reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Logit,only marks]{data/bbw/D1/reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }
@@ -360,7 +362,7 @@ Having failed to identify any bias for or against a particular team, we consider
 	xmin=9.1,xmax=450,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},
 	xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/D1/state_reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbm/D1/state_reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -370,7 +372,7 @@ Having failed to identify any bias for or against a particular team, we consider
 	xmin=9.1,xmax=450,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},
 	xlabel={\# Games},ylabel={Expected reseeding},
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/D1/state_reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbw/D1/state_reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }
@@ -384,7 +386,7 @@ Having failed to identify any bias for or against a particular team, we consider
 	xmin=100,xmax=3200,ymin=-2,ymax=3,xmode=log,xtick={100,200,500,1000,2000},xticklabels={100,200,500,1000,2000},
 	xlabel={\# Games},ylabel={Expected reseeding},nodes near coords,point meta=explicit symbolic,mark size=2pt,
 	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10,coordinate style/.condition={-.8<y&&y<-.5}{below}] % ,xlabel style={yshift=-7ex}
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{../bbm/D1/tz_reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{data/bbm/D1/tz_reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -396,7 +398,7 @@ Having failed to identify any bias for or against a particular team, we consider
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10,
 	coordinate style/.condition={-.8<y&&y<-.5}{below}
 	]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{../bbw/D1/tz_reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{data/bbw/D1/tz_reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }
@@ -406,23 +408,23 @@ For the timezone plot, note that we include Arizona (Mountain Standard Time) in 
 
 We now focus on our original example, that an 11 seed won games with seed differentials $-5$, $3$, $-9$, and $-7$.  For a game with seed differential $s$, we previously approximated the probability of the favored team winning by $p(s)=(1+\exp(-\beta s))^{-1}$, where $\beta=0.161$ for this tournament.  Treating these as four independent games would give a probability of $0.89\%$. We will instead argue that the upsets in rounds 1 and 3 indicate that the team should have been seeded better, making the victories in rounds 2--4 and then round 4 more likely.
 
-Returning to the 124 men's (109 women's) teams, if we discard 3 (1) outliers where $\lvert\mu\rvert>16$, then we can weight the remaining 121 (108) values of $\mu$ by the number of games the team played to estimate that $\mu$ has a mean $\mu_0$  of $-0.2$ (0.15) and a standard deviation $\sigma$  of 3.2 (2.1). This means that we can instead assume that a better seeded team is correctly seeded, and that a worse seeded team should have had their seed adjusted downward by the appropriate normal random variable $X$.  In that case, the most likely seeding correction in the event of an upset would be the maximizer of
-\[\frac1{\sigma\sqrt{2\pi}}\exp\Bigl\{-\frac{(X-\mu_0)^2}{2\sigma^2}\Bigr\}\frac{\exp(-\beta(s-X))}{1+\exp(-\beta(s-X))}.\]
+Returning to the 124 men's (109 women's) teams, if we discard 3 (1) outliers where $\lvert\mu\rvert>16$, then we can weight the remaining 121 (108) values of $\mu$ by the number of games the team played to estimate that $\mu$ has a mean $\mu_0$  of $-0.2$ (0.15) and a standard deviation $\sigma$  of 3.2 (2.1). This indicates that we can instead assume that a better seeded team is correctly seeded, and that a worse seeded team should have had their seed adjusted downward by the normal random variable $N\sim\mathcal{N}(\mu_0,\sigma^2)$.  In that case, the most likely seeding correction in the event of an upset would be the maximizer of
+\[\frac1{\sigma\sqrt{2\pi}}\exp\Bigl\{-\frac{(N-\mu_0)^2}{2\sigma^2}\Bigr\}\frac{\exp(-\beta(s-N))}{1+\exp(-\beta(s-N))}.\]
 This maximum occurs at the root of the nonlinear equation
-\[\frac\beta{1+\exp(-\beta(s-X))}=\frac{X-\mu_0}{\sigma^2}.\]
+\[\frac\beta{1+\exp(-\beta(s-N))}=\frac{N-\mu_0}{\sigma^2}.\]
 With our values of $\beta$, $\mu_0$, and $\sigma$, a numerical solver estimates that on $1\le s\le15$, this root is approximately $0.68+\frac s{25}$ for the men's tournament and $0.89+\frac s{33}$ for the women's tournament.  This means that after an 11 seed defeats a 6 seed, we should instead model the 11 seed as if they had been seeded 10.12.  Treating the last three games dependent on the first one (but independent from each other), we would act as if the seed differentials had be $-5$, $3.88$, $-8.12$, and $-6.12$, bringing the probability up to $1.2\%$.
 
 Repeating this analysis for two upsets, we would want to maximize
 \[
-\frac1{\sigma\sqrt{2\pi}}\exp\Bigl\{-\frac{(X-\mu_0)^2}{2\sigma^2}\Bigr\}
-\frac{\exp(-\beta(s_1-X))}{1+\exp(-\beta(s_1-X))}
-\frac{\exp(-\beta(s_2-X))}{1+\exp(-\beta(s_2-X))},
+\frac1{\sigma\sqrt{2\pi}}\exp\Bigl\{-\frac{(N-\mu_0)^2}{2\sigma^2}\Bigr\}
+\frac{\exp(-\beta(s_1-N))}{1+\exp(-\beta(s_1-N))}
+\frac{\exp(-\beta(s_2-N))}{1+\exp(-\beta(s_2-N))},
 \]
 which happens when
-\[\frac\beta{1+\exp(-\beta(s_1-X))}+\frac\beta{1+\exp(-\beta(s_2-X))}=\frac{X-\mu_0}{\sigma^2}.\]
+\[\frac\beta{1+\exp(-\beta(s_1-N))}+\frac\beta{1+\exp(-\beta(s_2-N))}=\frac{N-\mu_0}{\sigma^2}.\]
 This root is approximately $1.43+\frac{s_1+s_2}{24}$ for the men (and $1.48+\frac{s_1+s_2}{29}$ for the women) on $1\le s_1,s_2\le15$, so that after upsets of seed differentials $-5$ and $-9$, we should instead model the 11 seed as if they had been seeded 9.  Repeating our calculation with seed differentials of $-5$, $3.88$, $-8.12$, and $-5$, the probability is now the previously stated $1.3\%$.
 
-We will now revisit the probability of an upset in the second round after an upset in the first, examined in light of reseeding.  For a logistic function $p(s)=(1+\exp(-\beta_0-\beta_1s))^{-1}$, the log-likelihood $\ell$ is the expression $Y_k\ln p(S_k)+(1-Y_k)\ln(1-p(S_k))$ where $S_k$ is the seed differential (positive for a favored team) and $Y_k$ is 1 in victory and 0 in defeat.  The expression is maximized when $p$ is the logistic best fit (note that this logistic function is slightly different than ours, where $\beta=\beta_1$ and $\mu=-\beta_0/\beta_1$, although $\mu=\beta_0=0$ because of symmetry in our case).  In \autoref{tab:D1_log_likely_upset}, we see the average log-likelihood for each second round matchup after a first round upset.
+We will now revisit the probability of an upset in the second round after an upset in the first, examined in light of reseeding.  For a logistic function $p(s)=(1+\exp(-\beta_0-\beta_1s))^{-1}$, recall that the average log-likelihood $\bar\ell$ is the expression $Y_k\ln p(S_k)+(1-Y_k)\ln(1-p(S_k))$ where $S_k$ is the seed differential (positive for a favored team) and $Y_k$ is 1 in victory and 0 in defeat.  The expression is maximized when $p$ is the logistic best fit (note that this logistic function is slightly different than ours, where $\beta=\beta_1$ and $\mu=-\beta_0/\beta_1$, although $\mu=\beta_0=0$ because of symmetry in our case).  In \autoref{tab:D1_log_likely_upset}, we see the average log-likelihood for each second round matchup after a first round upset.
 \begin{table}\caption{\label{tab:D1_log_likely_upset}Average log-likelihood in the second round, after one first round upset, with and without reseeding.  (Minimum 10 games.)}
 \centering
 \begin{tabular}{ c *4{S[table-format=-1.2]} }\toprule
@@ -448,7 +450,7 @@ Wikipedia has brackets for many other basketball tournaments, most notably 32 (3
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.202*x))};
-\input{../bbm/winlossplot}
+\input{data/bbm/winlossplot}
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -457,7 +459,7 @@ Wikipedia has brackets for many other basketball tournaments, most notably 32 (3
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.284*x))};
-\input{../bbw/winlossplot}
+\input{data/bbw/winlossplot}
 \end{axis}
 \end{tikzpicture}
 }
@@ -470,7 +472,7 @@ and then the number of games compared to how a team should be reseeded in \autor
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=320,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/reseed_filtered.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbm/reseed_filtered.csv};
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -479,7 +481,7 @@ and then the number of games compared to how a team should be reseeded in \autor
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=320,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200},xticklabels={10,20,50,100,200},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/reseed_filtered.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbw/reseed_filtered.csv};
 \end{axis}
 \end{tikzpicture}
 }
@@ -490,7 +492,7 @@ We also summarize the likelihood of upsets by calculating $\beta$ for each tourn
 \begin{figure}
 \subcaptionbox{\label{fig:bbm_game_v_rate}Men's}[.48\textwidth]{%
 \begin{tikzpicture}
-\pgfplotstableread[col sep=comma]{../bbm/group_betas.csv}\datatable
+\pgfplotstableread[col sep=comma]{data/bbm/group_betas.csv}\datatable
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=->,
   xmin=20,xmax=3000,ymin=0,ymax=.8,xmode=log,xtick={50,100,200,500,1000,2000},xticklabels={50,100,200,500,1k,2k},
   xlabel={\# of games},ylabel={$\beta$}]
@@ -501,7 +503,7 @@ We also summarize the likelihood of upsets by calculating $\beta$ for each tourn
 }\hfill
 \subcaptionbox{\label{fig:bbw_game_v_rate}Women's}[.48\textwidth]{%
 \begin{tikzpicture}
-\pgfplotstableread[col sep=comma]{../bbw/group_betas.csv}\datatable
+\pgfplotstableread[col sep=comma]{data/bbw/group_betas.csv}\datatable
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=->,
   xmin=20,xmax=3000,ymin=0,ymax=.8,xmode=log,xtick={50,100,200,500,1000,2000},xticklabels={50,100,200,500,1k,2k},
   xlabel={\# of games},ylabel={$\beta$}]
@@ -521,7 +523,7 @@ To examine one conference tournament slightly more in-depth, we plot in \autoref
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=150,ymin=-5,ymax=5,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/SEC/reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbm/SEC/reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }\hfill
@@ -530,7 +532,7 @@ To examine one conference tournament slightly more in-depth, we plot in \autoref
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=150,ymin=-5,ymax=5,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
- \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/SEC/reseed.csv};
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{data/bbw/SEC/reseed.csv};
 \end{axis}
 \end{tikzpicture}
 }
@@ -542,7 +544,7 @@ We would like to calculate conferences' expected reseeding to compare how confer
 \begin{figure}
 \subcaptionbox{\label{fig:bbm_conf_game_v_mu}Men's}[.48\textwidth]{%
 \begin{tikzpicture}
-\pgfplotstableread[col sep=comma]{../bbm/conf_reseed.csv}\datatable
+\pgfplotstableread[col sep=comma]{data/bbm/conf_reseed.csv}\datatable
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=1000,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200,500},xticklabels={10,20,50,100,200,500},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
@@ -553,7 +555,7 @@ We would like to calculate conferences' expected reseeding to compare how confer
 }\hfill
 \subcaptionbox{\label{fig:bbw_conf_game_v_mu}Women's}[.48\textwidth]{%
 \begin{tikzpicture}
-\pgfplotstableread[col sep=comma]{../bbw/conf_reseed.csv}\datatable
+\pgfplotstableread[col sep=comma]{data/bbw/conf_reseed.csv}\datatable
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
   xmin=9.1,xmax=1000,ymin=-10,ymax=10,xmode=log,xtick={10,20,50,100,200,500},xticklabels={10,20,50,100,200,500},xlabel style={yshift=-7ex},
   xlabel={\# of games},ylabel={Expected reseeding}]
@@ -752,7 +754,7 @@ We do however provide one final plot of seed differential versus fraction of gam
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.208*x))};
-\input{../winlossplot}
+\input{data/winlossplot}
 \end{axis}
 \end{tikzpicture}%
 }\hfill
@@ -761,7 +763,7 @@ We do however provide one final plot of seed differential versus fraction of gam
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
 \addplot[domain=0:15]{1/(1+exp(-.208*x))};
-\input{../winlosssimpleplot}
+\input{data/winlosssimpleplot}
 \end{axis}
 \end{tikzpicture}
 }%
@@ -771,7 +773,7 @@ We do however provide one final plot of seed differential versus fraction of gam
 
 \section{Further Analysis}
 
-Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer be true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
+Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
 
 It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{\githuburl}.  For the less programmatically minded, we provide an online interface at \url{\interfaceurl} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
 
@@ -784,7 +786,7 @@ No potential competing interests were reported by the author.
 \end{document}
 
 word count:
-texcount bracket.tex: 2639
+texcount bracket.tex: 2779
 
 
 S(z) = 1/(1+e^{-z})
