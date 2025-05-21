@@ -1,20 +1,17 @@
 \documentclass{beamer}
 
-%\usepackage{csvsimple-l3}
 \usepackage{booktabs}
 \usepackage{multirow}
-%\usepackage{graphicx}
-%\usepackage{biblatex}
 \usepackage{listings}
 \usepackage{siunitx}
 \usepackage{pgfplots}
 \usepackage{tikz-cd}
 \usepackage{subcaption}
-%\usepackage{comment}
-%\usepackage{hyperref}
+\usepackage{comment}
 \usepackage{ulem}
 \usepackage{multicol}
 \usepackage[nolinks]{qrcode}
+\usepackage{cancel}
 
 \pgfplotsset{compat=1.18}
 \tikzset{ dots/.style = {mark=*, draw=black, mark size=.5pt} }
@@ -25,7 +22,8 @@
 
 \title{Seeding Statistics of Elimination Tournaments}
 \author{Timothy Prescott}
-\date{\today}
+%\date{September 4, 2024}
+\date{October 26, 2024}
 
 \begin{document}
 
@@ -33,6 +31,7 @@
 \maketitle
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Alternative Titles}
 \begin{center}\Large\color{blue}
@@ -45,25 +44,33 @@ Seeding Statistics of Elimination Tournaments\\
 
 \begin{frame}
 \frametitle{Exploring Alternative Titles}\centering
-\begin{tikzcd}[tips=false, column sep=1em, row sep=1.5em, ampersand replacement=\&]
-\& \text{St of Se of To of El} \ar{dl}\ar{d}\ar{dr}\\
-\text{St of Se of El To} \ar{d} \ar{dr} \& \text{To of El St of Se} \ar{dl} \ar{dr} \& \text{Se St of To of El} \ar{dl} \ar{d} \\
-\text{El To St of Se} \& \text{Se St of El To} \& \text{To of El Se St} \\
-\& \text{El To Se St} \ar{ul} \ar{u} \ar{ur}
+\begin{tikzcd}[tips=false, column sep=1.5em, row sep=3ex, ampersand replacement=\&]
+\& \parbox{1in}{\centering Stat of Seed of\\Tourn of Elim} \ar{dl}\ar{d}\ar{dr}\\
+\parbox{1in}{\centering Stat of Seed of\\Elim Tourn} \ar{d} \ar{dr} \&
+\parbox{1in}{\centering Tourn of Elim\\Stat of Seed} \ar{dl} \ar{dr} \&
+\parbox{1in}{\centering Seed Stat of\\Tourn of Elim} \ar{dl} \ar{d} \\
+\parbox{1in}{\centering Elim Tourn\\Stat of Seed} \&
+\parbox{1in}{\centering\color<2>{red}Seed Stat of\\Elim Tourn} \&
+\parbox{1in}{\centering Tourn of Elim\\Seed Stat} \\
+\& \parbox{1in}{\centering Elim Tourn\\Seed Stat} \ar{ul} \ar{u} \ar{ur}
 \end{tikzcd}
 \end{frame}
+\end{comment}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Wikipedia}
 March Madness\\
 Wikipedia:\\
 ``[Year] NCAA Division I $\underbrace{\text{[men's/women's]}}_{\text{after 1981}}$ basketball tournament'':
 \end{frame}
+\end{comment}
 
 \begin{frame}
 \includegraphics[width=\linewidth]{../paper/2023bracket}
 \end{frame}
 
+\begin{comment}
 \begin{frame}[fragile]
 %The source for this bracket is
 \begin{lstlisting}[basicstyle=\tiny,breaklines=true]
@@ -98,6 +105,7 @@ Wikipedia:\\
 ...
 \end{lstlisting}
 \end{frame}
+\end{comment}
 
 \begin{frame}
 \setlength{\tabcolsep}{0px}
@@ -151,10 +159,17 @@ axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 %\end{minipage}
 \\\medskip
 \hfill Men's. $\beta=0.161$\hfill Women's. $\beta=0.276$\hfill\null\\
-Logistic best fit: $(1+\exp\{-\beta(x-\mu)\})^{-1}$, but $\mu=0$ by symmetry.\\
+Logistic best fit: $p(x)=(1+\exp\{-\beta(x-\mu)\})^{-1}$\\
+maximizes $Y\ln p(x)+(1-Y)\ln(1-p(x))$.\\
+But $\mu=0$ by symmetry.
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusion}
 Upsets with seed differential 7 or higher are significantly more likely ($p=\num{3.8e-12}$) in the men's tournament (18\%) than the women's (8\%).
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{After an upset}
 Fraction of time that the better seeded team wins in the second round, after one first round upset.  (Minimum 10 games.)
@@ -193,9 +208,16 @@ $p$ & \multicolumn2c{0.39} & \multicolumn2c{0.87} & \multicolumn2c{0.23} & \mult
 \end{center}
 $p$ values much too high to make any conclusions.
 \end{frame}
+\end{comment}
+
+\section{Following a team over the years}
 
 \begin{frame}
-\frametitle{Team names problem \#1: Southern Connecticut}
+\usebeamerfont{title}\insertsectionhead
+\end{frame}
+
+\begin{frame}
+\frametitle{Team names problem \#1: Different Names}
 \begin{multicols}{2}
 \begin{enumerate}
 \item S. Conn. State
@@ -208,15 +230,17 @@ $p$ values much too high to make any conclusions.
 \item South Connecticut St.
 \item Southern Conn.
 \item Southern Conn. St.
-\item Southern Connecticut
+\item \alert{Southern Connecticut}
 \item Southern Connecticut State
 \end{enumerate}
 \end{multicols}
-Solution: expand (almost) all abbreviations.  Drop unnecessary words.
+Solution: expand (almost) all abbreviations.\\
+Drop unnecessary words.
 \end{frame}
 
 \begin{frame}
-\frametitle{Team names problem \#2: USC}
+\frametitle{Team names problem \#2: Ambiguous Names}
+Is USC:
 \begin{center}
 \begin{tabular}{c @{\qquad} c}\toprule
 Southern California & South Carolina \\\midrule
@@ -246,7 +270,7 @@ Also also: Saint John's, Notre Dame, Miami, and many many many more.
 \item S\underline tate
 \item Manka\sout ato
 \item Baker\underline sfield
-\item Mont\sout egomery
+\item Mont\cancel egomery
 \item Montgome\underline ry
 \item De\sout s\underline Sales
 \end{itemize}
@@ -263,6 +287,7 @@ y axis line style=-,x axis line style=<->,clip=false,xtick={-10,10},ticklabel st
 % analyze.get_team_performance('bbm', 'D1', 'North Carolina')
 \addplot[domain=-15:15]{1/(1+exp(-.192*(x+2.78)))};
 \addplot[dots](-2.78,.5)node[left]{\tiny$\mu=-2.78$};
+\addplot[dots](0,0.630)node[below right]{\tiny$\begin{aligned}p&=(1+\exp(0.192\cdot2.78))^{-1}\\&=0.630\end{aligned}$};
 \addplot[dots](8,1)node[above]{\tiny11};
 \addplot[dots](3,1)node[below]{\tiny7};
 \addplot[dots](2,1)node[above]{\tiny4};
@@ -307,6 +332,7 @@ y axis line style=-,x axis line style=<->,clip=false,xtick={-10,10},ticklabel st
 % analyze.get_team_performance('bbw', 'D1', 'Tennessee')
 \addplot[domain=-15:15]{1/(1+exp(-.304*(x+1.92)))};
 \addplot[dots](-1.92,.5)node[left]{\tiny$\mu=-1.92$};
+\addplot[dots](0,0.642)node[below right]{\tiny$\begin{aligned}p&=(1+\exp(0.304\cdot0.192))^{-1}\\&=0.642\end{aligned}$};
 \addplot[dots](5,1)node[below]{\tiny6};
 \addplot[dots](1,1)node[below]{\tiny13};
 \addplot[dots](-1,1)node[below]{\tiny7};
@@ -371,8 +397,40 @@ Women's
 \end{minipage}
 \end{frame}
 
+\begin{comment}
 \begin{frame}
-\frametitle{Same thing, but grouped by state}
+\frametitle{\# Games v even log odds}
+\begin{minipage}{.48\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+	xmin=9.1,xmax=170,ymin=-3,ymax=7,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Even log odds},
+	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbm/D1/reseed.csv};
+% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
+%   {../bbm/D1/reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
+\end{axis}
+\end{tikzpicture}\\
+Men's
+\end{minipage}%
+\hfill
+\begin{minipage}{.48\textwidth}
+\begin{tikzpicture}
+\begin{axis}[width=.98\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
+	xmin=9.1,xmax=170,ymin=-3,ymax=7,xmode=log,xtick={10,20,50,100},xticklabels={10,20,50,100},xlabel={\# Games},ylabel={Even log odds},
+	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10]
+ \addplot[dots] table[col sep=comma,x=Games,y=Reseed,only marks]{../bbw/D1/reseed.csv};
+% \csvreader[head to column names, filter fp = {\Games>9 && \Rate>0.01}]
+%   {../bbw/D1/reseed.csv}{}{\addplot[dots](\Games,\Reseed);}
+\end{axis}
+\end{tikzpicture}\\
+Women's
+\end{minipage}
+\end{frame}
+\end{comment}
+
+\begin{comment}
+\begin{frame}
+\frametitle{\# Games v expected reseeding, but grouped by state}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \begin{axis}[width=.99\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -397,15 +455,17 @@ Men's
 Women's
 \end{minipage}
 \end{frame}
+\end{comment}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Same thing, but grouped by timezone}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
-	xmin=100,xmax=3200,ymin=-3,ymax=1,xmode=log,xtick={100,200,500,1000,2000},xticklabels={100,200,500,1k,2k},
+	xmin=100,xmax=3200,ymin=-2,ymax=3,xmode=log,xtick={100,200,500,1000,2000},xticklabels={100,200,500,1k,2k},
 	xlabel={\# Games},ylabel={Expected reseeding},nodes near coords,point meta=explicit symbolic,mark size=2pt,
-	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10,coordinate style/.condition={-.8<y&&y<-.5}{below}] % ,xlabel style={yshift=-7ex}
+	ticklabel style={font=\small},tickwidth=.3cm,restrict y to domain=-10:10,coordinate style/.condition={-1.5<y&&y<-.5}{below}] % ,xlabel style={yshift=-7ex}
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{../bbm/D1/tz_reseed.csv};
 \end{axis}
 \end{tikzpicture}\\
@@ -415,10 +475,10 @@ Men's
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
-	xmin=100,xmax=3200,ymin=-3,ymax=1,xmode=log,xtick={100,200,500,1000,2000},xticklabels={100,200,500,1k,2k},
+	xmin=100,xmax=3200,ymin=-2,ymax=3,xmode=log,xtick={100,200,500,1000,2000},xticklabels={100,200,500,1k,2k},
 	xlabel={\# Games},ylabel={Expected reseeding},nodes near coords,point meta=explicit symbolic,mark size=2pt,
 	ticklabel style={font=\small},tickwidth=.3cm,xlabel style={yshift=-7ex},restrict y to domain=-10:10,
-	coordinate style/.condition={-.8<y&&y<-.5}{below}
+	coordinate style/.condition={-1.5<y&&y<-.5}{below}
 	]
  \addplot[dots] table[col sep=comma,x=Games,y=Reseed,meta=Team,only marks]{../bbw/D1/tz_reseed.csv};
 \end{axis}
@@ -426,9 +486,27 @@ Men's
 Women's
 \end{minipage}
 \end{frame}
+\end{comment}
+
+\begin{comment}
+\begin{frame}
+\frametitle{How to treat upsetting teams}
+For reseeding $N\sim\mathcal{N}(\mu_0,\sigma^2)$, maximizing
+\[\frac1{\sigma\sqrt{2\pi}}\exp\left\{-\frac{(N-\mu_0)^2}{2\sigma^2}\right\}\frac{\exp(-\beta(s-N))}{1+\exp(-\beta(s-N))}\]
+occurs when
+\begin{gather*}
+\frac\beta{1+\exp(-\beta(s-N))}=\frac{N-\mu_0}{\sigma^2}\\[2\bigskipamount]
+\begin{array}{ccccc}\toprule
+& \beta & \mu_0 & \sigma & \text{linearized $N$} \\\midrule
+\text{Men's} & 0.161 & -0.2\phantom5 & 3.2 & 0.68+\frac s{25} \\
+\text{Women's} & 0.276 & \phantom-0.15 & 2.1 & 0.89+\frac s{33} \\\bottomrule
+\end{array}
+\end{gather*}
+\end{frame}
+\end{comment}
 
 \begin{frame}
-\frametitle{Again, but every college basketball tournament}
+\frametitle{Every college basketball tournament}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \begin{axis}[width=.97\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
@@ -508,6 +586,7 @@ Women's
 (Logarithmic) number of games versus upset rate in basketball tournaments. National tournaments denoted with +.
 \end{frame}
 
+\begin{comment}
 \begin{frame}
 \frametitle{Looking at one conference}
 \begin{minipage}{.48\textwidth}
@@ -532,9 +611,12 @@ Women's
 \end{minipage}\\\bigskip
 (Logarithmic) number of games versus expected reseeding in SEC basketball tournaments.
 \end{frame}
+\end{comment}
 
+\begin{comment}
 \begin{frame}
-\frametitle{Looking at all conferences}
+%\frametitle{Looking at all conferences}
+\frametitle{Grouped by conference}
 \begin{minipage}{.48\textwidth}
 \begin{tikzpicture}
 \pgfplotstableread[col sep=comma]{../bbm/conf_reseed.csv}\datatable
@@ -564,6 +646,7 @@ Men's
 \end{minipage}\\\bigskip
 (Logarithmic) number of games versus expected reseeding of conferences in national basketball tournaments.  Unknown conferences have been consolidated into +.
 \end{frame}
+\end{comment}
 
 \begin{frame}
 \frametitle{Much more we can do}
@@ -577,9 +660,11 @@ Soccer & 20 & 3 & 1 & 4 \\
 Ice hockey & 14 & 5 & 0 & 1 \\
 Football & 0 & 4 & 0 & 0 \\
 Volleyball & 0 & 1 & 0 & 1 \\
+Tennis & 0 & 1 & 0 & 1 \\
 Field hockey & 0 & 0 & 0 & 1 \\
 Lacrosse & 0 & 1 & 0 & 0 \\
-Tennis & 0 & 1 & 0 & 1 \\\bottomrule
+\addlinespace
+Total & 88 & 27 & 42 & 15 \\\bottomrule
 \end{tabular}\\\bigskip
 Also MLB, NBA, NFL, NHL, and WNBA.
 \end{frame}
