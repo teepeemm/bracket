@@ -354,9 +354,12 @@ function passesUserFilter([uni]) {
     return onlyStates.some( (state) => unisInState[state].includes(uni) );
 }
 
-/** @param {string} contents */
+/** Scatter plot the contents of a file, which is many rows of the form:
+ *  Team row: Team, Games, Rate, Logit, Reseed
+ *  Conference row: Conference, Games, Rate, Logit, Reseed, ConferenceIsKnown
+ *  Group betas row: Conference, Games, Rate, IsNational.
+ *  @param {string} contents */
 function scatterPlotFile(contents) {
-    // Row: [Team, Games, Rate, Logit, Reseed]
     const xIndex = document.getElementById('x').value,
         yIndex = document.getElementById('y').value,
         data = contents.split('\n').slice(1).filter(getStringLength).map( (line) => line.split(',') )
@@ -771,7 +774,7 @@ function fixFloatingPoint(number) {
 /** @param {string[]} row
  *  @returns {boolean} */
 function rowNonTrivial(row) {
-    return ( -16 < Number(row[4]) ) && ( Number(row[4]) < 16 ); // && ( 0.01 < Number(row[2]) );
+    return ( row.length < 5 ) || ( ( -16 < Number(row[4]) ) && ( Number(row[4]) < 16 ) );
 }
 
 /** @param {number} min
