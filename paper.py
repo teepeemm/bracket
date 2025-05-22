@@ -201,10 +201,10 @@ def print_prob_one_women_upset() -> None:
         return 1/(1+math.exp(-beta*x))
 
     prob_none = 1
-    for s in range(1,9):
+    for s in range(1, 9):
         prob_none *= p(2*s-1)**4
     print("probability of no upsets in women's tournament:", prob_none)
-    print("probability of at most one upset:", prob_none*(1+4*sum((1/p(17-2*s)-1) for s in range(1,9))))
+    print("probability of at most one upset:", prob_none*(1+4*sum((1/p(17-2*s)-1) for s in range(1, 9))))
 
 
 def print_weighted_reseed(reseed_file: str) -> None:
@@ -321,7 +321,7 @@ def print_calcs_for_paper(page: int = -1) -> None:
         print(scipy.stats.fisher_exact([[4, 0], [4, 0]], 'less')[1])
     if page in (6, -1):
         print('page 6')
-        print('disambiguations:',university.TOTAL_DISAMBIGUATIONS)
+        print('disambiguations:', university.TOTAL_DISAMBIGUATIONS)
         print_team_rename_from_stats()
         get_team_performance('bbm', 'D1', 'North Carolina')
         get_team_performance('bbw', 'D1', 'Tennessee')
