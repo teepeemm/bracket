@@ -16,6 +16,9 @@
 
 \setcounter{secnumdepth}{0}
 
+\newcommand{\betaBbmD}{0.161}
+\newcommand{\betaBbwD}{0.276}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % for publication
 %\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
@@ -113,22 +116,22 @@ Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first
 %\end{table}
 In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team wins as a function of the seed differential, along with their 95\% confidence intervals (using the Wilson interval\cite{Brown}).
 
-We also plot the logistic best fits (determined using Python's Scikit\cite{scikit-learn}).  Letting $Y=1$ for victory, $Y=0$ for defeat, and $S$ denote the seed differential of a game, the average log-likelihood $\bar\ell$ is the expected value of $Y\ln p(S)+(1-Y)\ln(1-p(S))$.  The logistic function is the function of the form $p(x)=(1+\exp(-\beta x-\beta\mu))^{-1}$ that maximizes $\bar\ell$.  We find that $\beta=0.161$ for the men's tournament, and $\beta=0.276$ for the women's.
+We also plot the logistic best fits (determined using Python's Scikit\cite{scikit-learn}).  Letting $Y=1$ for victory, $Y=0$ for defeat, and $S$ denote the seed differential of a game, the average log-likelihood $\bar\ell$ is the expected value of $Y\ln p(S)+(1-Y)\ln(1-p(S))$.  The logistic function is the function of the form $p(x)=(1+\exp(-\beta x-\beta\mu))^{-1}$ that maximizes $\bar\ell$.  We find that $\beta=\betaBbmD$ for the men's tournament, and $\beta=\betaBbwD$ for the women's.
 \begin{figure}
-\subcaptionbox{\label{fig:mD1_WL_prob}Men's. $\beta=0.161$}[.48\textwidth]{%
+\subcaptionbox{\label{fig:mD1_WL_prob}Men's. $\beta=\betaBbmD$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
-\addplot[domain=0:15]{1/(1+exp(-.161*x))};
+\addplot[domain=0:15]{1/(1+exp(-\betaBbmD*x))};
 \input{data/bbm/D1/winlossplot}
 \end{axis}
 \end{tikzpicture}%
 }\hfill
-\subcaptionbox{\label{fig:wD1_WL_prob}Women's. $\beta=0.276$}[.48\textwidth]{%
+\subcaptionbox{\label{fig:wD1_WL_prob}Women's. $\beta=\betaBbwD$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
 \addplot[dots](0,.5);
-\addplot[domain=0:15]{1/(1+exp(-.276*x))};
+\addplot[domain=0:15]{1/(1+exp(-\betaBbwD*x))};
 \input{data/bbw/D1/winlossplot}
 \end{axis}
 \end{tikzpicture}
@@ -143,7 +146,7 @@ In the women's tournament, upsets with a seed differential of 7 or more occurred
 % women upset: 9+8+16+11+32 = 76, women non upset: 282+174+150+134+111+1 = 852
 A Fisher test shows that such upsets are more likely in the men's tournament ($p=\num{3.8e-12}$).
 
-With $\beta=0.276$ and $p(x)=(1+\exp(-\beta x))^{-1}$, we are able to perform a calculation from the introduction.  The probability $P$ that there are no upsets in the first round of the women's tournament is $\prod_{i=1}^8 p(2i-1)^4\approx0.29\%$. The probability that the only upset is a single seed $k$ (losing to a seed $17-k$) is $P\cdot p(17-2k)^{-4}\cdot4p(17-2k)^3(1-p(17-2k))=4P\cdot(1-p(17-2k))/p(17-2k)$.  Therefore, the probability that there is at most one upset in the first round is
+With $\beta=\betaBbwD$ and $p(x)=(1+\exp(-\beta x))^{-1}$, we are able to perform a calculation from the introduction.  The probability $P$ that there are no upsets in the first round of the women's tournament is $\prod_{i=1}^8 p(2i-1)^4\approx0.29\%$. The probability that the only upset is a single seed $k$ (losing to a seed $17-k$) is $P\cdot p(17-2k)^{-4}\cdot4p(17-2k)^3(1-p(17-2k))=4P\cdot(1-p(17-2k))/p(17-2k)$.  Therefore, the probability that there is at most one upset in the first round is
 \[P+\sum_{k=1}^8 4P\frac{1-p(17-2k)}{p(17-2k)}\approx2.4\%.\]
 
 We are interested in the question of how a team performs in a game after an upset win.  Are they tired from having over-exerted themselves, more experienced from having won a tournament game, or better than previously appreciated because we can now condition on them beating a supposedly superior opponent?  As %summarized in \autoref{tab:round_from_seeds} and
