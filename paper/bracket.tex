@@ -771,11 +771,18 @@ We do however provide one final plot of seed differential versus fraction of gam
 \end{figure}
 
 
-\section{Further Analysis}
+\section{Conclusions and Further Analysis}
+
+% restate conclusions
 
 Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
 
 It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{\githuburl}.  For the less programmatically minded, we provide an online interface at \url{\interfaceurl} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
+
+Throughout our examination of tournaments, conferences, and teams, we must admit that we have been unable to find a consistently misrated team.  Further exploration may show that \textbackslash your\_favorite\_team is indeed underrated, or that \textbackslash your\_hated\_rival is indeed overrated, but we must be careful to avoid torturing the data and p-hacking to arrive at these results.
+
+An undergraduate student with experience in Python and probability would be able to extend this analysis in several ways.  Instead of collapsing seeds by only looking at the seed differential, can we find a probability estimation that also uses the average of the seeds?  Does this probability estimation depend on the tournament or the size of that tournament (for example, prior to 1985 the men's tournament had fewer than 64 teams)?  In the NCAA basketball tournaments, is there a significant difference for teams that qualified at large instead of teams that only qualified by virtue of winning their conference tournament (and does this question depend on the conference)?
+% bias reduction?
 
 \section{Disclosure Statement}
 
