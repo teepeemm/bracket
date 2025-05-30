@@ -427,7 +427,7 @@ def _get_year_range(year_in: int) -> str:
     """ Convert a single year into a range of that year and the next.  This is the format for the NFL playoffs. """
     if year_in == 1999:
         return '1999–2000'
-    return f'{year_in}–{(year_in+1)%100:02}'
+    return f'{year_in}–{ ((year_in+1) % 100):02}'
 
 
 def create_wiki_cache(filename: str, potential_titles: list[str]) -> bool:

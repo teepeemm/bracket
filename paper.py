@@ -43,9 +43,9 @@ def get_team_performance(group: str, tourney: str, team: str) -> None:
             if game[1].team == team:
                 win_loss_seeds['losses'][game[0].seed-game[1].seed] += 1
     for diff, count in win_loss_seeds['wins'].items():
-        print(rf'\addplot[dots]({diff},1)node[{"below"if(diff%2)else"above"}]{{\tiny{count}}};')
+        print(rf'\addplot[dots]({diff},1)node[{ "below" if (diff % 2) else "above" }]{{\tiny{count}}};')
     for diff, count in win_loss_seeds['losses'].items():
-        print(rf'\addplot[dots]({diff},0)node[{"above"if(diff%2)else"below"}]{{\tiny{count}}};')
+        print(rf'\addplot[dots]({diff},0)node[{ "above" if (diff % 2) else "below" }]{{\tiny{count}}};')
     for k, v in win_loss_seeds.items():
         print(sum(v.values()), k, v.items())
     win_loss_seeds_with_list = {k: list(v.elements()) for k, v in win_loss_seeds.items()}
