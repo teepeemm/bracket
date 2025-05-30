@@ -12,7 +12,7 @@
 \usepackage{mathtools}
 \usepackage{hyperref}
 
-%\usepackage[nomarkers,tablesfirst]{endfloat}
+\usepackage[nomarkers,tablesfirst]{endfloat}
 
 \setcounter{secnumdepth}{0}
 
@@ -216,7 +216,7 @@ Each year, the bracket's unveiling is met with inevitable second guessing that a
 
 We are able to examine these claims by recording how a team performs each year during the tournament.  But while collecting this data, we quickly run into a problem: the millions of Wikipedia editors (unsurprisingly) have not entered the team names consistently.  For example, eventually we see twelve of the twenty four possible configurations of S[o[uth[ern]]] Conn[ecticut] [St[ate]], only some of which use a period for the abbreviations, that will all become ``Southern Connecticut''.  Even within a single bracket (presumably one editor), a team tends to have a more abbreviated name in later rounds. We will therefore devote a large portion of our code to normalizing the team names that appear by expanding most abbreviations and dropping unnecessary words, occasionally resulting in a team name that is slightly different than what the media and fans customarily use.
 
-Once team names have been normalized, we still have a problem of ambiguity.  We will convert ``USC'' to ``Southern California'' or ``South Carolina'', often by looking for which mascot appears elsewhere on the page (a conference is also helpful).  Similarly, ``Saint John's'' will become ``Saint John's New York'' or ``Saint John's Minnesota'' along with scores of other disambiguations.  (Even after normalization and disambiguation, we still needed to correct many misspellings and other typos within Wikipedia.)
+Once team names have been normalized, we still have a problem of ambiguity.  We will convert ``USC'' to ``Southern California'' or ``South Carolina'', often by looking for which mascot appears elsewhere on the page (a conference is also helpful).  Similarly, ``Saint John's'' will become ``Saint John's New York'' or ``Saint John's Minnesota'' along with scores of other disambiguations.  (Even after normalization and disambiguation, we still needed to correct many misspellings and other typos within Wikipedia.  As a practical matter, we found it most useful to determine which state a team was from, and then examine why our code had trouble determining the state of a particular team.)
 
 Within our sample, UNC (now North Carolina) has played the most men's tournament games at 139, while (the University of) Tennessee has played the most women's tournament games at 165.  Plotting the seed differences of those games along with whether the game was a win (106 and 130 times) or a loss (33 and 35 times) along with the logistic regressions gives \autoref{fig:bbm_D1_team}.
 \begin{figure}
@@ -299,7 +299,7 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \caption{\label{fig:bbm_D1_team}Wins and losses (with multiplicity) in the NCAA Division I basketball tournament, along with the logistic regression $(1+\exp(-\beta(x-\mu)))^{-1}$.}
 \end{figure}
 
-The logistic function $(1+\exp(-\beta(x-\mu)))^{-1}$ for $\beta=0.194$ and $\mu=-2.60$ suggests that UNC performs about 2.60 seedings better than expected and that the log of their odds against an evenly seeded opponent is $-\beta\mu=0.504$, while $\beta=0.314$ and $\mu=-1.92$ suggests that Tennessee performs about 1.92 seedings worse and has log odds of $0.603$.  The larger $\beta$ also indicates that Tennessee is less likely to experience an upset (for better and worse).
+The logistic function $(1+\exp(-\beta(x-\mu)))^{-1}$ for $\beta=0.194$ and $\mu=-2.60$ suggests that UNC performs about 2.60 seedings better than expected and that the log of their odds against an evenly seeded opponent is $-\beta\mu=0.504$, while $\beta=0.314$ and $\mu=-1.92$ suggests that Tennessee performs about 1.92 seedings better and has log odds of $0.603$.  The larger $\beta$ also indicates that Tennessee is less likely to experience an upset (for better and worse).
 
 Of the 316 (303) teams that have participated in the men's (women's) tournament, 135 (110) have at least 10 games in the tournament and at least 1 win.  Of these, only 7 men's (1 women's) teams have $\beta<0.01$, causing a large $\mu$.  Repeating the calculation of $\mu$ for the remaining 128 (109) teams and plotting the number of games along with the team's $\mu$ gives us \autoref{fig:bb_D1_game_v_mu}, while plotting the number of games along with the team's log odds gives us \autoref{fig:bb_D1_game_v_logit}.
 
