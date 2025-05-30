@@ -12,12 +12,12 @@
 \usepackage{mathtools}
 \usepackage{hyperref}
 
-\usepackage[nomarkers,tablesfirst]{endfloat}
+%\usepackage[nomarkers,tablesfirst]{endfloat}
 
 \setcounter{secnumdepth}{0}
 
 \newcommand{\betaBbmD}{0.161}
-\newcommand{\betaBbwD}{0.276}
+\newcommand{\betaBbwD}{0.279}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % for publication
@@ -65,7 +65,7 @@ A notable occurrence during the 2024 NCAA Division I Men's Basketball Tournament
 
 Bracket construction has been analyzed by \cite{Schwenk} and \cite{Seltzer}, while \cite{Wittry} examined upsets in the tournament.  Making accurate upset predictions is popular and profitable (see \cite{Chartier} and the papers at \cite{Jacobson}), so that a driver of statistical research over the past few years has been to analyze teams' performance throughout the season in order to predict more accurately than others how each team will perform in the tournament.
 
-We will develop and provide Python code to analyze these tournaments.  Because a team's performance will vary from year to year, we will want to compare how a team performed with how they were seeded in a particular tournament (which we use to approximate how they were anticipated to perform).
+We will develop and provide Python code to analyze how teams have performed over the years in these tournaments.  Because a team's performance will vary from year to year, we will compare how a team performed with how they were seeded in a particular tournament (which we use to approximate how they were anticipated to perform).  Because we provide the code for this analysis, the interested reader will be able to repeat or extend our analysis at their leisure.
 
 
 \section{NCAA Division I Basketball Tournament}
@@ -106,7 +106,7 @@ the source for this bracket is
 | RD1-score08='''68'''
 ...
 \end{lstlisting}
-Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first number indicates the round, and the second numbers the teams within that round; teams numbered $2n-1$ and $2n$ will play each other.  Combining these results, we determine how often teams with a given seeding are victorious in 2766 (men's tournament) and 2309 (women's tournament) games through the year 2023. %, as shown in \autoref{tab:mD1_WL_prob}.
+Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first number indicates the round, and the second numbers the teams within that round; teams numbered $2n-1$ and $2n$ will play each other.  Combining these results, we determine how often teams with a given seeding are victorious in 2833 (men's tournament) and 2372 (women's tournament) games through the year 2024. %, as shown in \autoref{tab:mD1_WL_prob}.
 %\begin{table}
 %\caption{\label{tab:mD1_WL_prob}Percent of matches that a team seeded \emph{row} defeated a team seeded \emph{columns} worse.}
 %\tiny
@@ -140,11 +140,7 @@ We also plot the logistic best fits (determined using Python's Scikit\cite{sciki
 \end{figure}
 Because a win for a given seed differential corresponds to a loss for that negated seed differential, the logistic curves are symmetric about $(0,0.5)$, so that $\mu=0$, and we only plot the curve for nonnegative seed differentials.  The confidence intervals do not inspire much confidence in this best fit, but we will be able to add more data as we proceed with our analysis.
 
-A $\beta$ that is 70\% larger in the women's tournament than the men's tournament indicates that dramatic upsets are much less likely to occur.  In the men's tournament, upsets with a seed differential of 7 or more occurred 225 times out of 1225 games, or 18\% of the time.
-% men upset: 31+38+47+45+58+2+4 = 225, men non upset: 328+195+180+150+126+15+3+1+2 = 1000
-In the women's tournament, upsets with a seed differential of 7 or more occurred 76 times out of 928 games, or 8\% of the time.
-% women upset: 9+8+16+11+32 = 76, women non upset: 282+174+150+134+111+1 = 852
-A Fisher test shows that such upsets are more likely in the men's tournament ($p=\num{3.8e-12}$).
+A $\beta$ that is 70\% larger in the women's tournament than the men's tournament indicates that dramatic upsets are much less likely to occur.  In the men's tournament, upsets with a seed differential of 7 or more occurred 238 times out of 1286 games, or 19\% of the time.  In the women's tournament, upsets with a seed differential of 7 or more occurred 76 times out of 953 games, or 8\% of the time.  A Fisher test shows that such upsets are more likely in the men's tournament ($p=\num{2.5e-13}$).
 
 With $\beta=\betaBbwD$ and $p(x)=(1+\exp(-\beta x))^{-1}$, we are able to perform a calculation from the introduction.  The probability $P$ that there are no upsets in the first round of the women's tournament is $\prod_{i=1}^8 p(2i-1)^4\approx0.29\%$. The probability that the only upset is a single seed $k$ (losing to a seed $17-k$) is $P\cdot p(17-2k)^{-4}\cdot4p(17-2k)^3(1-p(17-2k))=4P\cdot(1-p(17-2k))/p(17-2k)$.  Therefore, the probability that there is at most one upset in the first round is
 \[P+\sum_{k=1}^8 4P\frac{1-p(17-2k)}{p(17-2k)}\approx2.4\%.\]
@@ -190,13 +186,13 @@ In \autoref{tab:D1_WL_prob_upset}, we examine the intervals from \autoref{fig:D1
 \begin{tabular}{ c *2{S[table-format=2(2), uncertainty-mode=separate]} }\toprule
 Seeds & {Men's (\%)} & {Women's (\%)} \\\midrule
 1 v \phantom19 & 89(6) & 93(5) \\
-2 v 10 & 62(12) & 84(9) \\
-3 v 11 & 66(12) & 68(13) \\
-4 v 12 & 69(13) & 82(13) \\
-5 v 13 & 79(15) \\
+2 v 10 & 62(11) & 84(9) \\
+3 v 11 & 67(11) & 69(13) \\
+4 v 12 & 70(13) & 82(13) \\
+5 v 13 & 80(15) \\
 6 v 14 & 80(16) \\\addlinespace
-overall & 75(5) & 84(5)\\
-\autoref{fig:D1_WL_prob} prediction & {\makebox[\wd\menswidest][l]{78.4}} & {\makebox[\wd\womenswidest][l]{90.1}} \\\bottomrule
+overall & 75(5) & 85(5)\\
+\autoref{fig:D1_WL_prob} prediction & {\makebox[\wd\menswidest][l]{78.4}} & {\makebox[\wd\womenswidest][l]{90.3}} \\\bottomrule
 \end{tabular}
 \end{table}
 
@@ -204,33 +200,33 @@ In 2001, the men's tournament added a ``play-in'' game, where the last two teams
 \begin{table}
 \centering%\small
 \caption{\label{tab:play_in_subsequent}Number of games won in first round in the men's tournament, by seed, where the worse seed was (not) the winner of a play-in game.  Also significance of the statement ``Play-in winners are more likely to have an upset in their first round.''}
-\begin{tabular}{ @{} c *{10}{S[table-format=2]} *{2}{S[table-format=3]} @{} }\toprule
+\begin{tabular}{ @{} c *{12}{S[table-format=2]} *{2}{S[table-format=3]} @{} }\toprule
 %& \multicolumn{10}c{By individual seed} \\\cmidrule(lr){2-11}\cmidrule(l){12-13}
-Seed & {6} & 11 & {5} & 12 & {4} & 13 & {3} & 14 & {1} & 16 & \multicolumn2c{Overall} \\ %& 6 & 11 & 1 & 16 \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(l){12-13}%\cmidrule(l){14-15}
-Play-in & 9 & 9 & 3 & 1 & 0 & 1 & 1 & 0 & 33 & 1 & 46 & 12 \\ %3 & 1 & 4 & 0 \\
-Non-play-in & 40 & 30 & 50 & 34 & 68 & 19 & 78 & 19 & 53 & 1 & 289 & 103 \\\addlinespace % 2 & 2 & 4 & 0 \\\addlinespace
-$p$ & \multicolumn2c{0.39} & \multicolumn2c{0.87} & \multicolumn2c{0.23} & \multicolumn2c{1} & \multicolumn2c{0.63} & \multicolumn2c{0.86} %\multicolumn2c{0.93} & \multicolumn2c{1}
+Seed & {7} & {10} & {6} & 11 & {5} & 12 & {4} & 13 & {3} & 14 & {1} & 16 & \multicolumn2c{Overall} \\ %& 6 & 11 & 1 & 16 \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}\cmidrule(lr){10-11}\cmidrule(l){12-13}\cmidrule(l){14-15}
+Play-in     &  1 &  1 &  9 &  9 &  3 &  1 &  0 &  1 &  1 &  0 & 35 & 1 &  49 &  13 \\ %3 & 1 & 4 & 0 \\
+Non-play-in & 34 & 56 & 41 & 33 & 52 & 36 & 71 & 20 & 81 & 10 & 55 & 1 & 487 & 187 \\\addlinespace % 2 & 2 & 4 & 0 \\\addlinespace
+$p$ & \multicolumn2c{0.86} & \multicolumn2c{0.44} & \multicolumn2c{0.88} & \multicolumn2c{0.23} & \multicolumn2c{1} & \multicolumn2c{0.63} & \multicolumn2c{0.91} %\multicolumn2c{0.93} & \multicolumn2c{1}
 \\\bottomrule
 \end{tabular}
 \end{table}
-Each seed has 88 total games from 22 years and 4 games per seed per year.  Of those 88, the first row of the table counts games played with play-in winners of that seed, while the second row counts games with non-play-in winners.  The left column of each pair counts games where the favored team won, while the right column counts upsets.  The final row gives the significance that play-in winners are more likely to have an upset.  Given the high $p$ values, we are unable to substantiate this claim.  There is even less data for the women's tournament, which has only had 8 play-in games since they were added in 2022.
+Each seed has 92 total games from 23 years and 4 games per seed per year.  Of those 92, the first row of the table counts games played with play-in winners of that seed, while the second row counts games with non-play-in winners.  The left column of each pair counts games where the favored team won, while the right column counts upsets.  The final row gives the significance that play-in winners are more likely to have an upset.  Given the high $p$ values, we are unable to substantiate this claim.  There is even less data for the women's tournament, which has only had 12 play-in games since they were added in 2022.
 
 Each year, the bracket's unveiling is met with inevitable second guessing that a team should be seeded differently.  Fans (and foes) of a particular team will often claim that team over (or under) performs in the tournament, or even that the team consistently receives (un)favorable bias from the selection committee.
 
 We are able to examine these claims by recording how a team performs each year during the tournament.  But while collecting this data, we quickly run into a problem: the millions of Wikipedia editors (unsurprisingly) have not entered the team names consistently.  For example, eventually we see twelve of the twenty four possible configurations of S[o[uth[ern]]] Conn[ecticut] [St[ate]], only some of which use a period for the abbreviations, that will all become ``Southern Connecticut''.  Even within a single bracket (presumably one editor), a team tends to have a more abbreviated name in later rounds. We will therefore devote a large portion of our code to normalizing the team names that appear by expanding most abbreviations and dropping unnecessary words, occasionally resulting in a team name that is slightly different than what the media and fans customarily use.
 
-Once team names have been normalized, we still have a problem of ambiguity.  We will convert ``USC'' to ``Southern California'' or ``South Carolina'', often by looking for which mascot appears elsewhere on the page (a conference is also helpful).  Similarly, ``Saint John's'' will become ``Saint John's New York'' or ``Saint John's Minnesota'' along with scores of other disambiguations.
+Once team names have been normalized, we still have a problem of ambiguity.  We will convert ``USC'' to ``Southern California'' or ``South Carolina'', often by looking for which mascot appears elsewhere on the page (a conference is also helpful).  Similarly, ``Saint John's'' will become ``Saint John's New York'' or ``Saint John's Minnesota'' along with scores of other disambiguations.  (Even after normalization and disambiguation, we still needed to correct many misspellings and other typos within Wikipedia.)
 
-Within our sample, UNC (now North Carolina) has played the most men's tournament games at 136, while (the University of) Tennessee has played the most women's tournament games at 163.  Plotting the seed differences of those games along with whether the game was a win (104 and 129 times) or a loss (32 and 34 times) along with the logistic regressions gives \autoref{fig:bbm_D1_team}.
+Within our sample, UNC (now North Carolina) has played the most men's tournament games at 139, while (the University of) Tennessee has played the most women's tournament games at 165.  Plotting the seed differences of those games along with whether the game was a win (106 and 130 times) or a loss (33 and 35 times) along with the logistic regressions gives \autoref{fig:bbm_D1_team}.
 \begin{figure}
-\subcaptionbox{\label{fig:bbm_D1_UNC}North Carolina men. $\beta=0.192$}[.48\textwidth]{%
+\subcaptionbox{\label{fig:bbm_D1_UNC}North Carolina men. $\beta=0.194$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,y axis line style=-,x axis line style=<->,xlabel={Seed differential},clip=false,xtick={-10,10},ticklabel style={font=\small},tickwidth=.3cm]
-\addplot[domain=-15:15]{1/(1+exp(-.192*(x+2.78)))};
-\addplot[dots](-2.78,.5)node[left]{\footnotesize$\mu=-2.78$};
-\addplot[dots](0,0.630)node[right]{\footnotesize$\begin{aligned}p&=(1+\exp(0.192\cdot2.78))^{-1}\\&=0.630\end{aligned}$};
-\addplot[dots](8,1)node[above]{\tiny11};
+\addplot[domain=-15:15]{1/(1+exp(-.194*(x+2.60)))};
+\addplot[dots](-2.60,.5)node[left]{\footnotesize$\mu=-2.60$};
+\addplot[dots](0,0.623)node[right]{\footnotesize$\begin{aligned}p&=(1+\exp(-0.194\cdot2.60))^{-1}\\&=0.623\end{aligned}$};
+\addplot[dots](8,1)node[above]{\tiny12};
 \addplot[dots](3,1)node[below]{\tiny7};
 \addplot[dots](2,1)node[above]{\tiny4};
 \addplot[dots](5,1)node[below]{\tiny11};
@@ -240,7 +236,7 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \addplot[dots](13,1)node[below]{\tiny7};
 \addplot[dots](9,1)node[below]{\tiny6};
 \addplot[dots](11,1)node[below]{\tiny3};
-\addplot[dots](15,1)node[below]{\tiny14};
+\addplot[dots](15,1)node[below]{\tiny15};
 \addplot[dots](4,1)node[above]{\tiny7};
 \addplot[dots](-7,1)node[below]{\tiny3};
 \addplot[dots](-1,1)node[below]{\tiny2};
@@ -248,7 +244,7 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \addplot[dots](12,1)node[above]{\tiny1};
 \addplot[dots](-6,1)node[above]{\tiny1};
 \addplot[dots](2,0)node[below]{\tiny4};
-\addplot[dots](3,0)node[above]{\tiny2};
+\addplot[dots](3,0)node[above]{\tiny3};
 \addplot[dots](6,0)node[below]{\tiny1};
 \addplot[dots](-1,0)node[above]{\tiny2};
 \addplot[dots](1,0)node[above]{\tiny6};
@@ -263,13 +259,13 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \end{axis}
 \end{tikzpicture}%
 }\hfill
-\subcaptionbox{\label{fig:bbw_D1_Tenn}Tennessee women. $\beta=0.304$}[.48\textwidth]{%
+\subcaptionbox{\label{fig:bbw_D1_Tenn}Tennessee women. $\beta=0.314$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,y axis line style=-,x axis line style=<->,xlabel={Seed differential},clip=false,xtick={-10,10},ticklabel style={font=\small},tickwidth=.3cm]
-\addplot[domain=-15:15]{1/(1+exp(-.304*(x+1.92)))};
-\addplot[dots](-1.92,.5)node[left]{\footnotesize$\mu=-1.92$};
-\addplot[dots](0,0.642)node[right]{\footnotesize$\begin{aligned}p&=(1+\exp(0.304\cdot1.92))^{-1}\\&=0.642\end{aligned}$};
-\addplot[dots](5,1)node[below]{\tiny6};
+\addplot[domain=-15:15]{1/(1+exp(-.314*(x+1.77)))};
+\addplot[dots](-1.77,.5)node[left]{\footnotesize$\mu=-1.77$};
+\addplot[dots](0,0.635)node[right]{\footnotesize$\begin{aligned}p&=(1+\exp(-0.314\cdot1.77))^{-1}\\&=0.635\end{aligned}$};
+\addplot[dots](5,1)node[below]{\tiny7};
 \addplot[dots](1,1)node[below]{\tiny13};
 \addplot[dots](-1,1)node[below]{\tiny7};
 \addplot[dots](7,1)node[below]{\tiny14};
@@ -292,7 +288,7 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \addplot[dots](3,0)node[above]{\tiny9};
 \addplot[dots](1,0)node[above]{\tiny6};
 \addplot[dots](-2,0)node[below]{\tiny1};
-\addplot[dots](-3,0)node[above]{\tiny4};
+\addplot[dots](-3,0)node[above]{\tiny5};
 \addplot[dots](0,0)node[below]{\tiny4};
 \addplot[dots](2,0)node[below]{\tiny1};
 \addplot[dots](7,0)node[above]{\tiny1};
@@ -303,9 +299,9 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \caption{\label{fig:bbm_D1_team}Wins and losses (with multiplicity) in the NCAA Division I basketball tournament, along with the logistic regression $(1+\exp(-\beta(x-\mu)))^{-1}$.}
 \end{figure}
 
-The logistic function $(1+\exp(-\beta(x-\mu)))^{-1}$ for $\beta=0.192$ and $\mu=-2.78$ suggests that UNC performs about 2.78 seedings worse than expected and that the log of their odds against an evenly seeded opponent is $-\beta\mu=0.534$, while $\beta=0.304$ and $\mu=-1.92$ suggests that Tennessee performs about 1.92 seedings worse and has log odds of $0.584$.  The larger $\beta$ also indicates that Tennessee is more likely to avoid an upset (for better and worse).
+The logistic function $(1+\exp(-\beta(x-\mu)))^{-1}$ for $\beta=0.194$ and $\mu=-2.60$ suggests that UNC performs about 2.60 seedings better than expected and that the log of their odds against an evenly seeded opponent is $-\beta\mu=0.504$, while $\beta=0.314$ and $\mu=-1.92$ suggests that Tennessee performs about 1.92 seedings worse and has log odds of $0.603$.  The larger $\beta$ also indicates that Tennessee is less likely to experience an upset (for better and worse).
 
-Of the 313 (299) teams that have participated in the men's (women's) tournament, 131 (110) have at least 10 games in the tournament and at least 1 win.  Of these, only 7 men's (1 women's) teams have $\beta<0.01$, causing a large $\mu$.  Repeating the calculation of $\mu$ for the remaining 124 (109) teams and plotting the number of games along with the team's $\mu$ gives us \autoref{fig:bb_D1_game_v_mu}, while plotting the number of games along with the team's log odds gives us \autoref{fig:bb_D1_game_v_logit}.
+Of the 316 (303) teams that have participated in the men's (women's) tournament, 135 (110) have at least 10 games in the tournament and at least 1 win.  Of these, only 7 men's (1 women's) teams have $\beta<0.01$, causing a large $\mu$.  Repeating the calculation of $\mu$ for the remaining 128 (109) teams and plotting the number of games along with the team's $\mu$ gives us \autoref{fig:bb_D1_game_v_mu}, while plotting the number of games along with the team's log odds gives us \autoref{fig:bb_D1_game_v_logit}.
 
 \begin{figure}
 \subcaptionbox{\label{fig:bbm_D1_game_v_mu}Men's}[.48\textwidth]{%
@@ -411,11 +407,11 @@ For the timezone plot, note that we include Arizona (Mountain Standard Time) in 
 
 We now focus on our original example, that an 11 seed won games with seed differentials $-5$, $3$, $-9$, and $-7$.  For a game with seed differential $s$, we previously approximated the probability of the favored team winning by $p(s)=(1+\exp(-\beta s))^{-1}$, where $\beta=\betaBbmD$ for this tournament.  Treating these as four independent games would give a probability of $0.89\%$. We will instead argue that the upsets in rounds 1 and 3 indicate that the team should have been seeded better, making the victories in rounds 2--4 and then round 4 more likely.
 
-Returning to the 124 men's (109 women's) teams, if we discard 3 (1) outliers where $\lvert\mu\rvert>16$, then we can weight the remaining 121 (108) values of $\mu$ by the number of games the team played to estimate that $\mu$ has a mean $\mu_0$  of $-0.2$ (0.15) and a standard deviation $\sigma$  of 3.2 (2.1). This indicates that we can instead assume that a better seeded team is correctly seeded, and that a worse seeded team should have had their seed adjusted downward by the normal random variable $N\sim\mathcal{N}(\mu_0,\sigma^2)$.  In that case, the most likely seeding correction in the event of an upset would be the maximizer of the product of the probability density function for $N$ and $1-p(s-N)$, which is
+Returning to the 128 men's (109 women's) teams, if we discard 3 (2) outliers where $\lvert\mu\rvert>16$, then we can weight the remaining 125 (107) values of $\mu$ by the number of games the team played to estimate that $\mu$ has a mean $\mu_0$  of $-0.2$ (0.03) and a standard deviation $\sigma$  of 3.2 (1.9). This indicates that we can instead assume that a better seeded team is correctly seeded, and that a worse seeded team should have had their seed adjusted downward by the normal random variable $N\sim\mathcal{N}(\mu_0,\sigma^2)$.  In that case, the most likely seeding correction in the event of an upset would be the maximizer of the product of the probability density function for $N$ and $1-p(s-N)$, which is
 \[\frac1{\sigma\sqrt{2\pi}}\exp\Bigl\{-\frac{(N-\mu_0)^2}{2\sigma^2}\Bigr\}\frac{\exp(-\beta(s-N))}{1+\exp(-\beta(s-N))}.\]
-Differentiating and simplifying, this maximum occurs when $N$ is the root of the nonlinear equation
+Differentiating with respect to $N$ and simplifying, this maximum occurs when $N$ is the root of the nonlinear equation
 \[\frac\beta{1+\exp(-\beta(s-N))}=\frac{N-\mu_0}{\sigma^2}.\]
-With our values of $\beta$, $\mu_0$, and $\sigma$, a numerical solver estimates that on $1\le s\le15$, this root is approximately $0.68+\frac s{25}$ for the men's tournament and $0.89+\frac s{33}$ for the women's tournament.  This means that after an 11 seed defeats a 6 seed, we should instead model the 11 seed as if they had been seeded 10.12.  Treating the last three games dependent on the first one (but independent from each other), we would act as if the seed differentials had be $-5$, $3.88$, $-8.12$, and $-6.12$, bringing the probability up to $1.2\%$.
+With our values of $\beta$, $\mu_0$, and $\sigma$, a numerical solver estimates that on $1\le s\le15$, this root is approximately $0.68+\frac s{25}$ for the men's tournament and $0.65+\frac s{42}$ for the women's tournament.  This means that after an 11 seed defeats a 6 seed, we should instead model the 11 seed as if they had been seeded 10.12.  Treating the last three games dependent on the first one (but independent from each other), we would act as if the seed differentials had been $-5$, $3.88$, $-8.12$, and $-6.12$, bringing the probability up to $1.2\%$.
 
 Repeating this analysis for two upsets, we would want to maximize
 \[
@@ -425,48 +421,48 @@ Repeating this analysis for two upsets, we would want to maximize
 \]
 which happens when $N$ solves
 \[\frac\beta{1+\exp(-\beta(s_1-N))}+\frac\beta{1+\exp(-\beta(s_2-N))}=\frac{N-\mu_0}{\sigma^2}.\]
-This root is approximately $1.43+\frac{s_1+s_2}{24}$ for the men (and $1.48+\frac{s_1+s_2}{29}$ for the women) on $1\le s_1,s_2\le15$, so that after upsets of seed differentials $-5$ and $-9$, we should instead model the 11 seed as if they had been seeded 9.  Repeating our calculation with seed differentials of $-5$, $3.88$, $-8.12$, and $-5$, the probability is now the previously stated $1.3\%$.
+This root is approximately $1.43+\frac{s_1+s_2}{24}$ for the men (and $1.17+\frac{s_1+s_2}{38}$ for the women) on $1\le s_1,s_2\le15$, so that after upsets of seed differentials $-5$ and $-9$, we should instead model the 11 seed as if they had been seeded 9.  Repeating our calculation with seed differentials of $-5$, $3.88$, $-8.12$, and $-5$, the probability is now the previously stated $1.3\%$.
 
 We will now revisit the probability of an upset in the second round after an upset in the first, examined in light of reseeding.  For a logistic function $p(s)=(1+\exp(-\beta_0-\beta_1s))^{-1}$, recall that the average log-likelihood $\bar\ell$ is the expression $Y_k\ln p(S_k)+(1-Y_k)\ln(1-p(S_k))$ where $S_k$ is the seed differential (positive for a favored team) and $Y_k$ is 1 in victory and 0 in defeat.  The expression is maximized when $\beta_0$ and $\beta_1$ are taken from the logistic best fit (note that this logistic function is slightly different than ours, where $\beta=\beta_1$ and $\mu=-\beta_0/\beta_1$, although $\mu=\beta_0=0$ because of symmetry in our case).  In \autoref{tab:D1_log_likely_upset}, we see the average log-likelihood for each second round matchup after a first round upset.
 \begin{table}\caption{\label{tab:D1_log_likely_upset}Average log-likelihood in the second round, after one first round upset, with and without reseeding.  (Minimum 10 games.)}
 \centering
 \begin{tabular}{ c *4{S[table-format=-1.2]} }\toprule
 \multirow{2}{*}{Seeds} & \multicolumn2c{Men's} & \multicolumn2c{Women's} \\
- & {Without} & {With} & {Without} & {With} \\\midrule
-1 v \phantom19 & -1.27 & -1.19 & -2.17 & -1.96 \\
-2 v 10 & -0.49 & -0.44 & -1.86 & -1.69 \\
-3 v 11 & -0.61 & -0.56 & -1.28 & -1.15 \\
-4 v 12 & -0.71 & -0.67 & -1.84 & -1.69 \\
-5 v 13 & -1.11 & -1.08 \\
-6 v 14 & -1.18 & -1.16 \\\addlinespace
-overall & -0.83 & -0.78 & -1.80 & -1.64 \\\bottomrule
+          & {Without} & {With} & {Without} & {With} \\\midrule
+1 v \phantom19 & -1.27 & -1.20 & -2.19 & -2.04 \\
+2 v 10         & -0.51 & -0.45 & -1.88 & -1.76 \\
+3 v 11         & -0.63 & -0.59 & -1.32 & -1.22 \\
+4 v 12         & -0.75 & -0.70 & -1.86 & -1.76 \\
+5 v 13         & -1.13 & -1.10 \\
+6 v 14         & -1.18 & -1.15 \\\addlinespace
+overall        & -0.85 & -0.80 & -1.83 & -1.71 \\\bottomrule
 \end{tabular}
 \end{table}
 Using the reseeding results in a better (less negative) average log-likelihood.
 
 
 \section{College Basketball Tournaments}
-Wikipedia has brackets for many other basketball tournaments, most notably 32 (32) different conference tournaments [with occasional changing names] determining a champion for an automatic bid to the men's (women's) national tournament.  There are also 7 (4) other tournaments with a national scope.  We again begin by plotting seed differential against fraction of games won by the favored team in \autoref{fig:bb_WL_prob},
+Wikipedia has brackets for many other basketball tournaments, most notably 32 (32) different conference tournaments [with occasional changing names] often determining a champion for an automatic bid to the men's (women's) national tournament.  There are also 7 (4) other tournaments with a national scope.  We again begin by plotting seed differential against fraction of games won by the favored team in \autoref{fig:bb_WL_prob},
 \begin{figure}
-\subcaptionbox{\label{fig:bbm_WL_prob}Men's. $\beta=0.202$}[.48\textwidth]{%
+\subcaptionbox{\label{fig:bbm_WL_prob}Men's. $\beta=0.205$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
-\addplot[domain=0:15]{1/(1+exp(-.202*x))};
+\addplot[domain=0:15]{1/(1+exp(-.205*x))};
 \input{data/bbm/winlossplot}
 \end{axis}
 \end{tikzpicture}
 }\hfill
-\subcaptionbox{\label{fig:bbw_WL_prob}Women's. $\beta=0.284$}[.48\textwidth]{%
+\subcaptionbox{\label{fig:bbw_WL_prob}Women's. $\beta=0.285$}[.48\textwidth]{%
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
 \addplot[dots](0,.5);
-\addplot[domain=0:15]{1/(1+exp(-.284*x))};
+\addplot[domain=0:15]{1/(1+exp(-.285*x))};
 \input{data/bbw/winlossplot}
 \end{axis}
 \end{tikzpicture}
 }
-\caption{\label{fig:bb_WL_prob}Seed differential versus fraction of games that a favored team wins in basketball tournaments, with 95\% Wilson confidence intervals and the logistic best fit.}
+\caption{\label{fig:bb_WL_prob}Seed differential versus fraction of games that a favored team wins in collegiate basketball tournaments, with 95\% Wilson confidence intervals and the logistic best fit.}
 \end{figure}
 and then the number of games compared to how a team should be reseeded in \autoref{fig:bb_game_v_mu}.
 \begin{figure}
@@ -519,7 +515,7 @@ We also summarize the likelihood of upsets by calculating $\beta$ for each tourn
 \end{figure}
 Note that national conferences generally have lower $\beta$ values, suggesting that upsets are more common.  Within a conference tournament, most teams have already played each other, and a team's record (which all conferences use for seeding) is a useful estimate of how good the team is.  In a national tournament, on the other hand, most teams have not played each other.  In this case, tournament organizers resort to (sometimes objective) arbitrary methods to determine seedings, but these methods are not as useful at estimating how good the teams are.
 
-To examine one conference tournament slightly more in-depth, we plot in \autoref{fig:bb_sec_game_v_mu} the number of games versus the expected reseeding for the SEC, located at $(504,0.21)$ in \autoref{fig:bbm_game_v_rate} and $(240,0.29)$ in \autoref{fig:bbw_game_v_rate}.
+To examine one conference tournament slightly more in-depth, we plot in \autoref{fig:bb_sec_game_v_mu} the number of games versus the expected reseeding for the SEC, located at $(517,0.20)$ in \autoref{fig:bbm_game_v_rate} and $(253,0.29)$ in \autoref{fig:bbw_game_v_rate}.
 \begin{figure}
 \subcaptionbox{\label{fig:bbm_sec_game_v_mu}Men's}[.48\textwidth]{%
 \begin{tikzpicture}
@@ -776,16 +772,19 @@ We do however provide one final plot of seed differential versus fraction of gam
 
 \section{Conclusions and Further Analysis}
 
-% restate conclusions
+It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{\githuburl}.  For the less programmatically minded, we provide an online interface at \url{\interfaceurl} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
+
+Someone with experience in Python and probability or statistics would be able to extend this analysis in several ways.  These possibilities are organized (we think) in order of decreasing complexity.
+\begin{itemize}
+\item Instead of collapsing seeds by only looking at the seed differential, can we find a probability estimation that also uses the average of the seeds?  (Complicating this question is that the observed frequencies in \autoref{tab:D1_WL_prob_upset} do not follow a clear pattern.)  Does the formula become simpler if we use the better or worse team's seed instead of the average?  Does this probability estimation depend on the tournament or the size of that tournament (for example, prior to 1985, the men's NCAA tournament had fewer than 64 teams)?
+\item In the NCAA basketball tournaments, is there a significant difference for teams that qualified at large instead of teams that only qualified by virtue of winning their conference tournament?  Does this question depend on the conference, and whether the conference is a traditional powerhouse conference or a ``mid-major''?  Can we predict a conference's performance by tracking how many teams from that conference are in the tournament?
+\item Can we apply an intercept correction to teams with few wins in a tournament, and thereby provide more samples for our database, or will we be artificially inflating our numbers?
+\item Our choice to focus on $\mu$ instead of $\beta\mu$ means that a small $\beta$ causes a large $\mu$.  Do we have notably different conclusions if we instead examine the logarithm of the odds against an evenly matched opponent, given by $-\beta\mu$?
+\end{itemize}
 
 Throughout the past century, conferences memberships have been in constant flux.  Because that was usually a team or two at a time, however, it still makes sense to talk about a conference as a whole and how it performed.  That is no longer true for the Pac 12, which in August 2024 exploded with 2, 4, and 4 teams going to the ACC, Big 10 and Big 12 conferences.
 
-It is our hope that this analysis and its database will allow further exploration of tournament seeding.  Consequently, the necessary Python code to reproduce our results is available at \url{\githuburl}.  For the less programmatically minded, we provide an online interface at \url{\interfaceurl} that can explore most of what we've done (counting wins and losses by seed differential for a particular team is more complicated).
-
-Throughout our examination of tournaments, conferences, and teams, we must admit that we have been unable to find a consistently misrated team.  Further exploration may show that \textbackslash your\_favorite\_team is indeed underrated, or that \textbackslash your\_hated\_rival is indeed overrated, but we must be careful to avoid torturing the data and p-hacking to arrive at these results.
-
-An undergraduate student with experience in Python and probability would be able to extend this analysis in several ways.  Instead of collapsing seeds by only looking at the seed differential, can we find a probability estimation that also uses the average of the seeds?  Does this probability estimation depend on the tournament or the size of that tournament (for example, prior to 1985 the men's tournament had fewer than 64 teams)?  In the NCAA basketball tournaments, is there a significant difference for teams that qualified at large instead of teams that only qualified by virtue of winning their conference tournament (and does this question depend on the conference)?
-% bias reduction?
+In all of our examination of tournaments, conferences, and teams, we must admit that most teams appear to be consistently correctly rated.  Further exploration may show that \textbackslash your\_favorite\_team is indeed underrated, or that \textbackslash your\_hated\_rival is indeed overrated, but we must be careful to avoid torturing the data and $p$-hacking to arrive at these results.  On the other hand, we now have tools to examine how teams have performed throughout the history of numerous tournaments.
 
 \section{Disclosure Statement}
 
@@ -796,7 +795,7 @@ No potential competing interests were reported by the author.
 \end{document}
 
 word count:
-texcount bracket.tex: 2779
+texcount bracket.tex: 3179
 
 
 S(z) = 1/(1+e^{-z})

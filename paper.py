@@ -5,6 +5,7 @@ import itertools
 import json
 import math
 import re
+import shutil
 import typing
 
 import numpy  # type: ignore
@@ -15,6 +16,9 @@ import scipy.stats  # type: ignore
 
 import analyze
 import university
+
+beta_mens = 0.161
+beta_womens = 0.276
 
 
 def get_team_performance(group: str, tourney: str, team: str) -> None:
@@ -195,10 +199,8 @@ def print_team_rename_from_stats() -> None:
 
 def print_prob_one_women_upset() -> None:
     """ The probability that at most one women's D1 team is upset in the first round """
-    beta = 0.276
-
     def p(x):
-        return 1/(1+math.exp(-beta*x))
+        return 1/(1+math.exp(-beta_womens*x))
 
     prob_none = 1
     for s in range(1, 9):
@@ -228,10 +230,9 @@ def print_weighted_reseed(reseed_file: str) -> None:
 
 def print_prob_several_upsets() -> None:
     """ Determine the probability that a specific sequence of upsets occurred """
-    beta = 0.161
-    print('naive:', math.prod((sigmoid(beta*s) for s in (-5, 3, -9, -7))))
-    print('one upset:', math.prod((sigmoid(beta*s) for s in (-5, 3.88, -8.12, -6.12))))
-    print('two upsets:', math.prod((sigmoid(beta*s) for s in (-5, 3.88, -8.12, -5))))
+    print('naive:', math.prod((sigmoid(beta_mens*s) for s in (-5, 3, -9, -7))))
+    print('one upset:', math.prod((sigmoid(beta_mens*s) for s in (-5, 3+0.88, 0.88-9, 0.88-7))))
+    print('two upsets:', math.prod((sigmoid(beta_mens*s) for s in (-5, 3+0.88, 0.88-9, 2-7))))
 
 
 def print_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
@@ -260,11 +261,12 @@ def print_double_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
     print(best_fit[0], ' + s1 /', 1/best_fit[1], ' + s2 /', 1/best_fit[2])
 
 
+# Copying the output of `print_upset_reseed`
+# if there was one upset, it was by col, of a seed 17-col, for a seed differential of 17-2col
 seed_adjust = {
     'bbm/D1/winloss.csv': lambda s: .68+(17-2*s)/25,
-    'bbw/D1/winloss.csv': lambda s: .89+(17-2*s)/33
+    'bbw/D1/winloss.csv': lambda s: .65+(17-2*s)/42
 }
-""" Copying the output of `print_upset_reseed` """
 
 
 def print_log_likelihood_round(win_loss_file: str,
@@ -286,8 +288,6 @@ def print_log_likelihood_round(win_loss_file: str,
                 continue
             wins = win_loss[row, col]
             losses = win_loss[col, row]
-            # if there was one upset, it was by col, of a seed 17-col, for a seed differential of 17-2col
-            # and a seed adjustment of .95 + (17-2col)/20 = 1.8 - col/10
             adjust = seed_adjust[win_loss_file](col) if should_adjust_seeds else 0
             log_likelihood = wins*math.log(sigmoid(rate*(col-row-adjust))) \
                 + losses*(1-math.log(sigmoid(rate*(row-col+adjust))))
@@ -299,48 +299,88 @@ def print_log_likelihood_round(win_loss_file: str,
     print(f'overall: {total_log_likelihood/total_games}')
 
 
+def print_large_upsets(filename: str, seed_diff: int) -> list[int]:
+    """ :param filename: The file to analyze
+    :param seed_diff: The cutoff seed differential """
+    winner = numpy.loadtxt(filename, dtype=int, delimiter=',')
+    expecteds = 0
+    upsets = 0
+    for offset in range(seed_diff, winner.shape[0]+1):
+        upsets += sum(numpy.diagonal(winner[1:, 1:], -offset))
+        expecteds += sum(numpy.diagonal(winner[1:, 1:], offset))
+    print(f'{filename}: {upsets}-{expecteds} out of {upsets+expecteds}: {upsets/(upsets+expecteds)}')
+    return [upsets, expecteds]
+
+
 def print_calcs_for_paper(page: int = -1) -> None:
-    """ :param page: """
-    if page in (3, -1):
-        print('page 3')
+    """ :param page: The page number omitting the endnote package """
+    # if page in (3, -1):
+    #     print('page 3')
+    if page in (4, -1):
+        print('page 4')
         analyze.analyze_winloss('bbm/D1/winloss.csv')
         analyze.analyze_winloss('bbw/D1/winloss.csv')
-        print(scipy.stats.fisher_exact([[76, 852], [225, 1000]], 'less')[1])
-        print_prob_one_women_upset()
     if page in (5, -1):
         print('page 5')
-        print(scipy.stats.fisher_exact([[9, 9], [40, 30]], 'less')[1])
-        print(scipy.stats.fisher_exact([[3, 1], [50, 34]], 'less')[1])
-        print(scipy.stats.fisher_exact([[0, 1], [68, 19]], 'less')[1])
-        print(scipy.stats.fisher_exact([[1, 0], [78, 19]], 'less')[1])
-        print(scipy.stats.fisher_exact([[33, 1], [53, 1]], 'less')[1])
-        # overall
-        print(scipy.stats.fisher_exact([[46, 12], [289, 103]], 'less')[1])
-        # women's
-        print(scipy.stats.fisher_exact([[3, 1], [2, 2]], 'less')[1])
-        print(scipy.stats.fisher_exact([[4, 0], [4, 0]], 'less')[1])
+        mens = print_large_upsets('bbm/D1/winloss.csv', 7)
+        womens = print_large_upsets('bbw/D1/winloss.csv', 7)
+        print(scipy.stats.fisher_exact([womens, mens], 'less')[1])
+        print_prob_one_women_upset()
+        # Table 1: see write_plots_for_paper
+        print(f'mens predicted: {sigmoid(8 * beta_mens)}')
+        print(f'womens predicted: {sigmoid(8 * beta_womens)}')
     if page in (6, -1):
         print('page 6')
+        # Table 2
+        print(scipy.stats.fisher_exact([[1, 1], [34, 56]], 'less')[1])
+        print(scipy.stats.fisher_exact([[9, 9], [41, 33]], 'less')[1])
+        print(scipy.stats.fisher_exact([[3, 1], [52, 36]], 'less')[1])
+        print(scipy.stats.fisher_exact([[0, 1], [71, 20]], 'less')[1])
+        print(scipy.stats.fisher_exact([[1, 0], [81, 10]], 'less')[1])
+        print(scipy.stats.fisher_exact([[35, 1], [55, 1]], 'less')[1])
+        # overall
+        print(scipy.stats.fisher_exact([[49, 13], [487, 187]], 'less')[1])
+        # women's
+        # print(scipy.stats.fisher_exact([[3, 1], [2, 2]], 'less')[1])
+        # print(scipy.stats.fisher_exact([[4, 0], [4, 0]], 'less')[1])
         print('disambiguations:', university.TOTAL_DISAMBIGUATIONS)
         print_team_rename_from_stats()
+    if page in (7, -1):
+        print('page 7')
         get_team_performance('bbm', 'D1', 'North Carolina')
         get_team_performance('bbw', 'D1', 'Tennessee')
         print_weighted_reseed('bbm/D1/reseed.csv')
         print_weighted_reseed('bbw/D1/reseed.csv')
-    if page in (8, -1):
-        print('page 8')
-        print_prob_several_upsets()
-        print_upset_reseed(0.161, -0.2, 3.2)
-        print_double_upset_reseed(0.161, -0.2, 3.2)
-        print_upset_reseed(0.276, 0.15, 2.1)
-        print_double_upset_reseed(0.276, 0.15, 2.1)
     if page in (9, -1):
         print('page 9')
+        print_prob_several_upsets()
+    if page in (10, -1):
+        print('page 10')
+        print_upset_reseed(beta_mens, -0.2, 3.2)
+        print_double_upset_reseed(beta_mens, -0.2, 3.2)
+        print_upset_reseed(beta_womens, 0.03, 1.9)
+        print_double_upset_reseed(beta_womens, 0.03, 1.9)
+        print_prob_several_upsets()
+    if page in (11, -1):
+        print('page 11')
         for should_adjust_seeds, group in itertools.product( (False, True), ('bbm', 'bbw') ):
             print_log_likelihood_round(f'{group}/D1/winloss.csv', should_adjust_seeds, lambda r, c: c - r != 8)
+        analyze.analyze_winloss('bbm/winloss.csv')
+        analyze.analyze_winloss('bbw/winloss.csv')
     if page in (12, -1):
         print('page 12')
         analyze.analyze_winloss('winloss.csv')
+
+
+def copy_to_data() -> None:
+    for group in ('bbm', 'bbw'):
+        for file_ in ('group_betas.csv', 'reseed_filtered.csv', 'winlossplot.tex', 'conf_reseed.csv'):
+            shutil.copyfile(f'{group}/{file_}', f'paper/data/{group}/{file_}')
+        for d1_file in ('reseed.csv', 'state_reseed.csv', 'tz_reseed.csv', 'winlossplot.tex'):
+            shutil.copyfile(f'{group}/D1/{d1_file}', f'paper/data/{group}/D1/{d1_file}')
+        shutil.copyfile(f'{group}/SEC/reseed.csv', f'paper/data/{group}/SEC/reseed.csv')
+    shutil.copyfile('winlossplot.tex', f'paper/data/winlossplot.tex')
+    shutil.copyfile('winlosssimpleplot.tex', f'paper/data/winlosssimpleplot.tex')
 
 
 def write_tex_table(group, tourney_group: dict[str, typing.Any]) -> None:
@@ -390,7 +430,8 @@ def sigmoid(x: float) -> float:
 def bracket_has_unseeded_seeding(bracket: str) -> bool:
     """ Does this bracket have seeding that it shouldn't?  This is a consequence of
     https://en.wikipedia.org/wiki/Module:Team_bracket/doc#Parameters
-    "RD_n-seed_m: ... For round 1, this value defaults to the conventional seed allocation for tournaments. "
+    "RD_n-seed_m: ... For round 1, this value defaults to the conventional seed allocation for tournaments."
+    See also https://github.com/teepeemm/bracket/issues/3
     :param bracket:
     :return: bracket should not have seeding but Wikipedia may automatically seed """
     return bool(re.search(r'\d+TeamBracket(?!-NFL)(?!-2Elim)\W', bracket)
@@ -441,8 +482,8 @@ def write_unseeded_seeding() -> None:
     }
     for group, tourneys in unseeded_seeding.items():
         print(group, 'has ', sum((len(years) for years in tourneys.values())))
-    with open('unseeded_seeding.json', 'w', encoding='utf-8') as unseeded_file:
-        json.dump(unseeded_seeding, unseeded_file, indent=4)
+    # with open('unseeded_seeding.json', 'w', encoding='utf-8') as unseeded_file:
+    #     json.dump(unseeded_seeding, unseeded_file, indent=4)
 
 
 if __name__ == '__main__':
