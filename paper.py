@@ -17,8 +17,8 @@ import scipy.stats  # type: ignore
 import analyze
 import university
 
-beta_mens = 0.161
-beta_womens = 0.276
+BETA_MENS = 0.161
+BETA_WOMENS = 0.276
 
 
 def get_team_performance(group: str, tourney: str, team: str) -> None:
@@ -200,7 +200,7 @@ def print_team_rename_from_stats() -> None:
 def print_prob_one_women_upset() -> None:
     """ The probability that at most one women's D1 team is upset in the first round """
     def p(x):
-        return 1/(1+math.exp(-beta_womens*x))
+        return 1/(1 + math.exp(-BETA_WOMENS * x))
 
     prob_none = 1
     for s in range(1, 9):
@@ -230,9 +230,9 @@ def print_weighted_reseed(reseed_file: str) -> None:
 
 def print_prob_several_upsets() -> None:
     """ Determine the probability that a specific sequence of upsets occurred """
-    print('naive:', math.prod((sigmoid(beta_mens*s) for s in (-5, 3, -9, -7))))
-    print('one upset:', math.prod((sigmoid(beta_mens*s) for s in (-5, 3+0.88, 0.88-9, 0.88-7))))
-    print('two upsets:', math.prod((sigmoid(beta_mens*s) for s in (-5, 3+0.88, 0.88-9, 2-7))))
+    print('naive:', math.prod((sigmoid(BETA_MENS * s) for s in (-5, 3, -9, -7))))
+    print('one upset:', math.prod((sigmoid(BETA_MENS * s) for s in (-5, 3 + 0.88, 0.88 - 9, 0.88 - 7))))
+    print('two upsets:', math.prod((sigmoid(BETA_MENS * s) for s in (-5, 3 + 0.88, 0.88 - 9, 2 - 7))))
 
 
 def print_upset_reseed(beta: float, mu0: float, sigma: float) -> None:
@@ -327,8 +327,8 @@ def print_calcs_for_paper(page: int = -1) -> None:
         print(scipy.stats.fisher_exact([womens, mens], 'less')[1])
         print_prob_one_women_upset()
         # Table 1: see write_plots_for_paper
-        print(f'mens predicted: {sigmoid(8 * beta_mens)}')
-        print(f'womens predicted: {sigmoid(8 * beta_womens)}')
+        print(f'mens predicted: {sigmoid(8 * BETA_MENS)}')
+        print(f'womens predicted: {sigmoid(8 * BETA_WOMENS)}')
     if page in (6, -1):
         print('page 6')
         # Table 2
@@ -356,10 +356,10 @@ def print_calcs_for_paper(page: int = -1) -> None:
         print_prob_several_upsets()
     if page in (10, -1):
         print('page 10')
-        print_upset_reseed(beta_mens, -0.2, 3.2)
-        print_double_upset_reseed(beta_mens, -0.2, 3.2)
-        print_upset_reseed(beta_womens, 0.03, 1.9)
-        print_double_upset_reseed(beta_womens, 0.03, 1.9)
+        print_upset_reseed(BETA_MENS, -0.2, 3.2)
+        print_double_upset_reseed(BETA_MENS, -0.2, 3.2)
+        print_upset_reseed(BETA_WOMENS, 0.03, 1.9)
+        print_double_upset_reseed(BETA_WOMENS, 0.03, 1.9)
         print_prob_several_upsets()
     if page in (11, -1):
         print('page 11')
@@ -373,14 +373,15 @@ def print_calcs_for_paper(page: int = -1) -> None:
 
 
 def copy_to_data() -> None:
+    """ Copy the appropriate files to the paper/data directory, so that TeX will find them. """
     for group in ('bbm', 'bbw'):
         for file_ in ('group_betas.csv', 'reseed_filtered.csv', 'winlossplot.tex', 'conf_reseed.csv'):
             shutil.copyfile(f'{group}/{file_}', f'paper/data/{group}/{file_}')
         for d1_file in ('reseed.csv', 'state_reseed.csv', 'tz_reseed.csv', 'winlossplot.tex'):
             shutil.copyfile(f'{group}/D1/{d1_file}', f'paper/data/{group}/D1/{d1_file}')
         shutil.copyfile(f'{group}/SEC/reseed.csv', f'paper/data/{group}/SEC/reseed.csv')
-    shutil.copyfile('winlossplot.tex', f'paper/data/winlossplot.tex')
-    shutil.copyfile('winlosssimpleplot.tex', f'paper/data/winlosssimpleplot.tex')
+    shutil.copyfile('winlossplot.tex', 'paper/data/winlossplot.tex')
+    shutil.copyfile('winlosssimpleplot.tex', 'paper/data/winlosssimpleplot.tex')
 
 
 def write_tex_table(group, tourney_group: dict[str, typing.Any]) -> None:
