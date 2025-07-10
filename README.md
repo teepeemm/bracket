@@ -1,6 +1,6 @@
 
 This repository analyzes elimination tournaments in Wikipedia,
-and is the source for a forthcoming paper.
+and is the source for [a paper in the journal Scatterplot](https://doi.org/10.1080/29932955.2025.2523666).
 If you're not as programmatically inclined,
 you can use a 
 [GUI with JavaScript](https://sites.und.edu/timothy.prescott/bracket/)
@@ -34,3 +34,23 @@ so that points unplotted by TeX don't appear (it had trouble with the file size)
 * [group/]reseed_approx.csv Same as reseed, but a linear approximation of its components
 * [group/[tournament/]]state_reseed.csv Same as reseed, but grouped by state
 * [group/[tournament/]]tz_reseed.csv Same as reseed, but grouped by timezone
+
+To cite the paper, you can use
+``` tex
+@article{Prescott31122025,
+    author = {Timothy Prescott},
+    title = {Seeding Statistics of Elimination Tournaments},
+    journal = {Scatterplot},
+    volume = {2},
+    number = {1},
+    pages = {2523666},
+    year = {2025},
+    publisher = {Taylor \& Francis},
+    doi = {10.1080/29932955.2025.2523666},
+    URL = {https://doi.org/10.1080/29932955.2025.2523666},
+    eprint = {https://doi.org/10.1080/29932955.2025.2523666},
+    abstract = {We develop and provide Python code and a website to statistically analyze seedings in elimination tournaments. We are able to apply this code to fifty-eight thousand games to estimate the probability of an upset solely as a logistic function of the difference in seeding. We are also able to examine how well or poorly a team performs compared to its seeding. We conclude that the only team that is consistently underrated is \textbackslash your\_favorite\_team, while the only team that is consistently overrated is \textbackslash your\_hated\_rival.}
+}
+```
+
+To cite this repository, you can use the link to the right.

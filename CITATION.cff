@@ -1,0 +1,33 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Seeding Statistics of Elimination Tournaments
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Timothy
+    family-names: Prescott
+    affiliation: University of North Dakota
+    orcid: 'https://orcid.org/0009-0009-0555-8074'
+url: 'https://sites.und.edu/timothy.prescott/bracket/'
+abstract: >-
+  We develop and provide Python code and a website to
+  statistically analyze seedings in elimination tournaments.
+  We are able to apply this code to fifty-eight thousand
+  games to estimate the probability of an upset solely as a
+  logistic function of the difference in seeding. We are
+  also able to examine how well or poorly a team performs
+  compared to its seeding. We conclude that the only team
+  that is consistently underrated is \your_favorite_team,
+  while the only team that is consistently overrated is
+  \your_hated_rival.
+keywords:
+  - logistic regression
+  - statistical analysis
+  - elimination tournament
+  - Python
+  - data visualization
+license: CC-BY-SA-4.0

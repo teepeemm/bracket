@@ -12,7 +12,7 @@
 \usepackage{mathtools}
 \usepackage{hyperref}
 
-\usepackage[nomarkers,tablesfirst]{endfloat}
+%\usepackage[nomarkers,tablesfirst]{endfloat}
 
 \setcounter{secnumdepth}{0}
 
@@ -21,16 +21,16 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % for publication
-%\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
-%\newcommand\githuburl{https://github.com/teepeemm/bracket}
-%\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
-%\newcommand\showJournal{\footnotetext{For submission to Scatterplot}}
+\newcommand\authorinfo{Timothy Prescott\footnote{University of North Dakota, \url{timothy.prescott@und.edu}}}
+\newcommand\githuburl{https://github.com/teepeemm/bracket}
+\newcommand\interfaceurl{https://sites.und.edu/timothy.prescott/bracket/}
+\newcommand\showJournal{\footnotetext{The Version of Record of this manuscript has been published and is available in Scatterplot date \url{https://www.tandfonline.com/DOI}}}
 
 % for refereeing
-\newcommand\authorinfo{Author Name\footnote{University of Affiliation, \url{first.last@affiliation.edu}}}
-\newcommand\githuburl{https://github.com/username/bracket}
-\newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
-\newcommand\showJournal{}
+%\newcommand\authorinfo{Author Name\footnote{University of Affiliation, \url{first.last@affiliation.edu}}}
+%\newcommand\githuburl{https://github.com/username/bracket}
+%\newcommand\interfaceurl{https://affiliation.edu/first.last/bracket/}
+%\newcommand\showJournal{}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pgfplotsset{compat=1.18}
@@ -63,16 +63,16 @@ We develop and provide Python code and a website to statistically analyze seedin
 \section{Introduction}
 A notable occurrence during the 2024 NCAA Division I Men's Basketball Tournament (commonly known as March Madness) was that \#11 North Carolina State reached the Final Four, beating teams seeded 6, 14, 2, and 4.  Another notable occurrence was that the only upset in the first round of the women's tournament was by \#11 Middle Tennessee.  We will estimate that the probability of the first was 1.3\%, while the probability of the second was 2.4\%.
 
-Bracket construction has been analyzed by \cite{Schwenk} and \cite{Seltzer}, while \cite{Wittry} examined upsets in the tournament.  Making accurate upset predictions is popular and profitable (see \cite{Chartier} and the papers at \cite{Jacobson}), so that a driver of statistical research over the past few years has been to analyze teams' performance throughout the season in order to predict more accurately than others how each team will perform in the tournament.
+Bracket construction has been analyzed by Schwenk \cite{Schwenk} and Seltzer and Simonson \cite{Seltzer}, while Wittry \cite{Wittry} examined upsets in the tournament.  Making accurate upset predictions is popular and profitable (see Chartier \cite{Chartier} and the papers at Jacobson \cite{Jacobson}), so that a driver of statistical research over the past few years has been to analyze teams' performance throughout the season in order to predict more accurately than others how each team will perform in the tournament.
 
 We will develop and provide Python code to analyze how teams have performed over the years in these tournaments.  Because a team's performance will vary from year to year, we will compare how a team performed with how they were seeded in a particular tournament (which we use to approximate how they were anticipated to perform).  Because we provide the code for this analysis, the interested reader will be able to repeat or extend our analysis at their leisure.
 
 
 \section{NCAA Division I Basketball Tournament}
-The modern partition of NCAA men's basketball into three divisions began in 1974, with seeding beginning in 1978.  For the years since, each tournaments' outcomes are in the Wikipedia page ``[Year] NCAA Division I [men's\textbar women's] basketball tournament'' (the gender was added in 1982 when the NCAA began sponsoring the women's tournament).  We are able to use Pywikibot\cite{pywikibot} to automatically download these pages for further analysis (we will also cache these pages to reduce the network load).  While Wikipedia renders a tournament as in \autoref{fig:bracket},
+The modern partition of NCAA men's basketball into three divisions began in 1974, with seeding beginning in 1978.  For the years since, each tournaments' outcomes are in the Wikipedia page ``[Year] NCAA Division I [men's\textbar women's] basketball tournament'' (the gender was added in 1982 when the NCAA began sponsoring the women's tournament).  We are able to use Pywikibot \cite{pywikibot} to automatically download these pages for further analysis (we will also cache these pages to reduce the network load).  While Wikipedia renders a tournament as in \autoref{fig:bracket},
 \begin{figure}
-\includegraphics[width=\linewidth]{2023bracket}
-\caption{\label{fig:bracket}Tournament bracket}
+\includegraphics[width=\linewidth,alt={The South regional bracket was played at the KFC Yum! Center in Louisville, KY. It consisted of 16 teams, with #5 San Diego State beating #6 Creighton to win the region.}]{2023bracket}
+\caption{\label{fig:bracket}Tournament bracket as seen in Wikipedia \cite{wikibracket}}
 \end{figure}
 the source for this bracket is
 \begin{lstlisting}[basicstyle=\scriptsize,breaklines=true]
@@ -114,9 +114,9 @@ Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first
 %\input{../bbm/D1/winlossprobs}
 %\end{tabular}
 %\end{table}
-In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team wins as a function of the seed differential, along with their 95\% confidence intervals (using the Wilson interval\cite{Brown}).
+In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team wins as a function of the seed differential, along with their 95\% confidence intervals (using the Wilson interval \cite{Brown}).
 
-We also plot the logistic best fits (determined using Python's Scikit\cite{scikit-learn}).  Letting $Y=1$ for victory, $Y=0$ for defeat, and $S$ denote the seed differential of a game, the average log-likelihood $\bar\ell$ is the expected value of $Y\ln p(S)+(1-Y)\ln(1-p(S))$.  The logistic function is the function of the form $p(x)=(1+\exp(-\beta x-\beta\mu))^{-1}$ that maximizes $\bar\ell$.  We find that $\beta=\betaBbmD$ for the men's tournament, and $\beta=\betaBbwD$ for the women's.
+We also plot the logistic best fits (determined using Python's Scikit \cite{scikit-learn}).  Letting $Y=1$ for victory, $Y=0$ for defeat, and $S$ denote the seed differential of a game, the average log-likelihood $\bar\ell$ is the expected value of $Y\ln p(S)+(1-Y)\ln(1-p(S))$.  The logistic function is the function of the form $p(x)=(1+\exp(-\beta x-\beta\mu))^{-1}$ that maximizes $\bar\ell$.  We find that $\beta=\betaBbmD$ for the men's tournament, and $\beta=\betaBbwD$ for the women's.
 \begin{figure}
 \subcaptionbox{\label{fig:mD1_WL_prob}Men's. $\beta=\betaBbmD$}[.48\textwidth]{%
 \begin{tikzpicture}
@@ -795,7 +795,7 @@ No potential competing interests were reported by the author.
 \end{document}
 
 word count:
-texcount bracket.tex: 3179
+texcount bracket.tex: 3211
 
 
 S(z) = 1/(1+e^{-z})
