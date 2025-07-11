@@ -3,11 +3,10 @@
 
 cff-version: 1.2.0
 title: Seeding Statistics of Elimination Tournaments
-message: >-
-  Citations for this paper are down below and
+message: "Citations for this paper are down below and
   at the paper's website linked to the left.
   To specifically cite this software, please use the
-  metadata from this file.
+  metadata from this file."
 type: software
 authors:
   - given-names: Timothy
