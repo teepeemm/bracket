@@ -1,0 +1,55 @@
+\def\ltlabtbldate{2025-05-10}
+\def\ltlabtblversion{0.85s}
+\ProvidesExplPackage {table-header-scope} {\ltlabtbldate} {\ltlabtblversion}
+  {Code related to the tagging of table headers}
+
+% See the discussion at https://github.com/latex3/tagging-project/discussions/930
+
+% these hooks aren't called?
+%\hook_gput_code:nnn { cmd / after / __tbl_set_header_rows: } { latex-lab-testphase-table } { \__tbl_set_td_headers: }
+%\AddToHook{ cmd / after / __tbl_set_header_rows: } { \__tbl_set_td_headers: }
+% this doesn't work?
+%\apptocmd{\__tbl_set_header_rows:}{\__tbl_set_td_headers:}{}{\fail}
+% do it the old fashioned way
+\tex_let:D \__tbl__old_set_header_rows: = \__tbl_set_header_rows:
+\cs_set_protected:Npn \__tbl_set_header_rows:
+  {
+    \__tbl__old_set_header_rows:
+    \__tbl_set_table_header_scope:
+  }
+
+\cs_new:Npn \__tbl_set_table_header_scope:
+  { \seq_map_function:NN \g__tbl_struct_cells_seq \__tbl_set_row_header_scope:n }
+
+\cs_new:Npn \__tbl_set_row_header_scope:n #1
+  { \clist_map_function:nN { #1 } \__tbl_set_td_header_scope:n }
+
+\cs_new:Npn \__tbl_set_td_header_scope:n #1
+  {
+    \int_compare:nNnT { #1 } > { 0 }
+      {
+        \prop_if_exist:cT { g__tag_struct_#1_prop }
+          {
+            \prop_get:cnNT { g__tag_struct_#1_prop } { C } \l__tbl_tmpa_tl
+              {
+                \tl_clear:N \l_tmpa_tl
+                \str_set:Ne \l__tbl_tmpa_str { \l__tbl_tmpa_tl }
+                \str_if_in:NnTF \l__tbl_tmpa_str { /TH-both }
+                  { \tl_set:Nn \l_tmpa_tl { Both } }
+                  {
+                    \str_if_in:NnTF \l__tbl_tmpa_str { /TH-row }
+                      { \tl_set:Nn \l_tmpa_tl { Row } }
+                      {
+                        \str_if_in:NnT \l__tbl_tmpa_str { /TH-col }
+                          { \tl_set:Nn \l_tmpa_tl { Column } }
+                      }
+                  }
+                \tl_if_empty:NF \l_tmpa_tl
+                  {
+                    \__tag_struct_prop_gput:nne { #1 } { A }
+                      { <</O/Table/Scope/\l_tmpa_tl>> }
+                  }
+              }
+          }
+      }
+  }
