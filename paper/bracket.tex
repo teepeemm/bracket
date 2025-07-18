@@ -16,7 +16,10 @@
 \usepackage{subcaption}
 \usepackage{comment}
 \usepackage{mathtools}
+\usepackage{unicode-math}
 \usepackage{hyperref}
+
+\usepackage{table-header-scope}
 
 % see https://github.com/latex3/tagging-project/issues/70
 \DeclareInstance{blockenv}{lstlisting}{display}
@@ -34,28 +37,26 @@
   level-increase = false,      % increment-level
 %  paraflattened  = true        % tagging-suppress-paras
 }
-\makeatletter\ExplSyntaxOn
+\makeatletter
+\ExplSyntaxOn
 \lst@UserCommand\lstrenewenvironment#1#2#{%
-    \cs_undefine:c{#1@}
-    \let\lst@arg\@empty
-    \lst@XConvert{#1}\@nil
-    \expandafter\lstnewenvironment@\lst@arg{#1}{#2}}
+  \cs_undefine:c{#1@}
+  \let\lst@arg\@empty
+  \lst@XConvert{#1}\@nil
+  \expandafter\lstnewenvironment@\lst@arg{#1}{#2}
+}
 \ExplSyntaxOff    
-  \lstrenewenvironment{lstlisting}[2][]{%
-     \MathCollectFalse 
-     \UseInstance{blockenv}{lstlisting} {}
-     \lst@TestEOLChar{#2}%
-     \lstset{#1}%
-     \csname\@lst @SetFirstNumber\endcsname%
-   }{%
-     \@nobreakfalse
-     \csname\@lst @SaveFirstNumber\endcsname%
-     \endblockenv
-   }  
-   
-% optional for real space chars 
-%\lstset{showspaces}
-%\def\lst@visiblespace{\lst@ttfamily{\char32}{\char32}}\makeatother
+\lstrenewenvironment{lstlisting}[2][]{%
+    \MathCollectFalse 
+    \UseInstance{blockenv}{lstlisting} {}
+    \lst@TestEOLChar{#2}%
+    \lstset{#1}%
+    \csname\@lst @SetFirstNumber\endcsname%
+  }{%
+    \@nobreakfalse
+    \csname\@lst @SaveFirstNumber\endcsname%
+    \endblockenv
+  }  
 \ExplSyntaxOff
 \makeatother   
 
@@ -83,8 +84,11 @@
 
 \pgfplotsset{compat=1.18}
 \tikzset{ dots/.style = {mark=*, draw=black, mark size=.5pt} }
-\usetikzlibrary{external}
-\tikzexternalize
+
+% to get valid PDF UA-1
+%\usetikzlibrary{external}
+%\tikzexternalize
+
 \addbibresource{bracket.bib}
 
 \title{Seeding Statistics of Elimination Tournaments}
@@ -118,10 +122,10 @@ We will develop and provide Python code to analyze how teams have performed over
 
 \section{NCAA Division I Basketball Tournament}
 The modern partition of NCAA men's basketball into three divisions began in 1974, with seeding beginning in 1978.  For the years since, each tournaments' outcomes are in the Wikipedia page ``[Year] NCAA Division I [men's\textbar women's] basketball tournament'' (the gender was added in 1982 when the NCAA began sponsoring the women's tournament).  We are able to use Pywikibot \cite{pywikibot} to automatically download these pages for further analysis (we will also cache these pages to reduce the network load).  While Wikipedia renders a tournament as in \autoref{fig:bracket},
-\begin{figure}
+\begin{figure*}
 \includegraphics[width=\linewidth,alt={The South regional bracket was played at the KFC Yum! Center in Louisville, KY. It consisted of 16 teams, with #5 San Diego State beating #6 Creighton to win the region.}]{2023bracket}
 \caption{\label{fig:bracket}Tournament bracket as seen in Wikipedia \cite{wikibracket}}
-\end{figure}
+\end{figure*}
 the source for this bracket is
 \begin{lstlisting}[basicstyle=\scriptsize,breaklines=true]
 ...
@@ -163,7 +167,7 @@ Each line begins with ``\texttt{| RD\#-[seed|team|score]\#\#}'', where the first
 %\end{tabular}
 %\end{table}
 In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team wins as a function of the seed differential, along with their 95\% confidence intervals (using the Wilson interval \cite{Brown}).
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:mD1_WL_prob}Men's. $\beta=\betaBbmD$}[.48\textwidth]{%
 \begin{tikzpicture}[alt={The top half of a logistic curve, with confidence intervals along the way.}]
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
@@ -183,7 +187,7 @@ In \autoref{fig:D1_WL_prob}, we plot the fraction of games that the favored team
 \end{tikzpicture}
 }
 \caption{\label{fig:D1_WL_prob}Seed differential versus fraction of games that a favored team wins in the NCAA Division I basketball tournament, with 95\% Wilson confidence intervals and the logistic best fit.  Identical seed differentials have been slightly spread to avoid overlap.}
-\end{figure}
+\end{figure*}
 
 We also plot the logistic best fits (determined using Python's Scikit \cite{scikit-learn}).  Letting $Y=1$ for victory, $Y=0$ for defeat, and $S$ denote the seed differential of a game, the average log-likelihood $\bar\ell$ is the expected value of $Y\ln p(S)+(1-Y)\ln(1-p(S))$.  The logistic function is the function of the form $p(x)=(1+\exp(-\beta x-\beta\mu))^{-1}$ that maximizes $\bar\ell$.  We find that $\beta=\betaBbmD$ for the men's tournament, and $\beta=\betaBbwD$ for the women's.
 Because a win for a given seed differential corresponds to a loss for that negated seed differential, the logistic curves are symmetric about $(0,0.5)$, so that $\mu=0$, and we only plot the curve for nonnegative seed differentials.  The confidence intervals do not inspire much confidence in this best fit, but we will be able to add more data as we proceed with our analysis.
@@ -247,7 +251,7 @@ overall & 75(5) & 85(5)\\
 
 In 2001, the men's tournament added a ``play-in'' game, where the last two teams to make the tournament played each other for the last spot.  The play-in game expanded to eight teams for four spots in 2011.  (The NCAA initially referred to this as the first round, but later branded this the ``First Four'' so that ``first round'' would still refer to the round with 64 teams.  We use the ``later'' terminology.)  We are interested in the question of how the play-in winners perform in their first round game: are they tired from having played earlier in the week, more experienced from having played a tournament game, or better than previously appreciated because we can now condition on them beating a supposedly equivalent opponent?  We are able to identify play-in games by looking for identically high seeded teams.  We then record how the winning team performs in their first round game, and summarize according to their seed in \autoref{tab:play_in_subsequent}.
 Each seed has 92 total games from 23 years and 4 games per seed per year.  Of those 92, the first row of the table counts games played with play-in winners of that seed, while the second row counts games with non-play-in winners.  The left column of each pair counts games where the favored team won, while the right column counts upsets.  The final row gives the significance that play-in winners are more likely to have an upset.  Given the high $p$ values, we are unable to substantiate this claim.  There is even less data for the women's tournament, which has only had 12 play-in games since they were added in 2022.
-\begin{table}
+\begin{table*}
 \centering%\small
 \caption{\label{tab:play_in_subsequent}Number of games won in first round in the men's tournament, by seed, where the worse seed was (not) the winner of a play-in game.  Also significance of the statement ``Play-in winners are more likely to have an upset in their first round.''}
 \tagpdfsetup{table/header-rows={1},table/header-columns={1}}
@@ -260,7 +264,7 @@ Non-play-in & 34 & 56 & 41 & 33 & 52 & 36 & 71 & 20 & 81 & 10 & 55 & 1 & 487 & 1
 $p$ & \multicolumn2c{0.86} & \multicolumn2c{0.44} & \multicolumn2c{0.88} & \multicolumn2c{0.23} & \multicolumn2c{1} & \multicolumn2c{0.63} & \multicolumn2c{0.91} %\multicolumn2c{0.93} & \multicolumn2c{1}
 \\\bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 Each year, the bracket's unveiling is met with inevitable second guessing that a team should be seeded differently.  Fans (and foes) of a particular team will often claim that team over (or under) performs in the tournament, or even that the team consistently receives (un)favorable bias from the selection committee.
 
@@ -269,7 +273,7 @@ We are able to examine these claims by recording how a team performs each year d
 Once team names have been normalized, we still have a problem of ambiguity.  We will convert ``USC'' to ``Southern California'' or ``South Carolina'', often by looking for which mascot appears elsewhere on the page (a conference is also helpful).  Similarly, ``Saint John's'' will become ``Saint John's New York'' or ``Saint John's Minnesota'' along with scores of other disambiguations.  (Even after normalization and disambiguation, we still needed to correct many misspellings and other typos within Wikipedia.  As a practical matter, we found it most useful to determine which state a team was from, and then examine why our code had trouble determining the state of a particular team.)
 
 Within our sample, UNC (now North Carolina) has played the most men's tournament games at 139, while (the University of) Tennessee has played the most women's tournament games at 165.  Plotting the seed differences of those games along with whether the game was a win (106 and 130 times) or a loss (33 and 35 times) along with the logistic regressions gives \autoref{fig:bbm_D1_team}.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_D1_UNC}North Carolina men. $\beta=0.194$}[.48\textwidth]{%
 \begin{tikzpicture}[alt={A logistic curve shifted slightly left, with mostly positive sample points.}]
 \begin{axis}[width=\linewidth,height=\linewidth,xmin=-16,xmax=16,ymin=0,ymax=1,axis y line=center,y axis line style=-,x axis line style=<->,xlabel={Seed differential},clip=false,xtick={-10,10},ticklabel style={font=\small},tickwidth=.3cm]
@@ -347,13 +351,13 @@ Within our sample, UNC (now North Carolina) has played the most men's tournament
 \end{tikzpicture}
 }
 \caption{\label{fig:bbm_D1_team}Wins and losses (with multiplicity) in the NCAA Division I basketball tournament, along with the logistic regression $(1+\exp(-\beta(x-\mu)))^{-1}$.}
-\end{figure}
+\end{figure*}
 
 The logistic function $(1+\exp(-\beta(x-\mu)))^{-1}$ for $\beta=0.194$ and $\mu=-2.60$ suggests that UNC performs about 2.60 seedings better than expected and that the log of their odds against an evenly seeded opponent is $-\beta\mu=0.504$, while $\beta=0.314$ and $\mu=-1.92$ suggests that Tennessee performs about 1.92 seedings better and has log odds of $0.603$.  The larger $\beta$ also indicates that Tennessee is less likely to experience an upset (for better and worse).
 
 Of the 316 (303) teams that have participated in the men's (women's) tournament, 135 (110) have at least 10 games in the tournament and at least 1 win.  Of these, only 7 men's (1 women's) teams have $\beta<0.01$, causing a large $\mu$.  Repeating the calculation of $\mu$ for the remaining 128 (109) teams and plotting the number of games along with the team's $\mu$ gives us \autoref{fig:bb_D1_game_v_mu}, while plotting the number of games along with the team's log odds gives us \autoref{fig:bb_D1_game_v_logit}.
 
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_D1_game_v_mu}Men's}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -373,9 +377,9 @@ Of the 316 (303) teams that have participated in the men's (women's) tournament,
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_D1_game_v_mu}(Logarithmic) number of games versus expected reseeding in each NCAA Division I basketball tournament.}
-\end{figure}
+\end{figure*}
 
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_D1_game_v_logit}Men's}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -395,7 +399,7 @@ Of the 316 (303) teams that have participated in the men's (women's) tournament,
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_D1_game_v_logit}(Logarithmic) number of games versus logarithm of odds against an evenly matched opponent in each NCAA Division I basketball tournament.}
-\end{figure}
+\end{figure*}
 
 We observe a slight negative trend of reseeding for the teams that have a large number of games (the right most four men's teams are perennial contenders Kentucky, Kansas, Duke, and North Carolina, while the right three women's teams are Stanford, Connecticut, and Tennessee).
 Such teams have a large amount of victories against lower ranking teams, so that the logistic best fit is pulled up and toward a negative $\mu$.  This also corresponds to a slight positive trend for the log odds.
@@ -405,7 +409,7 @@ Such teams have a large amount of victories against lower ranking teams, so that
 
 Having failed to identify any bias for or against a particular team, we consider the possibility that a \emph{group} of teams may experience some bias.  We repeat the calculation of $\mu$ (omitting $-\beta\mu$), now grouping teams by their state in \autoref{fig:bb_D1_game_v_mu_by_state} and (slightly inaccurately) grouping the states by timezone in \autoref{fig:bb_D1_game_v_mu_by_timezone}.
 For the timezone plot, note that we include Arizona (Mountain Standard Time) in Mountain (Daylight) Time because the majority of the collegiate basketball season occurs outside of Daylight Saving Time.  Also, we include Indiana in Eastern Time. % because Indiana and timezones are just confusing.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_D1_game_v_mu_by_state}Men's, omitting DE (0-7); HI (1-4); ND (2-5); SD (0-6); AK, ME, NH (all 0-0).}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -427,9 +431,9 @@ For the timezone plot, note that we include Arizona (Mountain Standard Time) in 
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_D1_game_v_mu_by_state}(Logarithmic) number of games versus expected reseeding in each NCAA Division I basketball tournament, grouped by state.}
-\end{figure}
+\end{figure*}
 %
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_D1_game_v_mu_by_timezone}Men's, omitting Alaska (0-0) and Hawaii (1-4).}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -453,7 +457,7 @@ For the timezone plot, note that we include Arizona (Mountain Standard Time) in 
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_D1_game_v_mu_by_timezone}(Logarithmic) number of games versus expected reseeding in each NCAA Division I basketball tournament, grouped by timezone.}
-\end{figure}
+\end{figure*}
 
 We now focus on our original example, that an 11 seed won games with seed differentials $-5$, $3$, $-9$, and $-7$.  For a game with seed differential $s$, we previously approximated the probability of the favored team winning by $p(s)=(1+\exp(-\beta s))^{-1}$, where $\beta=\betaBbmD$ for this tournament.  Treating these as four independent games would give a probability of $0.89\%$. We will instead argue that the upsets in rounds 1 and 3 indicate that the team should have been seeded better, making the victories in rounds 2--4 and then round 4 more likely.
 
@@ -494,7 +498,7 @@ overall        & -0.85 & -0.80 & -1.83 & -1.71 \\\bottomrule
 \section{College Basketball Tournaments}
 Wikipedia has brackets for many other basketball tournaments, most notably 32 (32) different conference tournaments [with occasional changing names] often determining a champion for an automatic bid to the men's (women's) national tournament.  There are also 7 (4) other tournaments with a national scope.  We again begin by plotting seed differential against fraction of games won by the favored team in \autoref{fig:bb_WL_prob},
 and then the number of games compared to how a team should be reseeded in \autoref{fig:bb_game_v_mu}.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_WL_prob}Men's. $\beta=0.205$}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Shallower logistic curve with overlaid confidence intervals.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
@@ -514,8 +518,8 @@ and then the number of games compared to how a team should be reseeded in \autor
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_WL_prob}Seed differential versus fraction of games that a favored team wins in collegiate basketball tournaments, with 95\% Wilson confidence intervals and the logistic best fit.}
-\end{figure}
-\begin{figure}
+\end{figure*}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_game_v_mu}Men's}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Crowded scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -535,11 +539,11 @@ and then the number of games compared to how a team should be reseeded in \autor
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_game_v_mu}(Logarithmic) number of games versus expected reseeding in basketball tournaments.}
-\end{figure}
+\end{figure*}
 
 We also summarize the likelihood of upsets by calculating $\beta$ for each tournament, and plot the results in \autoref{fig:bb_game_v_rate}.
 Note that national conferences generally have lower $\beta$ values, suggesting that upsets are more common.  Within a conference tournament, most teams have already played each other, and a team's record (which all conferences use for seeding) is a useful estimate of how good the team is.  In a national tournament, on the other hand, most teams have not played each other.  In this case, tournament organizers resort to (sometimes objective) arbitrary methods to determine seedings, but these methods are not as useful at estimating how good the teams are.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_game_v_rate}Men's}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \pgfplotstableread[col sep=comma]{data/bbm/group_betas.csv}\datatable
@@ -563,11 +567,11 @@ Note that national conferences generally have lower $\beta$ values, suggesting t
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_game_v_rate}(Logarithmic) number of games versus upset rate in basketball tournaments. National tournaments denoted with +.}
-\end{figure}
+\end{figure*}
 
 To examine one conference tournament slightly more in-depth, we plot in \autoref{fig:bb_sec_game_v_mu} the number of games versus the expected reseeding for the SEC, located at $(517,0.20)$ in \autoref{fig:bbm_game_v_rate} and $(253,0.29)$ in \autoref{fig:bbw_game_v_rate}.
 We again observe a negative reseeding bias for teams that have played the most games (Kentucky for the men and Tennessee for the women).  This bias cannot be blamed on non-existent selection committees.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_sec_game_v_mu}Men's}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -587,11 +591,11 @@ We again observe a negative reseeding bias for teams that have played the most g
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_sec_game_v_mu}(Logarithmic) number of games versus expected reseeding in SEC basketball tournaments.}
-\end{figure}
+\end{figure*}
 
 We would like to calculate conferences' expected reseeding to compare how conferences have performed in national tournaments over the years.  Unfortunately, the teams in a conference have shifted, so that we cannot make a simple list of which teams go to which conference.  Instead, for a particular year we will note which teams participated in which conference tournaments.  Then in national tournaments we will record how conferences performed against each other in \autoref{fig:bb_conf_game_v_mu}.
 This approach does have the drawback that if a conference did not have a tournament in a particular year, then we are not able to identify any teams as coming from that conference, so that we group them into an unknown conference.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:bbm_conf_game_v_mu}Men's}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \pgfplotstableread[col sep=comma]{data/bbm/conf_reseed.csv}\datatable
@@ -615,7 +619,7 @@ This approach does have the drawback that if a conference did not have a tournam
 \end{tikzpicture}
 }
 \caption{\label{fig:bb_conf_game_v_mu}(Logarithmic) number of games versus expected reseeding of conferences in national basketball tournaments.  Unknown conferences have been consolidated into +.}
-\end{figure}
+\end{figure*}
 
 %\section{College Tournaments}
 Wikipedia has many more tournaments to analyze.  We tabulate the collegiate tournaments in \autoref{tab:tourney_count}, and note that we also can perform our calculations on brackets from the MLB, NBA, NFL, NHL, and WNBA.
@@ -642,7 +646,7 @@ Total & 88 & 27 & 42 & 15 \\\bottomrule
 \begin{comment}
 We first analyze baseball and softball, plotting the seed differential versus fraction of games won in \autoref{fig:basesoft_WL_prob}
 and the number of games played versus the expected reseeding in \autoref{fig:basesoft_game_v_mu}.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:baseball_WL_prob}Baseball. $\beta=0.201$}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Logistic curve with overlaid confidence intervals.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
@@ -662,8 +666,8 @@ and the number of games played versus the expected reseeding in \autoref{fig:bas
 \end{tikzpicture}
 }
 \caption{\label{fig:basesoft_WL_prob}Seed differential versus fraction of games that a favored team wins in bat and ball tournaments, with 95\% Wilson confidence intervals and the logistic best fit.}
-\end{figure}
-\begin{figure}
+\end{figure*}
+\begin{figure*}
 \subcaptionbox{\label{fig:baseball_game_v_mu}Baseball}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -683,11 +687,11 @@ and the number of games played versus the expected reseeding in \autoref{fig:bas
 \end{tikzpicture}
 }
 \caption{\label{fig:basesoft_game_v_mu}(Logarithmic) number of games versus expected reseeding in bat and ball tournaments.}
-\end{figure}
+\end{figure*}
 
 Focusing on individual conferences, we calculate the upset rate $\beta$ for each tournament in \autoref{fig:basesoft_game_v_rate}
 and the performance of each conference within national tournaments in \autoref{fig:basesoft_conf_game_v_mu}.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:baseball_game_v_rate}Baseball}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \pgfplotstableread[col sep=comma]{../baseball/group_betas.csv}\datatable
@@ -711,8 +715,8 @@ and the performance of each conference within national tournaments in \autoref{f
 \end{tikzpicture}
 }
 \caption{\label{fig:basesoft_game_v_rate}(Logarithmic) number of games versus upset rate in bat and ball tournaments. National tournaments denoted with +.}
-\end{figure}
-\begin{figure}
+\end{figure*}
+\begin{figure*}
 \subcaptionbox{\label{fig:baseball_conf_game_v_mu}Baseball}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \pgfplotstableread[col sep=comma]{../baseball/conf_reseed.csv}\datatable
@@ -740,11 +744,11 @@ and the performance of each conference within national tournaments in \autoref{f
 \end{tikzpicture}
 }
 \caption{\label{fig:basesoft_conf_game_v_mu}(Logarithmic) number of games versus expected reseeding of conferences in national bat and ball tournaments.  Unknown conferences have been consolidated into +.}
-\end{figure}
+\end{figure*}
 
 We are also able to analyze soccer tournaments.  Unfortunately, of the 27 tournaments we identify in Wikipedia, only 5 are women's tournaments, leading us to combine the genders for our analysis.  As has been our habit, we first plot seed differential versus fraction of games won in \autoref{fig:soccer_WL_prob}.  We continue by examining number of games versus upset rate in \autoref{fig:soccer_game_v_rate}.
 In \autoref{fig:soccer_game_v_mu}, we plot how many games teams have played versus how they should be reseeded, individually and then grouped by conference.
-\begin{figure}
+\begin{figure*}
 \captionbox{\label{fig:soccer_WL_prob}Seed differential versus fraction of games that a favored team wins in soccer tournaments, with 95\% Wilson confidence intervals and the logistic best fit. $\beta=0.214$}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Logistic curve with overlaid confidence intervals.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=19.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-]
@@ -766,8 +770,8 @@ In \autoref{fig:soccer_game_v_mu}, we plot how many games teams have played vers
 \end{tikzpicture}
 }
 %\caption{\label{fig:soccer}Analysis of soccer tournaments.}
-\end{figure}
-\begin{figure}
+\end{figure*}
+\begin{figure*}
 \subcaptionbox{\label{fig:soccer_game_v_mu_indiv}All teams}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Scatter plot as described by the caption.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,axis y line=left,axis x line=center,y axis line style=<->,
@@ -791,14 +795,14 @@ In \autoref{fig:soccer_game_v_mu}, we plot how many games teams have played vers
 \end{tikzpicture}
 }
 \caption{\label{fig:soccer_game_v_mu}(Logarithmic) number of games versus expected reseeding in soccer tournaments.}
-\end{figure}
+\end{figure*}
 \end{comment}
 
 
 %\section{Professional Tournaments}
 
 We do however provide one final plot of seed differential versus fraction of games won in \autoref{fig:WL_prob}, using the entirety of our data.  In \autoref{fig:WL_prob_split}, we keep identical seed differentials separate, as our habit.  In \autoref{fig:WL_prob_unified}, we coalesce the seed differentials to provide a single confidence interval for each seed differential.
-\begin{figure}
+\begin{figure*}
 \subcaptionbox{\label{fig:WL_prob_split}Separated seed differentials.}[.48\textwidth]{%
 \begin{tikzpicture}[alt={Logistic curve with overlaid confidence intervals.}]
 \begin{axis}[width=\linewidth,height=.8\linewidth,xmin=0,xmax=15.1,ymin=0,ymax=1,xlabel={Seed differential},ylabel={Fraction won by favored},axis y line=left,y axis line style=-,ticklabel style={font=\small}]
@@ -818,7 +822,7 @@ We do however provide one final plot of seed differential versus fraction of gam
 \end{tikzpicture}
 }%
 \caption{\label{fig:WL_prob}Seed differential versus fraction of games that a favored team wins in their tournament, with 95\% Wilson confidence intervals and the logistic best fit ($\beta=0.208$).}
-\end{figure}
+\end{figure*}
 
 
 \section{Conclusions and Further Analysis}
