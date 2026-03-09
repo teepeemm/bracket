@@ -377,7 +377,6 @@ def get_game(description: SubgroupDesc, year: int | None,
                     del missing[f'{year}'][filename_pieces.group(1)]
                 else:
                     print(filename, 'does not exist')
-                    breakpoint()
             return
     if missing is not None and f'{year}' in missing and filename_pieces.group(1) in missing[f'{year}']:
         print(f'missing file {filename} found')
@@ -910,7 +909,7 @@ def analyze_tourney_group(group: str, tourney_group: dict[str, typing.Any]) -> N
                                  'nonconference' not in tourney_group or tourney in tourney_group['nonconference'])
     for year, tourneys in tourney_group['missing'].items():
         for tourney in tourneys.keys():
-            print(f'Tourney {tourney} in {year} should be missing')
+            print(f'Tourney {group}/{tourney} in {year} should be missing')
     write_win_loss(group, directories)
     write_reseeding_approx(group, directories)
     write_states(group, directories)
