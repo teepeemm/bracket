@@ -361,7 +361,7 @@ def get_game_from_wikipedia(content: str, flags: Flags) -> typing.Iterator[Game]
 
 
 def get_game(description: SubgroupDesc, year: int | None,
-             missing: dict[str, typing.Any] = None) -> typing.Iterator[Game]:
+             missing: dict[str, dict[str,str]]|None = None) -> typing.Iterator[Game]:
     """ :param description: Necessary details to locate the Wikipedia page.  Needs at least keys `directory` & `group`.
     :param year:
     :param missing:
@@ -760,14 +760,14 @@ def _update_reseeding_year(outcomes: collections.defaultdict[str, dict[str, list
             outcomes[groups[1]]['losses'].append(seed_diff)
 
 
-def analyze_tourney_subgroup(group: str, tourney: str, tourney_subgroup: dict[str, typing.Any],
-                             suffix: str, missing: dict[str, typing.Any], is_national: bool) -> None:
+def analyze_tourney_subgroup(group: str, tourney: str, tourney_group: dict[str, typing.Any]) -> None:
     """ :param group: The group containing this tournament.
     :param tourney: This tournament.
-    :param tourney_subgroup: The sub-dictionary of tourney_group that holds the variations
-    :param suffix: Taken from the tourney group
-    :param missing: missing tournaments
-    :param is_national: That the tournament has a national (non-conference) scope """
+    :param tourney_group: The dictionary of tournaments in this group """
+    tourney_subgroup = {k: v for k, v in tourney_group.items() if k.rstrip('_') == tourney}
+    suffix = tourney_group.get('suffix', '')
+    missing = tourney_group['missing']
+    is_national = 'nonconference' not in tourney_group or tourney in tourney_group['nonconference']
     directory = f'{group}/{tourney}'
     if os.path.isdir(directory):
         source_mtime = max((get_source_mtime(directory, get_years(description.get('years', None)))
@@ -863,7 +863,7 @@ def write_tourney_states(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str
 
 
 def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any],
-                           missing: dict[str, typing.Any] = None) -> None:
+                           missing: dict[str, dict[str,str]]|None = None) -> None:
     """ Creates a 2d array where (row,col) is the number of times row beat col and writes this to a csv. """
     win_loss_file: str = subgroup_desc.directory + '/winloss.csv'
     try:
@@ -903,10 +903,7 @@ def analyze_tourney_group(group: str, tourney_group: dict[str, typing.Any]) -> N
     directories = [k for k in tourney_group.keys()
                    if k not in ('comment', 'suffix', 'nonconference', 'missing') and not k.endswith('_')]
     for tourney in directories:
-        tourney_subgroup = {k: v for k, v in tourney_group.items() if k.rstrip('_') == tourney}
-        analyze_tourney_subgroup(group, tourney, tourney_subgroup, tourney_group.get('suffix', ''),
-                                 tourney_group['missing'],
-                                 'nonconference' not in tourney_group or tourney in tourney_group['nonconference'])
+        analyze_tourney_subgroup(group, tourney, tourney_group)
     for year, tourneys in tourney_group['missing'].items():
         for tourney in tourneys.keys():
             print(f'Tourney {group}/{tourney} in {year} should be missing')

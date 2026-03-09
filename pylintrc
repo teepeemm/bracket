@@ -10,3 +10,6 @@ max-returns=7
 # Maximum number of characters on a single line.
 # default was 100, but PyCharm allows 120
 max-line-length=120
+
+# Default was 1000, but analyze has 1010
+max-module-lines = 1100

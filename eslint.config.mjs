@@ -58,6 +58,7 @@ export default [
             "jsdoc/no-bad-blocks": "warn",
             "jsdoc/no-blank-block-descriptions": "warn",
             "jsdoc/no-defaults": "warn",
+            "jsdoc/reject-function-type": "off",
             "jsdoc/require-asterisk-prefix": "error",
             "jsdoc/require-file-overview": "error",
             "jsdoc/require-hyphen-before-param-description": "warn",
