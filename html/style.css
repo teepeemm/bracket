@@ -33,3 +33,7 @@ svg, label {
 img[alt="Modern Campus CMS"] {
     display: none;
 }
+
+.journal {
+    font-style: italic;
+}
