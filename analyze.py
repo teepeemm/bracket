@@ -360,15 +360,28 @@ def get_game_from_wikipedia(content: str, flags: Flags) -> typing.Iterator[Game]
                     yield from TeamResult.game_from_match(match_info, flags, disambiguator)
 
 
-def get_game(description: SubgroupDesc, year: int | None) -> typing.Iterator[Game]:
+def get_game(description: SubgroupDesc, year: int | None,
+             missing: dict[str, typing.Any] = None) -> typing.Iterator[Game]:
     """ :param description: Necessary details to locate the Wikipedia page.  Needs at least keys `directory` & `group`.
     :param year:
+    :param missing:
     :return: Individual games from Wikipedia according to the description """
     filename = f'{description.directory.rstrip("_")}/{year}.txt'
+    filename_pieces = re.fullmatch(f'{description.group}/([^/]+)/{year}.txt', filename)
+    assert filename_pieces
     if not os.path.isfile(filename) or os.path.getmtime(filename) + SECONDS_PER_YEAR < time.time():
         potential_titles = get_potential_titles(description, year, description.tourney == 'NFL_')
         if not create_wiki_cache(filename, potential_titles):
+            if missing is not None:
+                if f'{year}' in missing and filename_pieces.group(1) in missing[f'{year}']:
+                    del missing[f'{year}'][filename_pieces.group(1)]
+                else:
+                    print(filename, 'does not exist')
+                    breakpoint()
             return
+    if missing is not None and f'{year}' in missing and filename_pieces.group(1) in missing[f'{year}']:
+        print(f'missing file {filename} found')
+        del missing[f'{year}'][filename_pieces.group(1)]
     flags = Flags(
         multi_elim=description.multi_elim,
         is_tennis=description.directory == 'other/Tennis',
@@ -436,7 +449,6 @@ def create_wiki_cache(filename: str, potential_titles: list[str]) -> bool:
     :param potential_titles: The potential sites in Wikipedia, used for tail recursion.
     :return: Whether the site was found """
     if not potential_titles:
-        print(filename, 'does not exist')
         return False
     potential_title = potential_titles.pop(0)
     site = pywikibot.Site('en', 'wikipedia')
@@ -610,7 +622,7 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any], grouper: typing.Cal
                                              get_years(description.get('years', None)))
                             for group, tourney_group in tourneys.items()
                             for tourney, description in tourney_group.items()
-                            if tourney not in ('suffix', 'comment', 'nonconference')))
+                            if tourney not in ('suffix', 'comment', 'nonconference', 'missing')))
         if source_mtime < os.path.getmtime(f'{label}reseed.csv'):
             return
     except FileNotFoundError:
@@ -621,7 +633,7 @@ def write_overall_reseeding(tourneys: dict[str, typing.Any], grouper: typing.Cal
         if group == 'professional':
             continue
         for tourney, description_dict in tourney_group.items():
-            if tourney in ('suffix', 'comment', 'nonconference'):
+            if tourney in ('suffix', 'comment', 'nonconference', 'missing'):
                 continue
             description = SubgroupDesc(**description_dict)._replace(
                 group=group, tourney=tourney, directory=f'{group}/{tourney.rstrip("_")}',
@@ -653,7 +665,7 @@ def write_group_reseeding(group: str, tourney_group: dict[str, typing.Any],
         source_mtime = max((get_source_mtime(f'{group}/{tourney.rstrip("_")}',
                                              get_years(description.get('years', None)))
                             for tourney, description in tourney_group.items()
-                            if tourney not in ('suffix', 'comment', 'nonconference')))
+                            if tourney not in ('suffix', 'comment', 'nonconference', 'missing')))
         if source_mtime < os.path.getmtime(f'{group}/{label}reseed.csv'):
             return
     except FileNotFoundError:
@@ -661,7 +673,7 @@ def write_group_reseeding(group: str, tourney_group: dict[str, typing.Any],
     outcomes: collections.defaultdict[str, dict[str, list[int]]] = collections.defaultdict(
         lambda: {'wins': [], 'losses': []})
     for tourney, description_dict in tourney_group.items():
-        if tourney in ('suffix', 'comment', 'nonconference'):
+        if tourney in ('suffix', 'comment', 'nonconference', 'missing'):
             continue
         description = SubgroupDesc(**description_dict)._replace(
             group=group, tourney=tourney, directory=f'{group}/{tourney.rstrip("_")}',
@@ -703,7 +715,7 @@ def write_conf_reseeding(group: str, tourney_group: dict[str, typing.Any]) -> No
             confs[tourney.rstrip('_')] |= {t.team for game in get_game(subgroup_desc, year) for t in game}
         # now look through the nonconference tournaments
         for tourney, description_dict in tourney_group.items():
-            if tourney in ('comment', 'nonconference', 'suffix'):
+            if tourney in ('comment', 'nonconference', 'suffix', 'missing'):
                 continue
             description = SubgroupDesc(**description_dict)._replace(
                 group=group, directory=f'{group}/{tourney}'.rstrip('_'), is_national=True)
@@ -750,11 +762,12 @@ def _update_reseeding_year(outcomes: collections.defaultdict[str, dict[str, list
 
 
 def analyze_tourney_subgroup(group: str, tourney: str, tourney_subgroup: dict[str, typing.Any],
-                             suffix: str, is_national: bool) -> None:
+                             suffix: str, missing: dict[str, typing.Any], is_national: bool) -> None:
     """ :param group: The group containing this tournament.
     :param tourney: This tournament.
     :param tourney_subgroup: The sub-dictionary of tourney_group that holds the variations
     :param suffix: Taken from the tourney group
+    :param missing: missing tournaments
     :param is_national: That the tournament has a national (non-conference) scope """
     directory = f'{group}/{tourney}'
     if os.path.isdir(directory):
@@ -771,7 +784,7 @@ def analyze_tourney_subgroup(group: str, tourney: str, tourney_subgroup: dict[st
         source_mtime=source_mtime,
         is_national=is_national
     )
-    write_tourney_win_loss(subgroup_desc, tourney_subgroup)
+    write_tourney_win_loss(subgroup_desc, tourney_subgroup, missing)
     write_tourney_reseeding(subgroup_desc, tourney_subgroup)
     write_tourney_reseeding(subgroup_desc, tourney_subgroup,
                             functools.partial(university.get_state, group=group), 'state_')
@@ -850,7 +863,8 @@ def write_tourney_states(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str
                      index=states.keys()).rename_axis(index='Team').sort_index(axis='index').to_csv(state_file)
 
 
-def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any]) -> None:
+def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[str, typing.Any],
+                           missing: dict[str, typing.Any] = None) -> None:
     """ Creates a 2d array where (row,col) is the number of times row beat col and writes this to a csv. """
     win_loss_file: str = subgroup_desc.directory + '/winloss.csv'
     try:
@@ -862,7 +876,7 @@ def write_tourney_win_loss(subgroup_desc: SubgroupDesc, tourney_subgroup: dict[s
     for description_dict in tourney_subgroup.values():
         description = subgroup_desc._replace(**description_dict)
         for year in get_years(description.years):
-            for game in get_game(description, year):
+            for game in get_game(description, year, missing):
                 tourney_winner[game[0].seed, game[1].seed] += 1
     numpy.savetxt(win_loss_file, tourney_winner, delimiter=',', fmt='%d')  # type: ignore
     numpy.savetxt('html/'+'_'.join(win_loss_file.rsplit('/', 1)),
@@ -876,7 +890,7 @@ def get_tourneys_of_year(tourney_group: dict[str, typing.Any]) -> dict[int, list
     tourneys_of_year: dict[int, list[str]] = collections.defaultdict(list)
     # start by finding which years have a tournament we should look at
     for tourney, description in tourney_group.items():
-        if tourney in ('suffix', 'nonconference', 'comment'):
+        if tourney in ('suffix', 'nonconference', 'comment', 'missing'):
             continue
         for year in get_years(description.get('years', None)):  # NFL does not get to analyze_confs
             if year:
@@ -888,11 +902,15 @@ def analyze_tourney_group(group: str, tourney_group: dict[str, typing.Any]) -> N
     """ :param group: The key within the json file, identifying the group
     :param tourney_group: The value, listing the various tournaments of that group """
     directories = [k for k in tourney_group.keys()
-                   if k not in ('comment', 'suffix', 'nonconference') and not k.endswith('_')]
+                   if k not in ('comment', 'suffix', 'nonconference', 'missing') and not k.endswith('_')]
     for tourney in directories:
         tourney_subgroup = {k: v for k, v in tourney_group.items() if k.rstrip('_') == tourney}
         analyze_tourney_subgroup(group, tourney, tourney_subgroup, tourney_group.get('suffix', ''),
+                                 tourney_group['missing'],
                                  'nonconference' not in tourney_group or tourney in tourney_group['nonconference'])
+    for year, tourneys in tourney_group['missing'].items():
+        for tourney in tourneys.keys():
+            print(f'Tourney {tourney} in {year} should be missing')
     write_win_loss(group, directories)
     write_reseeding_approx(group, directories)
     write_states(group, directories)
