@@ -10,7 +10,7 @@ If you're not as programmatically inclined,
 you can use a 
 [GUI with JavaScript](https://sites.und.edu/timothy.prescott/bracket/)
 
-We examine 60k games between ranked teams in tournaments to see
+I examined 60k games between ranked teams in 5k tournaments to see
 if there is a bias for or against a particular team, state, or conference.
 (We do not find any such bias.)
 
