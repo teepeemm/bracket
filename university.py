@@ -30,7 +30,7 @@ class Flags(typing.NamedTuple):
     is_national: bool = False
 
 
-_team_name_from = collections.defaultdict(set)
+_team_name_from: collections.defaultdict[str, set[str]] = collections.defaultdict(set)
 """ Observed team names that become a particular team name. Used by `check_team_name_starts`. """
 
 timezones: dict[str, tuple[str, ...]] = {
