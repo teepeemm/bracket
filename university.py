@@ -17,7 +17,7 @@ import re
 import typing
 
 __author__ = 'Timothy Prescott'
-__version__ = '2024-06-24'
+__version__ = '2026-06-10'
 
 
 class Flags(typing.NamedTuple):
